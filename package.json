@@ -1,7 +1,7 @@
 {
-  "name": "webpack-library-starter",
-  "version": "1.0.2",
-  "description": "Produce universal library with webpack and es6",
+  "name": "fast-download",
+  "version": "0.0.1",
+  "description": "Library to trigger downloads for browsers and cordova",
   "main": "lib/library.js",
   "scripts": {
     "build": "webpack --env dev && webpack --env build && npm run test",
@@ -41,5 +41,8 @@
     "mocha": "^4.0.1",
     "webpack": "^3.10.0",
     "yargs": "^10.0.3"
+  },
+  "dependencies": {
+    "bluebird": "^3.5.1"
   }
 }

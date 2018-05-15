@@ -16,13 +16,14 @@
     "before": true,
     "it": true,
     "expect": true,
-    "sinon": true
+    "sinon": true,
+    "cordova": true
   },
 
   "parser": "babel-eslint",
 
   "plugins": [
-    
+
   ],
 
   "rules": {
