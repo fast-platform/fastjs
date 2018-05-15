@@ -1,8 +1,8 @@
 {
   "name": "fast-downloads",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Library to trigger downloads for browsers and cordova",
-  "main": "lib/library.js",
+  "main": "lib/fast-downloads.min.js",
   "scripts": {
     "build": "webpack --env dev && webpack --env build && npm run test",
     "dev": "webpack --progress --colors --watch --env dev",
