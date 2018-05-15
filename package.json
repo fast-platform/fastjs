@@ -1,6 +1,6 @@
 {
-  "name": "fast-download",
-  "version": "0.0.1",
+  "name": "fast-downloads",
+  "version": "0.0.2",
   "description": "Library to trigger downloads for browsers and cordova",
   "main": "lib/library.js",
   "scripts": {
@@ -11,23 +11,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/krasimir/webpack-library-starter.git"
+    "url": "https://github.com/UN-FAO/fast-download"
   },
-  "keywords": [
-    "webpack",
-    "es6",
-    "starter",
-    "library",
-    "universal",
-    "umd",
-    "commonjs"
-  ],
+  "keywords": ["webpack", "es6", "starter", "library", "universal", "umd", "commonjs"],
   "author": "Krasimir Tsonev",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/krasimir/webpack-library-starter/issues"
+    "url": "https://github.com/UN-FAO/fast-download/issues"
   },
-  "homepage": "https://github.com/krasimir/webpack-library-starter",
+  "homepage": "https://github.com/UN-FAO/fast-download",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
