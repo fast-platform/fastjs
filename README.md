@@ -1,7 +1,5 @@
 # FAST - Download
 
-![npm (tag)](https://img.shields.io/npm/v/fast-downloads.svg)
-
 A small library to trigger File downloads that work on Browser and Cordova
 
 ### Installing
