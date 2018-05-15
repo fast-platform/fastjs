@@ -8,7 +8,8 @@ const pkg = require('./package.json');
 
 let libraryName = pkg.name;
 
-let plugins = [], outputFile;
+let plugins = [],
+  outputFile;
 
 if (env === 'build') {
   plugins.push(new UglifyJsPlugin({ minimize: true }));
@@ -18,7 +19,7 @@ if (env === 'build') {
 }
 
 const config = {
-  entry: __dirname + '/src/index.js',
+  entry: ['babel-polyfill', __dirname + '/src/index.js'],
   devtool: 'source-map',
   output: {
     path: __dirname + '/lib',
