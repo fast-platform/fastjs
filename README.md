@@ -1,7 +1,7 @@
 # FAST - Download
 
-![GitHub package version](https://img.shields.io/github/package-json/v/airarrazaval/formio-export.svg)
-![npm (tag)](https://img.shields.io/npm/v/formio-export/latest.svg)
+![npm downloads](ttps://img.shields.io/npm/dt/fast-downloads.svg)
+![npm (tag)](https://img.shields.io/npm/v/fast-downloads.svg)
 
 This library is a plain JavaScript export tool for Form.io componets. This allows to export any Form.io component (with or without submission data) to PDF (other formats comming soon).
 

@@ -13,7 +13,7 @@
     "type": "git",
     "url": "https://github.com/UN-FAO/fast-download"
   },
-  "keywords": ["webpack", "es6", "starter", "library", "universal", "umd", "commonjs"],
+  "keywords": ["file download", "download", "cordova", "browser", "browser download"],
   "author": "Ignacio Cabrera",
   "license": "MIT",
   "bugs": {
