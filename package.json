@@ -1,6 +1,6 @@
 {
   "name": "fast-downloads",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Library to trigger downloads for browsers and cordova",
   "main": "lib/fast-downloads.min.js",
   "scripts": {

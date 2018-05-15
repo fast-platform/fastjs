@@ -1,2 +1,2 @@
-import Download from './download.js';
+import Download from './Download.js';
 export { Download };
