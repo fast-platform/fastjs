@@ -14,7 +14,7 @@
     "url": "https://github.com/UN-FAO/fast-download"
   },
   "keywords": ["webpack", "es6", "starter", "library", "universal", "umd", "commonjs"],
-  "author": "Krasimir Tsonev",
+  "author": "Ignacio Cabrera",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/UN-FAO/fast-download/issues"
