@@ -1,6 +1,6 @@
 # FAST - Download
 
-A small library to trigger File downloads that work on Browser and Cordova
+A small library to trigger File downloads that works on Browser and Cordova
 
 ### Installing
 
