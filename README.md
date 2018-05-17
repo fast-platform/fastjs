@@ -1,6 +1,30 @@
 # FAST - Submission2CSV
 
-A library to generate a flat CSV file from an array of Form.io submissions
+A library to generate a flat CSV file from an array of Form.io submissions.
+This library is design for those complex Form.io forms with nested objects and arrays
+that will simply not translate into a single CSV row.
+
+Submission2CSV will flatten your submissions and give you the right CSV every time!
+
+```
+let sub = [{
+      name: 'John'
+      complex : [
+        {a:1, b:2},
+        {a:3, b:4}
+      ]
+  },{
+      name: 'Pedro'
+      complex : [
+        {a:5, b:6},
+        {a:7, b:8}
+      ]
+  }]
+
+  // Resulting CSV ==> name;complex.0.a;complex.0.b;complex.1.a;complex.1.b\r\nJohn;1;2;3;4\r\Pedro;5;6;7;8
+```
+
+This means that 1 submission will always be 1 CSV row
 
 ### Installing
 
