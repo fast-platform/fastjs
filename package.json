@@ -1,8 +1,8 @@
 {
-  "name": "fast-downloads",
-  "version": "0.0.9",
-  "description": "Library to trigger downloads for browsers and cordova",
-  "main": "lib/fast-downloads.js",
+  "name": "fast-submission2csv",
+  "version": "0.0.1",
+  "description": "Generates a flat CSV file from an array of Form.io submissions",
+  "main": "lib/fast-submission2csv.js",
   "scripts": {
     "build": "webpack --env dev && webpack --env build && npm run test",
     "dev": "webpack --progress --colors --watch --env dev",
@@ -11,15 +11,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/UN-FAO/fast-download"
+    "url": "https://github.com/UN-FAO/fast-submission2csv"
   },
-  "keywords": ["file download", "download", "cordova", "browser", "browser download"],
+  "keywords": ["form.io", "excel", "cordova", "browser", "browser excel"],
   "author": "Ignacio Cabrera",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/UN-FAO/fast-download/issues"
+    "url": "https://github.com/UN-FAO/fast-submission2csv/issues"
   },
-  "homepage": "https://github.com/UN-FAO/fast-download",
+  "homepage": "https://github.com/UN-FAO/fast-submission2csv",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
@@ -38,6 +38,13 @@
     "yargs": "^10.0.3"
   },
   "dependencies": {
-    "bluebird": "^3.5.1"
+    "bluebird": "^3.5.1",
+    "fast-downloads": "0.0.8",
+    "flat": "^4.0.0",
+    "formiojs": "^2.32.2",
+    "i18next": "^11.3.2",
+    "jsonexport": "^2.1.0",
+    "lodash": "^4.17.10",
+    "papaparse": "^4.4.0"
   }
 }
