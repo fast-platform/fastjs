@@ -12,7 +12,7 @@ npm install --save fast-submission2csv
 
 # Usage
 
-Using the Downloader with promises
+Using the Exporter with promises
 
 ```javascript
 import Exporter from 'fast-submission2csv';
@@ -24,7 +24,7 @@ file = Exporter.csv({ output, data, formioForm, translations, language }).then(
 );
 ```
 
-Using the Downloader with Await
+Using the Exporter with Await
 
 ```javascript
 import Exporter from 'fast-submission2csv';
