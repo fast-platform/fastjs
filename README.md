@@ -94,7 +94,7 @@ import Exporter from 'fast-submission2csv';
    //  name: 'backup_with_date',
 ```
 
-Full Example
+Full Example [(Play with it!)](https://stackblitz.com/edit/fast-submission2csv)
 
 ```javascript
 import Exporter from 'fast-submission2csv';
