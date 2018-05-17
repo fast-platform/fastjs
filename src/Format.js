@@ -75,7 +75,7 @@ let Format = (() => {
     }, []);
 
     labels.push({
-      apiKey: 'owner_email',
+      apiKey: 'ownerEmail',
       label: i.t('Owner Email')
     });
 

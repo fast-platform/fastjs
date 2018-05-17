@@ -7,6 +7,7 @@ that will simply not translate into a single CSV row.
 Submission2CSV will flatten your submissions and give you the right CSV every time!
 
 ```
+// You can pass the data object of the submission
 let sub = [{
       name: 'John'
       complex : [
@@ -21,6 +22,56 @@ let sub = [{
       ]
   }]
 
+// Or the full array of Form.io submissions
+
+let sub = [
+  {
+    "owner": "5a3981489768470001cce4ef",
+    "deleted": null,
+    "roles": [],
+    "_vid": 0,
+    "_fvid": 0,
+    "state": "submitted",
+    "access": [],
+    "externalIds": [],
+    "externalTokens": [],
+    "created": "2018-05-17T17:27:10.485Z",
+    "_id": "5afdbb6e3d986958e233f56a",
+    "data": {
+      name: 'John'
+      complex : [
+        {a:1, b:2},
+        {a:3, b:4}
+      ]
+  },
+    "form": "5afd5bd8b2e21c9fc7286a70",
+    "modified": "2018-05-17T17:27:10.486Z",
+    "__v": 0
+  },
+  {
+    "owner": "5a3981489768470001cce4ef",
+    "deleted": null,
+    "roles": [],
+    "_vid": 0,
+    "_fvid": 0,
+    "state": "submitted",
+    "access": [],
+    "externalIds": [],
+    "externalTokens": [],
+    "created": "2018-05-17T17:27:17.272Z",
+    "_id": "5afdbb753d9869c37e33f56b",
+    "data": {
+      name: 'Pedro'
+      complex : [
+        {a:5, b:6},
+        {a:7, b:8}
+      ]
+  },
+    "form": "5afd5bd8b2e21c9fc7286a70",
+    "modified": "2018-05-17T17:27:17.273Z",
+    "__v": 0
+  }
+]
   // Resulting CSV ==> name;complex.0.a;complex.0.b;complex.1.a;complex.1.b\r\nJohn;1;2;3;4\r\Pedro;5;6;7;8
 ```
 

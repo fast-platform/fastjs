@@ -2,7 +2,7 @@ import 'babel-polyfill';
 import chai from 'chai';
 import Exporter from '../src/Exporter.js';
 import formioForm from './testForm.json';
-
+import formioData from './formioData.json';
 chai.expect();
 
 const expect = chai.expect;
@@ -34,6 +34,29 @@ describe('Given a Form.io form, submissions and translations', () => {
     let language = 'en';
 
     file = await Exporter.csv({ output, data, formioForm, translations, language });
+  });
+
+  describe('When I parse the JSON data array', () => {
+    it('should get the parsed CSV back', () => {
+      expect(file.csv).to.be.equal('Name;Age\r\nname;age\r\nJuan;20\r\nPedro;32');
+    });
+  });
+
+  describe('When I parse the JSON data array in different Language', () => {
+    it('should get the parsed CSV back in that language', async () => {
+      let language = 'de';
+
+      file = await Exporter.csv({ output, data, formioForm, translations, language });
+      expect(file.csv).to.be.equal('Name;Alter\r\nname;age\r\nJuan;20\r\nPedro;32');
+    });
+  });
+});
+
+describe('Given a Form.io form, Form.io formatted submissions and translations', () => {
+  before(async () => {
+    let language = 'en';
+
+    file = await Exporter.csv({ output, data: formioData, formioForm, translations, language });
   });
 
   describe('When I parse the JSON data array', () => {
