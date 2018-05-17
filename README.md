@@ -48,6 +48,31 @@ import Exporter from 'fast-submission2csv';
           language          // {String} 'en' language to export the labels
       }
     );
+   //  output ==> {
+   //  csv : 'Some;Formatted;CSV'
+   //  name: 'backup_with_date',
+```
+
+Short Example + Download
+
+```javascript
+import Exporter from 'fast-submission2csv';
+import Download from 'fast-downloads';
+
+  let output = await  Exporter.csv({
+          output,           // {String} 'csv' [will add more options]
+          data,             // {Array} Form.io submissions
+          formioForm,       // {Object} Form.io form
+          translations,     // {Object} i18next formatted resource
+          language          // {String} 'en' language to export the labels
+      }
+    );
+
+  let download = await Download.file({
+            content: output.csv,
+            fileName: output.name + '.csv' ,
+            mimeType: 'text/csv;encoding:utf-8'
+          });
 ```
 
 Expected Output
