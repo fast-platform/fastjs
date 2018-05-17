@@ -1,4 +1,4 @@
-# FAST - Download
+# FAST - Submission2CSV
 
 A library to generate a flat CSV file from an array of Form.io submissions
 
