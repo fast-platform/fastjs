@@ -67,7 +67,7 @@ import Exporter from 'fast-submission2csv';
    //  output ==> {
    //  csv : 'Some;Formatted;CSV'
    //  name: 'backup_with_date',
-   // }
+   }
 ```
 
 Full Example
