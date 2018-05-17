@@ -1,6 +1,6 @@
 {
   "name": "fast-submission2csv",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Generates a flat CSV file from an array of Form.io submissions",
   "main": "lib/fast-submission2csv.js",
   "scripts": {
