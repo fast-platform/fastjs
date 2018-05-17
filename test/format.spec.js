@@ -40,7 +40,7 @@ describe('Given a Form.io form, submissions and translations', () => {
 
     it('should format the Labels and API keys', () => {
       expect(JSON.stringify(formattedData.labels)).to.be.equal(
-        '[{"apiKey":"name","label":"Name"},{"apiKey":"age","label":"Age"},{"apiKey":"submit","label":"Submit"},{"apiKey":"owner_email","label":"Owner Email"}]'
+        '[{"apiKey":"name","label":"Name"},{"apiKey":"age","label":"Age"},{"apiKey":"submit","label":"Submit"},{"apiKey":"ownerEmail","label":"Owner Email"}]'
       );
     });
 
@@ -55,7 +55,7 @@ describe('Given a Form.io form, submissions and translations', () => {
 
     it('should format the Labels on that specific language', () => {
       expect(JSON.stringify(formattedData.labels)).to.be.equal(
-        '[{"apiKey":"name","label":"Name"},{"apiKey":"age","label":"Alter"},{"apiKey":"submit","label":"Einreichen"},{"apiKey":"owner_email","label":"Besitzer E-Mail"}]'
+        '[{"apiKey":"name","label":"Name"},{"apiKey":"age","label":"Alter"},{"apiKey":"submit","label":"Einreichen"},{"apiKey":"ownerEmail","label":"Besitzer E-Mail"}]'
       );
     });
   });

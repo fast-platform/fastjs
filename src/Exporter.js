@@ -40,8 +40,9 @@ let Export = (() => {
    * @param {Object} translations
    */
   async function csv({ output, options, data, formioForm, translations, language }) {
-    console.log('data', data);
+    console.log('preData', data);
     data = preFormatData(data);
+    console.log('posData', data);
     let formattedData = Format.submission({
       output,
       data,

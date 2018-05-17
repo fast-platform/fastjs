@@ -5,6 +5,6 @@
     { "apiKey": "name", "label": "Name" },
     { "apiKey": "age", "label": "Age" },
     { "apiKey": "submit", "label": "Submit" },
-    { "apiKey": "owner_email", "label": "Owner Email" }
+    { "apiKey": "ownerEmail", "label": "Owner Email" }
   ]
 }
