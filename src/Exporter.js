@@ -1,5 +1,6 @@
 import Format from './Format';
 import Csv from './Csv';
+
 let Export = (() => {
   function preFormatData(submissions) {
     submissions = submissions.map((o) => {
@@ -40,9 +41,8 @@ let Export = (() => {
    * @param {Object} translations
    */
   async function csv({ output, options, data, formioForm, translations, language }) {
-    console.log('preData', data);
     data = preFormatData(data);
-    console.log('posData', data);
+
     let formattedData = Format.submission({
       output,
       data,
@@ -51,7 +51,15 @@ let Export = (() => {
       language
     });
 
-    let file = await Csv.get({ json: formattedData });
+    let args = {};
+
+    args.json = formattedData;
+
+    if (options && options.rawArray) {
+      args.rawArray = true;
+    }
+
+    let file = await Csv.get(args);
 
     return file;
   }
