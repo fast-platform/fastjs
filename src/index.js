@@ -1,3 +1,3 @@
-import FormioExport from './formio-export';
-export { FormioExport };
-export default FormioExport;
+import Exporter from './Exporter.js';
+export { Exporter };
+export default Exporter;

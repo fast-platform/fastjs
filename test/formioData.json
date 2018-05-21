@@ -1,0 +1,36 @@
+[
+  {
+    "owner": "5a3981489768470001cce4ef",
+    "deleted": null,
+    "roles": [],
+    "_vid": 0,
+    "_fvid": 0,
+    "state": "submitted",
+    "access": [],
+    "externalIds": [],
+    "externalTokens": [],
+    "created": "2018-05-17T17:27:10.485Z",
+    "_id": "5afdbb6e3d986958e233f56a",
+    "data": { "name": "Juan", "age": 20, "submit": true },
+    "form": "5afd5bd8b2e21c9fc7286a70",
+    "modified": "2018-05-17T17:27:10.486Z",
+    "__v": 0
+  },
+  {
+    "owner": "5a3981489768470001cce4ef",
+    "deleted": null,
+    "roles": [],
+    "_vid": 0,
+    "_fvid": 0,
+    "state": "submitted",
+    "access": [],
+    "externalIds": [],
+    "externalTokens": [],
+    "created": "2018-05-17T17:27:17.272Z",
+    "_id": "5afdbb753d9869c37e33f56b",
+    "data": { "name": "Pedro", "age": 32, "submit": true },
+    "form": "5afd5bd8b2e21c9fc7286a70",
+    "modified": "2018-05-17T17:27:17.273Z",
+    "__v": 0
+  }
+]

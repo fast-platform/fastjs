@@ -1,0 +1,10 @@
+{
+  "date": "2018_05_17_12_02_45",
+  "data": [{ "name": "Juan", "age": 20 }, { "name": "Pedro", "age": 32 }],
+  "labels": [
+    { "apiKey": "name", "label": "Name" },
+    { "apiKey": "age", "label": "Age" },
+    { "apiKey": "submit", "label": "Submit" },
+    { "apiKey": "ownerEmail", "label": "Owner Email" }
+  ]
+}
