@@ -5,7 +5,7 @@ let i18n = (() => {
    *
    * @param {Object} translations
    */
-  function init(translations) {
+  function init (translations) {
     return i18next.init(
       {
         lng: 'en',

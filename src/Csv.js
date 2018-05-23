@@ -1,5 +1,6 @@
 import Papa from 'papaparse';
-import jsonexport from 'jsonexport';
+
+import jsonexport from 'jsonexport/dist';
 import Promise from 'bluebird';
 import _zip from 'lodash/zip';
 import _unzip from 'lodash/unzip';
@@ -9,7 +10,7 @@ let CSV = (() => {
    *
    * @param {Object} translations
    */
-  function toCsv(json) {
+  function toCsv (json) {
     return new Promise((resolve, reject) => {
       jsonexport(json, function (err, csv) {
         if (err) reject(err);
@@ -18,7 +19,7 @@ let CSV = (() => {
     });
   }
 
-  async function get({ json, rawArray }) {
+  async function get ({ json, rawArray }) {
     return new Promise(async (resolve, reject) => {
       let csv = await toCsv(json.data);
       let labelsRow = [];

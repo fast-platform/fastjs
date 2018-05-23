@@ -2,7 +2,7 @@ import Format from './Format';
 import Csv from './Csv';
 
 let Export = (() => {
-  function preFormatData(submissions) {
+  function preFormatData (submissions) {
     submissions = submissions.map((o) => {
       if (!o.data) {
         return o;
@@ -40,7 +40,7 @@ let Export = (() => {
    *
    * @param {Object} translations
    */
-  async function csv({ output, options, data, formioForm, translations, language }) {
+  async function csv ({ output, options, data, formioForm, translations, language }) {
     data = preFormatData(data);
 
     let formattedData = Format.submission({
@@ -64,7 +64,7 @@ let Export = (() => {
     return file;
   }
 
-  async function format({ output, options, data, formioForm, translations, language }) {
+  async function format ({ output, options, data, formioForm, translations, language }) {
     return Format.submission({
       output,
       data,

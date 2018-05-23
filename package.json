@@ -3,6 +3,10 @@
   "version": "0.0.13",
   "description": "Generates a flat CSV file from an array of Form.io submissions",
   "main": "lib/fast-submission2csv.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
   "scripts": {
     "build": "webpack --env dev && webpack --env build && npm run test",
     "dev": "webpack --progress --colors --watch --env dev",
@@ -19,28 +23,29 @@
   "bugs": {
     "url": "https://github.com/UN-FAO/fast-submission2csv/issues"
   },
-  "homepage": "https://github.com/UN-FAO/fast-submission2csv",
+  "homepage": "https://github.com/UN-FAO/fast-submission2csv#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
-    "babel-eslint": "^8.0.3",
+    "babel-eslint": "^8.2.3",
     "babel-loader": "^7.1.4",
     "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-polyfill": "^6.26.0",
+    "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
     "babel-preset-env": "^1.6.1",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-stage-0": "^6.24.1",
     "chai": "^4.1.2",
-    "eslint": "^4.13.1",
-    "eslint-loader": "^1.9.0",
-    "mocha": "^4.0.1",
-    "webpack": "^3.10.0",
-    "yargs": "^10.0.3"
+    "eslint": "^4.19.1",
+    "eslint-loader": "^2.0.0",
+    "jsdom": "^11.10.0",
+    "jsdom-global": "^3.0.2",
+    "mocha": "^5.1.1",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.1.2",
+    "yargs": "^11.0.0"
   },
   "dependencies": {
     "bluebird": "^3.5.1",
+    "fast-downloads": "0.0.8",
     "flat": "^4.0.0",
-    "formiojs": "^2.32.2",
     "i18next": "^11.3.2",
     "jsonexport": "^2.1.0",
     "lodash": "^4.17.10",

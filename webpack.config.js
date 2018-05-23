@@ -1,26 +1,23 @@
 /* global __dirname, require, module*/
-
-const webpack = require('webpack');
-const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
+// const webpack = require('webpack');
 const path = require('path');
 const env = require('yargs').argv.env; // use --env with webpack 2
 const pkg = require('./package.json');
 
 let libraryName = pkg.name;
 
-let plugins = [],
-  outputFile;
+let outputFile, minimize;
 
 if (env === 'build') {
-  /*
-  plugins.push(new UglifyJsPlugin({ minimize: true }));
-   */
+  minimize = true;
   outputFile = libraryName + '.min.js';
 } else {
+  minimize = false;
   outputFile = libraryName + '.js';
 }
 
 const config = {
+  mode: 'production',
   entry: __dirname + '/src/index.js',
   devtool: 'source-map',
   output: {
@@ -29,6 +26,9 @@ const config = {
     library: libraryName,
     libraryTarget: 'umd',
     umdNamedDefine: true
+  },
+  optimization: {
+    minimize: minimize
   },
   module: {
     rules: [
@@ -46,9 +46,19 @@ const config = {
   },
   resolve: {
     modules: [path.resolve('./node_modules'), path.resolve('./src')],
-    extensions: ['.json', '.js']
+    extensions: ['.json', '.js'],
+    alias: {
+      'formio-export': path.resolve(__dirname, 'src/')
+    }
   },
-  plugins: plugins
+  externals: {
+    lodash: {
+      commonjs: 'lodash',
+      commonjs2: 'lodash',
+      amd: '_',
+      root: '_'
+    }
+  }
 };
 
 module.exports = config;
