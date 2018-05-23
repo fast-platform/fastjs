@@ -92,7 +92,7 @@ Using the Exporter with promises
 ```javascript
 import Exporter from 'fast-submission2csv';
 
-file = Exporter.csv({ output, data, formioForm, translations, language }).then(
+file = Exporter.csv({ data, formioForm, translations, language }).then(
   (output) => {
     // console.log('The file was generated', output)
   },
@@ -104,7 +104,7 @@ Using the Exporter with Await
 ```javascript
 import Exporter from 'fast-submission2csv';
 
-output = await Exporter.csv({ output, data, formioForm, translations, language })
+output = await Exporter.csv({ data, formioForm, translations, language })
   if(output){
     // console.log('The file was generated', output)
   }
@@ -116,7 +116,6 @@ Short Example
 import Exporter from 'fast-submission2csv';
 
   let output = await  Exporter.csv({
-          output,           // {String} 'csv' [will add more options]
           data,             // {Array} Form.io submissions
           formioForm,       // {Object} Form.io form
           translations,     // {Object} i18next formatted resource
@@ -135,7 +134,6 @@ import Exporter from 'fast-submission2csv';
 import Download from 'fast-downloads';
 
   let output = await  Exporter.csv({
-          output,           // {String} 'csv' [will add more options]
           data,             // {Array} Form.io submissions
           formioForm,       // {Object} Form.io form
           translations,     // {Object} i18next formatted resource
@@ -148,25 +146,6 @@ import Download from 'fast-downloads';
             fileName: output.name + '.csv' ,
             mimeType: 'text/csv;encoding:utf-8'
           });
-```
-
-Expected Output
-
-```javascript
-import Exporter from 'fast-submission2csv';
-
-  let output = await  Exporter.csv({
-          output,           // {String} 'csv' [will add more options]
-          data,             // {Array} Form.io submissions
-          formioForm,       // {Object} Form.io form
-          translations,     // {Object} i18next formatted resource
-          language          // {String} 'en' language to export the labels
-      }
-    );
-
-   //  output ==> {
-   //  csv : 'Some;Formatted;CSV'
-   //  name: 'backup_with_date',
 ```
 
 Full Example [(Play with it!)](https://stackblitz.com/edit/fast-submission2csv)
@@ -192,7 +171,7 @@ let translations = {
     }
   }
 };
-let output = 'csv';
+
 let data = [{ name: 'John', age: 20 }, { name: 'Pedro', age: 32 }];
 
 let formioForm = {
@@ -299,7 +278,6 @@ let formioForm = {
 
 
   let file = await  Exporter.csv({
-          output,
           data,
           formioForm,
           translations,

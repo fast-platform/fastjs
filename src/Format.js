@@ -115,7 +115,7 @@ let Format = (() => {
    * @param {Object} formioForm
    * @param {Object} i18n
    */
-  function submission ({ output, data, formioForm, translations, language }) {
+  function submission ({ data, formioForm, translations, language }) {
     let i = i18n.init(translations);
 
     i.changeLanguage(language);
@@ -158,8 +158,7 @@ let Format = (() => {
       label: i.t('Owner Email')
     });
 
-    data = output && output === 'json' ? data : json;
-    return { data: data, labels: labels };
+    return { data: json, labels: labels };
   }
 
   return Object.freeze({
