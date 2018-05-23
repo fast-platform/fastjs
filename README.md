@@ -298,7 +298,7 @@ let formioForm = {
 }
 
 
-  let output = await  Exporter.csv({
+  let file = await  Exporter.csv({
           output,
           data,
           formioForm,
@@ -307,7 +307,7 @@ let formioForm = {
       }
     );
 
-    //  output ==> {
+    //  file ==> {
     //  csv : 'Name;Age\r\nname;age\r\nJohn;20\r\nPedro;32'
     //  name: 'backup_2018_05_17_12_02_45',
     // }
