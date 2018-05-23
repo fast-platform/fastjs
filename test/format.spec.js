@@ -43,10 +43,6 @@ describe('Given a Form.io form, submissions and translations', () => {
         '[{"apiKey":"name","label":"Name"},{"apiKey":"age","label":"Age"},{"apiKey":"submit","label":"Submit"},{"apiKey":"ownerEmail","label":"Owner Email"}]'
       );
     });
-
-    it('should give a date formatted as a string', () => {
-      expect(JSON.stringify(formattedData.date)).to.be.a('string');
-    });
   });
 
   describe('When I change the language', () => {
