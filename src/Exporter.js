@@ -64,8 +64,19 @@ let Export = (() => {
     return file;
   }
 
+  async function format({ output, options, data, formioForm, translations, language }) {
+    return Format.submission({
+      output,
+      data,
+      formioForm,
+      translations,
+      language
+    });
+  }
+
   return Object.freeze({
-    csv
+    csv,
+    format
   });
 })();
 

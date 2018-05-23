@@ -34,13 +34,6 @@ let Format = (() => {
     let i = i18n.init(translations);
 
     i.changeLanguage(language);
-
-    let date = new Date()
-      .toJSON()
-      .replace(/-/g, '_')
-      .replace(/T/g, '_')
-      .replace(/:/g, '_')
-      .slice(0, 19);
     let json = [];
     let labels = [];
 
@@ -55,7 +48,7 @@ let Format = (() => {
         delete submission.owner;
         json.push(flatten(submission));
       });
-      return { date: date, data: json };
+      return { data: json };
     }
 
     _forEach(data, function (submission) {
@@ -80,7 +73,7 @@ let Format = (() => {
     });
 
     data = output && output === 'json' ? data : json;
-    return { date: date, data: data, labels: labels };
+    return { data: data, labels: labels };
   }
 
   return Object.freeze({

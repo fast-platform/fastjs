@@ -1,6 +1,6 @@
 {
   "name": "fast-submission2csv",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Generates a flat CSV file from an array of Form.io submissions",
   "main": "lib/fast-submission2csv.js",
   "scripts": {
@@ -39,7 +39,6 @@
   },
   "dependencies": {
     "bluebird": "^3.5.1",
-    "fast-downloads": "0.0.8",
     "flat": "^4.0.0",
     "formiojs": "^2.32.2",
     "i18next": "^11.3.2",
