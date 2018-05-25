@@ -1,88 +1,17 @@
-# FAST - Submission2CSV
+# FASTjs
 
-A library to generate a flat CSV file from an array of Form.io submissions.
-This library is design for those complex Form.io forms with nested objects and arrays
-that will simply not translate into a single CSV row.
+A JS library to give you a nice Interface on top of Form.io. It creates all the 
+necesary classes for you to use your Form.io forms naturaly as they where Models, working 
+both online and offline
 
-Submission2CSV will flatten your submissions and give you the right CSV every time!
-
-```
-// You can pass the data object of the submission
-let sub = [{
-      name: 'John'
-      complex : [
-        {a:1, b:2},
-        {a:3, b:4}
-      ]
-  },{
-      name: 'Pedro'
-      complex : [
-        {a:5, b:6},
-        {a:7, b:8}
-      ]
-  }]
-
-// Or the full array of Form.io submissions
-
-let sub = [
-  {
-    "owner": "5a3981489768470001cce4ef",
-    "deleted": null,
-    "roles": [],
-    "_vid": 0,
-    "_fvid": 0,
-    "state": "submitted",
-    "access": [],
-    "externalIds": [],
-    "externalTokens": [],
-    "created": "2018-05-17T17:27:10.485Z",
-    "_id": "5afdbb6e3d986958e233f56a",
-    "data": {
-      name: 'John'
-      complex : [
-        {a:1, b:2},
-        {a:3, b:4}
-      ]
-  },
-    "form": "5afd5bd8b2e21c9fc7286a70",
-    "modified": "2018-05-17T17:27:10.486Z",
-    "__v": 0
-  },
-  {
-    "owner": "5a3981489768470001cce4ef",
-    "deleted": null,
-    "roles": [],
-    "_vid": 0,
-    "_fvid": 0,
-    "state": "submitted",
-    "access": [],
-    "externalIds": [],
-    "externalTokens": [],
-    "created": "2018-05-17T17:27:17.272Z",
-    "_id": "5afdbb753d9869c37e33f56b",
-    "data": {
-      name: 'Pedro'
-      complex : [
-        {a:5, b:6},
-        {a:7, b:8}
-      ]
-  },
-    "form": "5afd5bd8b2e21c9fc7286a70",
-    "modified": "2018-05-17T17:27:17.273Z",
-    "__v": 0
-  }
-]
-  // Resulting CSV ==> name;complex.0.a;complex.0.b;complex.1.a;complex.1.b\r\nJohn;1;2;3;4\r\Pedro;5;6;7;8
-```
-
-This means that 1 submission will always be 1 CSV row
+FASTjs + Form.io will help you develop faster in any Framework
 
 ### Installing
 
 To install this package into your project, you can use the following command within your terminal
 
 ```
-npm install --save fast-submission2csv
+npm install --save fastjs
 ```
 
 # Usage

@@ -1,8 +1,8 @@
 {
-  "name": "fast-submission2csv",
-  "version": "0.0.14",
-  "description": "Generates a flat CSV file from an array of Form.io submissions",
-  "main": "lib/fast-submission2csv.js",
+  "name": "fastjs",
+  "version": "0.0.1",
+  "description": "Formio interface for online and offline use",
+  "main": "lib/fastjs.js",
   "directories": {
     "lib": "lib",
     "test": "test"
@@ -15,15 +15,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/UN-FAO/fast-submission2csv"
+    "url": "https://github.com/UN-FAO/fastjs.git"
   },
-  "keywords": ["form.io", "excel", "cordova", "browser", "browser excel"],
+  "keywords": ["form.io", "js", "cordova", "browser"],
   "author": "Ignacio Cabrera",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/UN-FAO/fast-submission2csv/issues"
+    "url": "https://github.com/UN-FAO/fastjs.git/issues"
   },
-  "homepage": "https://github.com/UN-FAO/fast-submission2csv#readme",
+  "homepage": "https://github.com/UN-FAO/fastjs.git#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
@@ -42,13 +42,5 @@
     "webpack-cli": "^2.1.2",
     "yargs": "^11.0.0"
   },
-  "dependencies": {
-    "bluebird": "^3.5.1",
-    "fast-downloads": "0.0.8",
-    "flat": "^4.0.0",
-    "i18next": "^11.3.2",
-    "jsonexport": "^2.1.0",
-    "lodash": "^4.17.10",
-    "papaparse": "^4.4.0"
-  }
+  "dependencies": {}
 }
