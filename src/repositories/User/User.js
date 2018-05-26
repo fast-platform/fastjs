@@ -1,4 +1,4 @@
-import Configuration from 'database/models/Configuration';
+import config from 'config';
 import USER from 'database/models/User';
 import SyncHelper from 'database/helpers/SyncHelper';
 import _isEmpty from 'lodash/isEmpty';
@@ -30,8 +30,7 @@ let User = (() => {
   }
 
   async function login ({ credentials, role }) {
-    let config = await Configuration.getLocal();
-    let url = config.APP_URL;
+    let url = config.get().baseURL;
 
     if (role === 'admin') {
       url = url + '/admin/login';
