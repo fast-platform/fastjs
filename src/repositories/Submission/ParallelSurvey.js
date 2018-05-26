@@ -2,88 +2,9 @@ import uuidv4 from 'uuid/v4';
 import _get from 'lodash/get';
 import Formio from 'formiojs';
 import Submission from 'database/models/Submission';
-import OFFLINE_PLUGIN from 'modules/Formio/components/formio/src/offlinePlugin';
+// import OFFLINE_PLUGIN from 'modules/Formio/components/formio/src/offlinePlugin';
 
 let ParallelSurvey = (() => {
-  /**
-   * Creates the Wizard object to have new user or new group
-   * @param {*} param0
-   */
-  async function createWizard ({ submission, vm }) {
-    let groupId = getGroupId(submission);
-
-    if (submissionHasGroup(groupId)) {
-      return Object.assign({}, getNewUserWizard(vm), { groupId: groupId });
-    }
-    return Object.assign({}, getNewGroupWizard(vm), { groupId: groupId });
-  }
-
-  async function createNewSurvey ({ submission, vm, info }) {
-    let groupId = getGroupId(submission);
-
-    if (submissionHasGroup(groupId)) {
-      return prepareNewUserObject({ submission, vm, info });
-    }
-    return prepareNewGroupObject({ submission, vm, info });
-  }
-
-  async function storeNewSurvey ({ survey, vm }) {
-    let formio = new Formio(vm.$FAST_CONFIG.APP_URL + '/' + vm.$route.params.idForm);
-    // De register if there was a previous registration
-
-    Formio.deregisterPlugin('offline');
-    // Register the plugin for offline mode
-    Formio.registerPlugin(OFFLINE_PLUGIN.getPlugin({ formio: formio, hashField: vm.hashField }), 'offline');
-
-    let formSubmission = {
-      data: survey,
-      redirect: 'Update',
-      draft: true,
-      trigger: 'createParalelSurvey'
-    };
-
-    formio.saveSubmission(formSubmission);
-  }
-
-  function prepareNewGroupObject ({ submission, vm, info }) {
-    let groupName = info[0];
-    let participantName = info[1];
-    let nextParticipant = info[2];
-    // Format the parallelSurvey object
-    let parallelSurvey = {
-      groupId: uuidv4(),
-      groupName: groupName,
-      participantName: participantName,
-      submissionId: submission._id
-    };
-
-    // Store information of the parallelSurvey on the current submission
-    vm.currentSubmission.data.parallelSurvey = Submission.local().setParallelSurvey(parallelSurvey);
-
-    // New survey Information
-    let surveyData = {
-      parallelSurvey: Submission.local().setParallelSurvey({
-        ...parallelSurvey,
-        participantName: nextParticipant
-      })
-    };
-
-    return surveyData;
-  }
-
-  function prepareNewUserObject ({ submission, vm, info }) {
-    let participantName = info[0];
-    let parallelsurveyInfo = Submission.local().getParallelSurvey(submission);
-
-    parallelsurveyInfo.participantName = participantName;
-    // New survey Information
-    let surveyData = {
-      parallelSurvey: Submission.local().setParallelSurvey(parallelsurveyInfo)
-    };
-
-    return surveyData;
-  }
-
   function getNewGroupWizard (vm) {
     let progressSteps = ['1', '2', '3'];
     let steps = [
@@ -135,6 +56,83 @@ let ParallelSurvey = (() => {
 
   function submissionHasGroup (groupId) {
     return groupId;
+  }
+  /**
+   * Creates the Wizard object to have new user or new group
+   * @param {*} param0
+   */
+  async function createWizard ({ submission, vm }) {
+    let groupId = getGroupId(submission);
+
+    if (submissionHasGroup(groupId)) {
+      return Object.assign({}, getNewUserWizard(vm), { groupId: groupId });
+    }
+    return Object.assign({}, getNewGroupWizard(vm), { groupId: groupId });
+  }
+  function prepareNewGroupObject ({ submission, vm, info }) {
+    let groupName = info[0];
+    let participantName = info[1];
+    let nextParticipant = info[2];
+    // Format the parallelSurvey object
+    let parallelSurvey = {
+      groupId: uuidv4(),
+      groupName: groupName,
+      participantName: participantName,
+      submissionId: submission._id
+    };
+
+    // Store information of the parallelSurvey on the current submission
+    vm.currentSubmission.data.parallelSurvey = Submission.local().setParallelSurvey(parallelSurvey);
+
+    // New survey Information
+    let surveyData = {
+      parallelSurvey: Submission.local().setParallelSurvey({
+        ...parallelSurvey,
+        participantName: nextParticipant
+      })
+    };
+
+    return surveyData;
+  }
+
+  function prepareNewUserObject ({ submission, vm, info }) {
+    let participantName = info[0];
+    let parallelsurveyInfo = Submission.local().getParallelSurvey(submission);
+
+    parallelsurveyInfo.participantName = participantName;
+    // New survey Information
+    let surveyData = {
+      parallelSurvey: Submission.local().setParallelSurvey(parallelsurveyInfo)
+    };
+
+    return surveyData;
+  }
+
+  async function createNewSurvey ({ submission, vm, info }) {
+    let groupId = getGroupId(submission);
+
+    if (submissionHasGroup(groupId)) {
+      return prepareNewUserObject({ submission, vm, info });
+    }
+    return prepareNewGroupObject({ submission, vm, info });
+  }
+
+  async function storeNewSurvey ({ survey, vm }) {
+    let formio = new Formio(vm.$FAST_CONFIG.APP_URL + '/' + vm.$route.params.idForm);
+    // De register if there was a previous registration
+
+    // Formio.deregisterPlugin('offline');
+    // Register the plugin for offline mode
+    // Formio.registerPlugin(OFFLINE_PLUGIN.getPlugin({ formio: formio, hashField: vm.hashField }), 'offline');
+
+    let formSubmission = {
+      data: survey,
+      redirect: 'Update',
+      draft: true,
+      trigger: 'createParalelSurvey'
+    };
+
+    formio.saveSubmission(formSubmission);
   }
 
   return Object.freeze({

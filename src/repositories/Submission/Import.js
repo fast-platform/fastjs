@@ -1,8 +1,8 @@
 import Formio from 'formiojs';
-import OFFLINE_PLUGIN from 'modules/Formio/components/formio/src/offlinePlugin';
+// import OFFLINE_PLUGIN from 'modules/Formio/components/formio/src/offlinePlugin';
 import Promise from 'bluebird';
-import { Loading } from 'quasar';
-import PreProcess from './importPreProcess';
+// import { Loading } from 'quasar';
+// import PreProcess from './importPreProcess';
 import Submission from 'repositories/Submission/SubmissionRepository';
 import Event from 'Wrappers/Event';
 let Import = class {
@@ -35,10 +35,10 @@ let Import = class {
    * @param {*} vm
    */
   static async parseJson (json, vm) {
-    let totalSubmissions = json.length;
+    // let totalSubmissions = json.length;
     let formio = Import.getFormIOInstance(vm);
 
-    Loading.show({ message: 'Importing ' + totalSubmissions + ' submissions' });
+    // Loading.show({ message: 'Importing ' + totalSubmissions + ' submissions' });
     // json = json.slice(151, 200);
     Promise.each(json, async function (row, index) {
       // await Uploader.sendDataToFormIO(row)
@@ -50,7 +50,8 @@ let Import = class {
         Event.emit({ name: 'FAST:DATA:IMPORTED', data: { imported: true }, text: 'Data was imported' });
       })
       .catch((error) => {
-        Loading.hide(error);
+        // Loading.hide(error);
+        console.log(error);
         vm.$swal(
           vm.$t('Import Error!'),
           vm.$t('Your submission could not be Imported. Please check the format of your Json file.'),
@@ -93,8 +94,8 @@ let Import = class {
    * @param {*} vm
    */
   static getFormIOInstance (vm) {
-    Formio.deregisterPlugin('offline');
-    Formio.registerPlugin(OFFLINE_PLUGIN.getPlugin(vm.form.data.path, undefined, false), 'offline');
+    // Formio.deregisterPlugin('offline');
+    // Formio.registerPlugin(OFFLINE_PLUGIN.getPlugin(vm.form.data.path, undefined, false), 'offline');
     let APP_URL = vm.$FAST_CONFIG.APP_URL;
     let formUrl = APP_URL + '/' + vm.form.data.path;
     let formio = new Formio(formUrl);
@@ -106,9 +107,9 @@ let Import = class {
    * @param {*} vm
    */
   static async saveSubmission (submission, formio, vm) {
-    let processedSubmission = PreProcess.JsonSubmission(submission);
+    // let processedSubmission = PreProcess.JsonSubmission(submission);
 
-    await Submission.add({ submission: processedSubmission, formio: formio });
+    await Submission.add({ submission: submission, formio: formio });
   }
 };
 

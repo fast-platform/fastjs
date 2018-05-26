@@ -4,6 +4,61 @@ import SyncHelper from 'database/helpers/SyncHelper';
 import SubmissionModel from 'database/models/Submission';
 
 let Submission = (() => {
+  function formatSubmission (submission, formio) {
+    submission = SyncHelper.deleteNulls(submission);
+
+    submission = {
+      ...submission,
+      sync: false,
+      /*eslint-disable*/
+      user_email: Auth.email(),
+      /* eslint-enable*/
+      formio: formio
+    };
+    return submission;
+  }
+
+  function alreadyStored (submission) {
+    return submission._lid || submission._id;
+  }
+  async function create (submission) {
+    submission.created = moment().unix();
+    let newSubmission = await SubmissionModel.local().insert({
+      data: submission
+    });
+
+    return newSubmission;
+  }
+
+  function shouldUpdate (localSubmission, submission) {
+    // Cases where we want to update
+    let sendingSubmission = submission.draft === false;
+    let fromDraftToSubmission = localSubmission.data.draft === false && submission.draft === false;
+    let autoSave = submission.trigger === 'autoSaveAsDraft';
+    let isSynced = !!(localSubmission.data.access && Array.isArray(localSubmission.data.access));
+    let hasError = localSubmission.data.syncError !== false && typeof localSubmission.data.syncError !== 'undefined';
+
+    return ((sendingSubmission || fromDraftToSubmission) && !autoSave) || (!isSynced && autoSave && !hasError);
+  }
+
+  async function update (submission) {
+    submission = {
+      ...submission,
+      type: 'update',
+      updated: moment().unix()
+    };
+
+    let localSubmission = await SubmissionModel.local().get(submission._lid || submission._id);
+
+    if (shouldUpdate(localSubmission, submission)) {
+      localSubmission.data = submission;
+      localSubmission.isSubmit = submission._lid ? false : localSubmission.isSubmit;
+      const saved = await SubmissionModel.local().update(localSubmission);
+
+      return saved;
+    }
+    return localSubmission;
+  }
   /**
    *
    * @param {*} submitedForm
@@ -34,60 +89,6 @@ let Submission = (() => {
         return newSubmission;
         break;
     }
-  }
-  function formatSubmission (submission, formio) {
-    submission = SyncHelper.deleteNulls(submission);
-
-    submission = {
-      ...submission,
-      sync: false,
-      user_email: Auth.email(),
-      formio: formio
-    };
-    return submission;
-  }
-
-  function alreadyStored (submission) {
-    return submission._lid || submission._id;
-  }
-
-  async function create (submission) {
-    submission.created = moment().unix();
-    let newSubmission = await SubmissionModel.local().insert({
-      data: submission
-    });
-
-    return newSubmission;
-  }
-
-  async function update (submission) {
-    submission = {
-      ...submission,
-      type: 'update',
-      updated: moment().unix()
-    };
-
-    let localSubmission = await SubmissionModel.local().get(submission._lid || submission._id);
-
-    if (shouldUpdate(localSubmission, submission)) {
-      localSubmission.data = submission;
-      localSubmission.isSubmit = submission._lid ? false : localSubmission.isSubmit;
-      const saved = await SubmissionModel.local().update(localSubmission);
-
-      return saved;
-    }
-    return localSubmission;
-  }
-
-  function shouldUpdate (localSubmission, submission) {
-    // Cases where we want to update
-    let sendingSubmission = submission.draft === false;
-    let fromDraftToSubmission = localSubmission.data.draft === false && submission.draft === false;
-    let autoSave = submission.trigger === 'autoSaveAsDraft';
-    let isSynced = !!(localSubmission.data.access && Array.isArray(localSubmission.data.access));
-    let hasError = localSubmission.data.syncError !== false && typeof localSubmission.data.syncError !== 'undefined';
-
-    return ((sendingSubmission || fromDraftToSubmission) && !autoSave) || (!isSynced && autoSave && !hasError);
   }
 
   return Object.freeze({
