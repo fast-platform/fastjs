@@ -2,7 +2,7 @@ import FormioUtils from 'formiojs/utils';
 import _forEach from 'lodash/forEach';
 import _isEmpty from 'lodash/isEmpty';
 import Translation from 'database/models/Translation';
-import { TRANSLATIONS } from 'modules/Localization/appTranslations';
+import config from 'config';
 import Form from 'database/models/Form';
 
 class FormLabels {
@@ -126,7 +126,9 @@ class FormLabels {
     });
 
     if (formNameFilter.includes('Application')) {
-      componentLabels = componentLabels.concat(TRANSLATIONS);
+      let translations = config.get().translations;
+
+      componentLabels = componentLabels.concat(translations);
     }
     // Clean duplicated labels
     let uniqueLabels = Array.from(new Set(componentLabels)).sort();
