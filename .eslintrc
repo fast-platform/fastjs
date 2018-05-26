@@ -20,9 +20,7 @@
 
   "parser": "babel-eslint",
 
-  "plugins": [
-
-  ],
+  "plugins": [],
 
   "rules": {
     "block-scoped-var": 2,
@@ -32,7 +30,7 @@
     "comma-spacing": [2, { "before": false, "after": true }],
     "comma-style": [2, "last"],
     "complexity": 0,
-    "consistent-return": 2,
+    "consistent-return": 0,
     "consistent-this": 0,
     "curly": [2, "multi-line"],
     "default-case": 0,
@@ -44,10 +42,10 @@
     "func-style": 0,
     "generator-star-spacing": [2, "both"],
     "guard-for-in": 0,
-    "handle-callback-err": [2, "^(err|error|anySpecificError)$" ],
+    "handle-callback-err": [2, "^(err|error|anySpecificError)$"],
     "indent": [2, 2, { "SwitchCase": 1 }],
     "key-spacing": [2, { "beforeColon": false, "afterColon": true }],
-    "keyword-spacing": [2, {"before": true, "after": true}],
+    "keyword-spacing": [2, { "before": true, "after": true }],
     "linebreak-style": 0,
     "max-depth": 0,
     "max-len": [2, 120, 4],
@@ -141,7 +139,7 @@
     "no-undefined": 0,
     "no-underscore-dangle": 0,
     "no-unneeded-ternary": 2,
-    "no-unreachable": 2,
+    "no-unreachable": 0,
     "no-unused-expressions": 0,
     "no-unused-vars": [2, { "vars": "all", "args": "none" }],
     "no-use-before-define": 2,
@@ -160,7 +158,7 @@
     "semi-spacing": 0,
     "sort-vars": 0,
     "space-before-blocks": [2, "always"],
-    "space-before-function-paren": [2, {"anonymous": "always", "named": "always", "asyncArrow": "always"}],
+    "space-before-function-paren": [2, { "anonymous": "always", "named": "always", "asyncArrow": "always" }],
     "space-in-brackets": 0,
     "space-in-parens": [2, "never"],
     "space-infix-ops": 2,
