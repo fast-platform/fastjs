@@ -17,7 +17,12 @@
     "type": "git",
     "url": "https://github.com/UN-FAO/fastjs.git"
   },
-  "keywords": ["form.io", "js", "cordova", "browser"],
+  "keywords": [
+    "form.io",
+    "js",
+    "cordova",
+    "browser"
+  ],
   "author": "Ignacio Cabrera",
   "license": "MIT",
   "bugs": {
@@ -52,7 +57,7 @@
     "lokijs": "^1.5.4",
     "md5": "^2.2.1",
     "moment": "^2.22.1",
-    "quasar": "0.0.18",
+    "quasar-framework": "^0.16.0",
     "uuid": "^3.2.1",
     "vue": "^2.5.16"
   }
