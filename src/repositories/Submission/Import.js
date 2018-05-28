@@ -1,8 +1,6 @@
 import Formio from 'formiojs';
-// import OFFLINE_PLUGIN from 'modules/Formio/components/formio/src/offlinePlugin';
+import offlinePlugin from 'offlinePlugin/offlinePlugin';
 import Promise from 'bluebird';
-// import { Loading } from 'quasar';
-// import PreProcess from './importPreProcess';
 import Submission from 'repositories/Submission/SubmissionRepository';
 import Event from 'Wrappers/Event';
 let Import = class {
@@ -94,8 +92,8 @@ let Import = class {
    * @param {*} vm
    */
   static getFormIOInstance (vm) {
-    // Formio.deregisterPlugin('offline');
-    // Formio.registerPlugin(OFFLINE_PLUGIN.getPlugin(vm.form.data.path, undefined, false), 'offline');
+    Formio.deregisterPlugin('offline');
+    Formio.registerPlugin(offlinePlugin.getPlugin(vm.form.data.path, undefined, false), 'offline');
     let APP_URL = vm.$FAST_CONFIG.APP_URL;
     let formUrl = APP_URL + '/' + vm.form.data.path;
     let formio = new Formio(formUrl);

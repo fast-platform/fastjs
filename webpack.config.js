@@ -3,7 +3,13 @@
 const path = require('path');
 const env = require('yargs').argv.env; // use --env with webpack 2
 const pkg = require('./package.json');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const showBundle = true;
+let plugins = [];
 
+if (showBundle) {
+  plugins.push(new BundleAnalyzerPlugin());
+}
 let libraryName = pkg.name;
 
 let outputFile, minimize;
@@ -44,6 +50,7 @@ const config = {
       }
     ]
   },
+  plugins: plugins,
   resolve: {
     modules: [path.resolve('./node_modules'), path.resolve('./src')],
     extensions: ['.json', '.js'],
