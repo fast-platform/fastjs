@@ -16,7 +16,7 @@ npm install --save fast-fastjs
 
 # Usage
 
-The main function of FASTjs is FAST, this function will initialize all configurations, translations and forms that you have in your Form.io project and will load them into the local LokiJs DB.
+The main function of FASTjs is FAST, this function will initialize all configurations, translations and register forms that you have in your Form.io project and will load them into the local LokiJs DB.
 
 An example of the init for a Vue application
 
@@ -24,8 +24,8 @@ An example of the init for a Vue application
 import {FAST} from 'fast-fastjs';
 
 let config = await FAST.start(
-		{
-        	Vue,             // {Vue} Your Vue instance (will create Vue.prototype.$FAST_CONFIG)
+		    {
+          	Vue,             // {Vue} Your Vue instance (will create Vue.prototype.$FAST_CONFIG)
             interval,        // {Boolean} Whether to initiate the App with the Sync interval
             appConf          // {Object} Configuration for the FASTjs library
         }
@@ -48,10 +48,10 @@ We give the flexibility to pull the configuration every time we start the projec
 
 // If we are storing our project configuration in Form.io
   let appConfigUrl = 'https://ydvyhgtgqlcasur.form.io/configuration/submission/'
-
+  let appConfigId = '5a956eav847b730402b25656'
   let appConf = {
     type: 'remote',                // {String} type of config "remote" or "local"
-    appConfigId: '',               // {String} ID of the submission that has the config
+    appConfigId                    // {String} ID of the submission that has the config
     appConfigUrl,                  // {String} Full URL tot he Form.io Form with the config
     translations: TRANSLATIONS     // {Object} i18n translations for the App
   };
@@ -85,9 +85,29 @@ In case you are using local config, your config object should look like this
 | PARALLEL_SURVEYS                  | {Bolean}                                       | Enable the paeallel surveys functionality?         |
 | NAVIGATION_OPENED                 | {Bolean}                                       | Should the page navegation start opened?           |
 | NAVIGATION_AUTOCLOSE_ON_SELECTION | {Bolean}                                       | After selecting a page, should the page nav close? |
-| DATA_REVIEWERS                    | {Bolean}                                       | Does the app need DataReviewers functionality?     |
+| DATA_REVIEWERS                    | {Bolean}                                       | Does the app need the DataReviewers functionality? |
 
 If you are using Form.io to manage the config, you can use the following form to hold your configurations.
 
-Remember to import this in your own Form.io Project.
-Example config [(View it here!)](https://fast-app-config.stackblitz.io/)
+Remember to import this in your own Form.io Project.[(View it here!)](https://fast-app-config.stackblitz.io/)
+
+### Loading other Forms.
+
+With FAST.start(), we only load the register form to avoid pulling a lot of data on page load.
+It is mandatory to pull the rest of the Forms whenever is convinient for you (Depending on your app)
+
+For that we need to call the FAST.loadRemainingConfig() method. You could even call them one after
+the other if you like this:
+
+```javascript
+import {FAST} from 'fast-fastjs';
+
+let config = await FAST.start(
+		    {
+          	Vue,             // {Vue} Your Vue instance (will create Vue.prototype.$FAST_CONFIG)
+            interval,        // {Boolean} Whether to initiate the App with the Sync interval
+            appConf          // {Object} Configuration for the FASTjs library
+        }
+    );
+await FAST.loadRemainingConfig({ interval: true });
+```
