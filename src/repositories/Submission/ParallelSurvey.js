@@ -132,7 +132,9 @@ let ParallelSurvey = (() => {
       trigger: 'createParalelSurvey'
     };
 
-    formio.saveSubmission(formSubmission);
+    let created = await formio.saveSubmission(formSubmission);
+
+    return created;
   }
 
   return Object.freeze({
