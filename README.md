@@ -97,7 +97,7 @@ With FAST.start(), we only load the register form to avoid pulling a lot of data
 It is mandatory to pull the rest of the Forms whenever is convinient for you (Depending on your app)
 
 To do so, we need to call the FAST.loadRemainingConfig() method. You could even call them one after
-the other if you like this:
+the other...just like this:
 
 ```javascript
 import {FAST} from 'fast-fastjs';
