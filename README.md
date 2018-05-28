@@ -111,3 +111,29 @@ let config = await FAST.start(
     );
 await FAST.loadRemainingConfig({ interval: true });
 ```
+
+# FAST Models
+
+FAST offers 8 main Models that you can use to access and manipulate your data
+
+| Model Name    | Description                                                                                 |
+| ------------- | ------------------------------------------------------------------------------------------- |
+| baseModel     | The main model used for all others. If you need to create your own, you can extend this one |
+| Configuration | Access to all project configuration                                                         |
+| Form          | Access to all Forms and Resources used in the application                                   |
+| Pages         | Access to all pages defined for the project                                                 |
+| Role          | Access to all roles defined for the project                                                 |
+| Submission    | Access to all submissions defined for the project                                           |
+| Translation   | Access to all translations defined for the project                                          |
+| User          | Access to the Users of the application                                                      |
+
+# FAST Helper Functions
+
+| Function Name  | Description                                                                                   |
+| -------------- | --------------------------------------------------------------------------------------------- |
+| Auth           | Useful set of functions to Authenticate and work with the Auth user                           |
+| Event          | Native JS event emitter                                                                       |
+| Moment         | A wrapper on top of Moment to use all translations (multilanguage projects)                   |
+| ParallelSurvey | Set of functions to work with more than one survey at the same time                           |
+| Localization   | Set of functions to work with the translations                                                |
+| OfflinePlugin  | The full Form.io offline plugin used. Useful when you have to active, or desactiva the plugin |
