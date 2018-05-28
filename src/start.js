@@ -90,6 +90,7 @@ let FAST = (() => {
     await Form.update({
       filter: [{ element: 'path', query: '=', value: 'userregister' }]
     });
+
     let appTranslations = await Localization.setLocales();
 
     return {
