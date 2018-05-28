@@ -156,21 +156,21 @@ check how each one works before trying to swap from one to the other
 | merged           |            | Returns the Same Model but with the getFrom variable set to 'remote-local' |
 | find             |            | Find method on top of the Model {Array}                                    |
 | findOne          |            | Find an element based on the filters and returns the first. {Object}       |
-| remove           |            | Removed the given element from the storage                                 |
+| remove           |            | Removes the given element from the storage                                 |
 | insert           |            | Inserts a new element into the storage                                     |
 | update           |            | Updates the given element                                                  |
 | updateOrCreate   |            | Tries to update an element, if it doesn´t exist it creates it              |
 | findAndRemove    |            | Finds and element and then deletes it                                      |
 
-Every model has acces to the same basic functionalities given by the baseM
+Every model has acces to the same basic functionalities given by the baseModel
 
 # FAST Helper Functions
 
-| Function Name  | Description                                                                                    |
-| -------------- | ---------------------------------------------------------------------------------------------- |
-| Auth           | Useful set of functions to Authenticate and work with the Auth user                            |
-| Event          | Native JS event emitter                                                                        |
-| Moment         | A wrapper on top of Moment to use all translations (multilanguage projects)                    |
-| ParallelSurvey | Set of functions to work with more than one survey at the same time                            |
-| Localization   | Set of functions to work with the translations                                                 |
-| OfflinePlugin  | The full Form.io offline plugin used. Useful when you have to active, or deactivate the plugin |
+| Function Name  | Description                                                                                      |
+| -------------- | ------------------------------------------------------------------------------------------------ |
+| Auth           | Useful set of functions to Authenticate and work with the Auth user                              |
+| Event          | Native JS event emitter                                                                          |
+| Moment         | A wrapper on top of Moment to use all translations (multilanguage projects)                      |
+| ParallelSurvey | Set of functions to work with more than one survey at the same time                              |
+| Localization   | Set of functions to work with the translations                                                   |
+| OfflinePlugin  | The full Form.io offline plugin used. Useful when you have to activate, or deactivate the plugin |
