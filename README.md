@@ -127,13 +127,50 @@ FAST offers 8 main Models that you can use to access and manipulate your data
 | Translation   | Access to all translations defined for the project                                          |
 | User          | Access to the Users of the application                                                      |
 
+The models can be used to access both local (LokiJS DB) or remote data (Form.io Server) by calling the remote() or local() methods.
+
+```javascript
+import {Form} from 'fast-fastjs';
+
+let localForms = await Form.local().find();
+let remoteForms = await Form.remote().find();
+```
+
+We could also work with both, local and remote using the merged() method
+
+```javascript
+import {Form} from 'fast-fastjs';
+
+let bothForms = await Form.merged().find();
+```
+
+We are still working on standardizing the methods for both local and remote so please
+check how each one works before trying to swap from one to the other
+
+| Method Name      | Parameters | Description                                                                |
+| ---------------- | ---------- | -------------------------------------------------------------------------- |
+| getOwnName       |            | Returns the Name of the Current Model                                      |
+| getFormPath      |            | Returns the Form.io Path of the current Model                              |
+| remote           |            | Returns the Same Model but with the getFrom variable set to 'remote'       |
+| local            |            | Returns the Same Model but with the getFrom variable set to 'local'        |
+| merged           |            | Returns the Same Model but with the getFrom variable set to 'remote-local' |
+| find             |            | Find method on top of the Model {Array}                                    |
+| findOne          |            | Find an element based on the filters and returns the first. {Object}       |
+| remove           |            | Removed the given element from the storage                                 |
+| insert           |            | Inserts a new element into the storage                                     |
+| update           |            | Updates the given element                                                  |
+| updateOrCreate   |            | Tries to update an element, if it doesn´t exist it creates it              |
+| findAndRemove    |            | Finds and element and then deletes it                                      |
+
+Every model has acces to the same basic functionalities given by the baseM
+
 # FAST Helper Functions
 
-| Function Name  | Description                                                                                   |
-| -------------- | --------------------------------------------------------------------------------------------- |
-| Auth           | Useful set of functions to Authenticate and work with the Auth user                           |
-| Event          | Native JS event emitter                                                                       |
-| Moment         | A wrapper on top of Moment to use all translations (multilanguage projects)                   |
-| ParallelSurvey | Set of functions to work with more than one survey at the same time                           |
-| Localization   | Set of functions to work with the translations                                                |
-| OfflinePlugin  | The full Form.io offline plugin used. Useful when you have to active, or desactiva the plugin |
+| Function Name  | Description                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------------------- |
+| Auth           | Useful set of functions to Authenticate and work with the Auth user                            |
+| Event          | Native JS event emitter                                                                        |
+| Moment         | A wrapper on top of Moment to use all translations (multilanguage projects)                    |
+| ParallelSurvey | Set of functions to work with more than one survey at the same time                            |
+| Localization   | Set of functions to work with the translations                                                 |
+| OfflinePlugin  | The full Form.io offline plugin used. Useful when you have to active, or deactivate the plugin |
