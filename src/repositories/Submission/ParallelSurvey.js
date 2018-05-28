@@ -2,7 +2,7 @@ import uuidv4 from 'uuid/v4';
 import _get from 'lodash/get';
 import Formio from 'formiojs';
 import Submission from 'database/models/Submission';
-// import OFFLINE_PLUGIN from 'modules/Formio/components/formio/src/offlinePlugin';
+import OFFLINE_PLUGIN from 'offlinePlugin/offlinePlugin';
 
 let ParallelSurvey = (() => {
   function getNewGroupWizard (vm) {
@@ -121,9 +121,9 @@ let ParallelSurvey = (() => {
     let formio = new Formio(vm.$FAST_CONFIG.APP_URL + '/' + vm.$route.params.idForm);
     // De register if there was a previous registration
 
-    // Formio.deregisterPlugin('offline');
+    Formio.deregisterPlugin('offline');
     // Register the plugin for offline mode
-    // Formio.registerPlugin(OFFLINE_PLUGIN.getPlugin({ formio: formio, hashField: vm.hashField }), 'offline');
+    Formio.registerPlugin(OFFLINE_PLUGIN.getPlugin({ formio: formio, hashField: vm.hashField }), 'offline');
 
     let formSubmission = {
       data: survey,

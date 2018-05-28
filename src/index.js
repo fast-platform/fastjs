@@ -16,6 +16,7 @@ import Localization from 'repositories/Localization/Localization';
 import User from 'database/models/User';
 import countryList from 'database/resources/countries.json';
 import FormLabels from 'repositories/Form/Labels';
+import OfflinePlugin from 'offlinePlugin/offlinePlugin';
 
 export {
   Moment,
@@ -35,5 +36,6 @@ export {
   Localization,
   User,
   countryList,
-  FormLabels
+  FormLabels,
+  OfflinePlugin
 };

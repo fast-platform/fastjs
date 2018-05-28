@@ -1,4 +1,4 @@
-import _debounce from 'lodash/debounce';
+// import _debounce from 'lodash/debounce';
 import StoreForm from './storeForm';
 
 const PostRequest = class {
@@ -27,10 +27,11 @@ const PostRequest = class {
 
       submission = formSubmission;
     }
-    let dStoreForm = _debounce(StoreForm.handle, 1000);
+    // let dStoreForm = _debounce(StoreForm.handle, 1500);
 
-    dStoreForm({ submission, formio, hashField });
-    return args.data;
+    let created = await StoreForm.handle({ submission, formio, hashField });
+
+    return created;
   }
 };
 

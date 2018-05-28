@@ -21,6 +21,7 @@ let Submission = (() => {
   function alreadyStored (submission) {
     return submission._lid || submission._id;
   }
+
   async function create (submission) {
     submission.created = moment().unix();
     let newSubmission = await SubmissionModel.local().insert({

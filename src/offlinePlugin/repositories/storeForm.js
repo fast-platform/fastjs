@@ -1,17 +1,15 @@
 import md5 from 'md5';
-import router from 'config/router';
 import CONFIGURATION from 'repositories/Configuration/Configuration';
 import User from 'repositories/User/User';
 import Submission from 'repositories/Submission/SubmissionRepository';
 import Event from 'Wrappers/Event';
 
 let StoreForm = class {
-  static handle ({ submission, formio, hashField }) {
+  static async handle ({ submission, formio, hashField }) {
     if (typeof hashField !== 'undefined') {
-      StoreForm.storeUser({ submission, formio, hashField });
-    } else {
-      StoreForm.storeSubmission({ submission, formio, hashField });
+      return StoreForm.storeUser({ submission, formio, hashField });
     }
+    return StoreForm.storeSubmission({ submission, formio, hashField });
   }
   /**
    *
@@ -40,42 +38,6 @@ let StoreForm = class {
       text: 'Draft Saved'
     });
 
-    if (submission._id) {
-      let config = await CONFIGURATION.getLocal();
-
-      if (submission.redirect === true) {
-        switch (config.SAVE_REDIRECT) {
-          case 'dashboard':
-            router.push({
-              name: 'dashboard'
-            });
-            break;
-          case 'collected':
-            router.push({
-              name: 'formio_form_show',
-              params: {
-                idForm: formio.formId
-              }
-            });
-            break;
-          default:
-            router.push({
-              name: 'dashboard'
-            });
-            break;
-        }
-      }
-    } else if (created.data && created.data.trigger && created.data.trigger === 'importSubmission') {
-      return;
-    } else {
-      router.push({
-        name: 'formio_submission_update',
-        params: {
-          idForm: formio.formId,
-          idSubmission: created._id
-        }
-      });
-    }
     return created;
   }
   /**
@@ -92,9 +54,11 @@ let StoreForm = class {
       formio: formio
     })
       .then(() => {
+        /*
         router.push({
           path: '/login'
         });
+        */
       })
       .catch((error) => {
         console.log(error);

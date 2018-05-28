@@ -1,7 +1,7 @@
 import Formio from 'formiojs';
 import Translation from 'database/models/Translation';
-import GetRequest from './repositories/offlinePlugin/GetRequest';
-import PostRequest from './repositories/offlinePlugin/PostRequest';
+import GetRequest from './repositories/getRequest';
+import PostRequest from './repositories/postRequest';
 
 const OFFLINE_PLUGIN = class {
   static getPlugin ({ formio, hashField }) {
@@ -52,9 +52,9 @@ const OFFLINE_PLUGIN = class {
 
           return result;
         }
+
         // If we are trying to save a submission
         if (args.method === 'POST' || args.method === 'PUT') {
-          console.log('we are trying to save a submission');
           let submission = await PostRequest.handle({ args, hashField, formio });
 
           return submission;
