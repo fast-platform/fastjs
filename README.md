@@ -96,7 +96,7 @@ Remember to import this in your own Form.io Project.[(View it here!)](https://fa
 With FAST.start(), we only load the register form to avoid pulling a lot of data on page load.
 It is mandatory to pull the rest of the Forms whenever is convinient for you (Depending on your app)
 
-For that we need to call the FAST.loadRemainingConfig() method. You could even call them one after
+To do so, we need to call the FAST.loadRemainingConfig() method. You could even call them one after
 the other if you like this:
 
 ```javascript
