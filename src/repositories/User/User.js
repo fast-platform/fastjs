@@ -46,7 +46,6 @@ let User = (() => {
   }
 
   return Object.freeze({
-    find,
     storeLocally,
     login
   });
