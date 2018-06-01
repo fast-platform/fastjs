@@ -128,6 +128,8 @@ class FormLabels {
     if (formNameFilter.includes('Application')) {
       let translations = config.get().translations;
 
+      console.log('translations', translations);
+
       componentLabels = componentLabels.concat(translations);
     }
     // Clean duplicated labels

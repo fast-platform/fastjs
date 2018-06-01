@@ -74,10 +74,11 @@ let FAST = (() => {
   async function start ({ Vue, interval = true, appConf }) {
     let pages, err;
 
+    console.log('appConf.translations', appConf.i18n);
     fastConfig.set({
       baseURL: appConf.appConfigUrl,
       submissionId: appConf.appConfigId,
-      translations: appConf.translations
+      i18n: appConf.i18n
     });
     // Pull the configuration
     let config = await Configuration.set({ Vue, appConf });

@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
 let config = (() => {
-  let jwt, url, submission, baseURL, translations;
+  var jwt, url, submission, baseURL, translations;
 
-  function set ({ jwtToken = undefined, baseURL = undefined, submissionId = undefined, translations = undefined }) {
-    jwt = jwtToken;
-    url = baseURL;
-    submission = submissionId;
-    translations = translations;
+  function set ({ jwtToken = undefined, baseURL = undefined, submissionId = undefined, i18n = undefined }) {
+    jwt = jwtToken ? jwtToken : jwt;
+    url = baseURL ? baseURL : url;
+    submission = submissionId ? submissionId : submission ;
+    translations = i18n ? i18n : translations ;
   }
 
   function setBaseUrl (baseUrl) {
