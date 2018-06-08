@@ -7,6 +7,9 @@ import SyncInterval from './repositories/Database/SyncInterval';
 import fastConfig from './config';
 import to from 'await-to-js';
 import Roles from 'repositories/Auth/Role';
+import Formio from 'formiojs';
+import _isEmpty from 'lodash/isEmpty';
+import _get from 'lodash/get';
 /* eslint-disable no-unused-vars */
 let FAST = (() => {
   async function loadRemainingConfig ({ interval = true }) {
@@ -23,8 +26,13 @@ let FAST = (() => {
 
       console.log(e, err);
     }
+    let currentConf = await Configuration.getLocal();
 
-    await Form.update();
+    let shouldUpdate = !_isEmpty(currentConf.meta.needUpdateForms);
+
+    if (shouldUpdate) {
+      await Form.update();
+    }
 
     if (interval) {
       SyncInterval.set(2000);
@@ -79,24 +87,41 @@ let FAST = (() => {
       submissionId: appConf.appConfigId,
       i18n: appConf.i18n
     });
+
     // Pull the configuration
     let config = await Configuration.set({ Vue, appConf });
 
     // Change the Base URL for all the other calls
     fastConfig.setBaseUrl(config.APP_URL);
 
-    await Roles.set(config.APP_URL);
+    Roles.set(config.APP_URL);
 
-    await Form.update({
-      filter: [{ element: 'path', query: '=', value: 'userregister' }]
+    let currentConf = await Configuration.getLocal();
+
+    let date = _get(currentConf, 'meta.formsLastUpdated', 1);
+
+    let data = await Formio.request(
+      config.APP_URL + '/form?modified__gt=' + new Date(date * 1000).toISOString() + '&select=path',
+      'GET'
+    );
+
+    Configuration.setLastUpdated({ element: 'Forms', data });
+
+    let shouldUpdate = data.some((form) => {
+      return form.path === 'userregister';
     });
+
+    if (shouldUpdate) {
+      Form.update({
+        filter: [{ element: 'path', query: '=', value: 'userregister' }]
+      });
+    }
 
     let appTranslations = await Localization.setLocales();
 
     return {
       config: config,
-      translations: appTranslations,
-      defaultLenguage: localStorage.getItem('defaultLenguage') || 'en'
+      translations: appTranslations
     };
   }
 

@@ -12,11 +12,14 @@ let Configuration = (() => {
     }
   }
 
-  async function set ({ Vue, appConf }) {
-    let localConfig, remoteConfig;
+  async function getLocal () {
+    let configuration = await CONFIGURATION.local().find();
 
-    localConfig = await CONFIGURATION.local().find();
-    localConfig = _get(localConfig, '[0]', undefined);
+    return _get(configuration, '[0]', undefined);
+  }
+
+  async function getRemote (appConf) {
+    let remoteConfig;
 
     if (Connection.isOnline()) {
       try {
@@ -28,7 +31,14 @@ let Configuration = (() => {
         throw new Error(error);
       }
     }
-    remoteConfig = _get(remoteConfig, '[0].data', undefined);
+    return _get(remoteConfig, '[0].data', undefined);
+  }
+
+  async function set ({ Vue, appConf }) {
+    let localConfig, remoteConfig;
+
+    localConfig = await getLocal();
+    remoteConfig = await getRemote(appConf);
 
     if (!localConfig && !remoteConfig) {
       throw new Error('Application is not connected to internet, or the configuration file cannot be pulled');
@@ -39,25 +49,54 @@ let Configuration = (() => {
       return localConfig;
     }
 
+    remoteConfig.meta = localConfig && localConfig.meta ? localConfig.meta : {};
+
     if (localConfig) {
       await CONFIGURATION.local().remove(localConfig);
     }
     let insertedConfig = await CONFIGURATION.local().insert(remoteConfig);
-    // Create Global Vue variable
 
     assingGlobalVariable(Vue, insertedConfig);
     return insertedConfig;
   }
 
-  async function getLocal () {
-    let configuration = await CONFIGURATION.local().find();
+  async function setLastUpdated ({ element, data }) {
+    if (
+      !['Form', 'Pages', 'register', 'Forms'].some((el) => {
+        return el === element;
+      })
+    ) {
+      throw new Error('The element provided must be "Form" or "Pages"');
+    }
+    let localConfig = await getLocal();
 
-    return _get(configuration, '[0]', {});
+    localConfig.meta = localConfig.meta ? localConfig.meta : {};
+    switch (element) {
+      case 'Form':
+        localConfig.meta.formsLastUpdated = Math.round(new Date().getTime() / 1000);
+        break;
+      case 'register':
+        localConfig.meta.registerLastUpdated = Math.round(new Date().getTime() / 1000);
+        break;
+      case 'Pages':
+        localConfig.meta.pagesLastUpdated = Math.round(new Date().getTime() / 1000);
+        break;
+      case 'Forms':
+        localConfig.meta.needUpdateForms = data;
+        break;
+      default:
+        break;
+    }
+
+    let updated = await CONFIGURATION.local().update(localConfig);
+
+    return updated;
   }
 
   return Object.freeze({
     set,
-    getLocal
+    getLocal,
+    setLastUpdated
   });
 })();
 
