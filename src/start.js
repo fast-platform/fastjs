@@ -121,7 +121,8 @@ let FAST = (() => {
 
     return {
       config: config,
-      translations: appTranslations
+      translations: appTranslations,
+      defaultLanguage: localStorage.getItem('defaultLenguage') || 'en'
     };
   }
 

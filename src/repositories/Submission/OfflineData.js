@@ -9,11 +9,12 @@ import Promise from 'bluebird';
 let OfflineData = (() => {
   async function send (data) {
     let offlineSubmissions = data;
-    let syncedSubmissionsCount = 0;
-    let syncedSubmissions = [];
     let offlinePlugin = FormioJS.getPlugin('offline');
 
     if (Connection.isOnline()) {
+      console.log('----------------------');
+      console.log('offlineSubmissions===>', offlineSubmissions);
+      console.log('----------------------');
       Promise.each(offlineSubmissions, async function (offlineSubmission) {
         let formio = new FormioJS(offlineSubmission.data.formio.formUrl);
         let postData = {
@@ -26,6 +27,7 @@ let OfflineData = (() => {
         if (offlineSubmission.data.formio.formId === 'userregister') {
           model = User;
         }
+        // Set the submission as queuedForSync
         await model.update(offlineSubmission);
 
         // If it has an ID and the Id its not local (doesnt contain "_local")
@@ -33,17 +35,21 @@ let OfflineData = (() => {
           postData._id = offlineSubmission.data._id;
         }
         FormioJS.deregisterPlugin('offline');
+        console.log('----------------------');
+        console.log('beforeInsert===>');
+        console.log('----------------------');
 
         try {
           let FormIOinsertedData = await formio.saveSubmission(postData);
+
+          console.log('----------------------');
+          console.log('FormIOinsertedData===>', FormIOinsertedData);
+          console.log('----------------------');
 
           if (!FormIOinsertedData._id) {
             throw Error('Submission cannot be synced');
           }
           FormIOinsertedData.formio = formio;
-
-          syncedSubmissionsCount = syncedSubmissionsCount + 1;
-          syncedSubmissions.push(FormIOinsertedData);
 
           // Update the local submission
           offlineSubmission.data = FormIOinsertedData;
@@ -88,10 +94,7 @@ let OfflineData = (() => {
       }).then((result) => {
         Event.emit({
           name: 'FAST:SUBMISSION:SYNCED',
-          data: {
-            count: syncedSubmissionsCount,
-            data: syncedSubmissions
-          },
+          data: {},
           text: 'The submissions have been synced'
         });
       });

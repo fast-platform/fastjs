@@ -23,9 +23,11 @@ let User = (() => {
       // User.local().update(user)
     } else {
       //  Insert the new user
-      await USER.local().insert({
+      let user = await USER.local().insert({
         data: formIoUser
       });
+
+      return user;
     }
   }
 

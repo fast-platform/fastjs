@@ -48,28 +48,13 @@ let StoreForm = class {
 
     submission.data.hashedPassword = md5(submission.data.password, config.MD5_KEY);
 
-    User.storeLocally({
+    let user = await User.storeLocally({
       data: submission.data,
       sync: false,
       formio: formio
-    })
-      .then(() => {
-        /*
-        router.push({
-          path: '/login'
-        });
-        */
-      })
-      .catch((error) => {
-        console.log(error);
-        /*
-        eventHub.emit(
-          'FAST:USER:REGISTRATION:ERROR',
-          submission.data
-        );
-        console.log(error);
-        */
-      });
+    });
+
+    return user;
   }
 };
 
