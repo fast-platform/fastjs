@@ -12,9 +12,6 @@ let OfflineData = (() => {
     let offlinePlugin = FormioJS.getPlugin('offline');
 
     if (Connection.isOnline()) {
-      console.log('----------------------');
-      console.log('offlineSubmissions===>', offlineSubmissions);
-      console.log('----------------------');
       Promise.each(offlineSubmissions, async function (offlineSubmission) {
         let formio = new FormioJS(offlineSubmission.data.formio.formUrl);
         let postData = {
@@ -35,16 +32,9 @@ let OfflineData = (() => {
           postData._id = offlineSubmission.data._id;
         }
         FormioJS.deregisterPlugin('offline');
-        console.log('----------------------');
-        console.log('beforeInsert===>');
-        console.log('----------------------');
 
         try {
           let FormIOinsertedData = await formio.saveSubmission(postData);
-
-          console.log('----------------------');
-          console.log('FormIOinsertedData===>', FormIOinsertedData);
-          console.log('----------------------');
 
           if (!FormIOinsertedData._id) {
             throw Error('Submission cannot be synced');
