@@ -55,7 +55,7 @@ let Connection = (() => {
   }
 
   function isOnline () {
-    return online;
+    return window.navigator.onLine;
   }
 
   function heartBeat (vm) {
