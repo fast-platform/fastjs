@@ -1,4 +1,4 @@
-import Configuration from 'database/models/Configuration';
+import Configuration from 'repositories/Configuration/Configuration';
 import md5 from 'md5';
 import User from 'database/models/User';
 import UserRepository from 'repositories/User/User';
@@ -19,7 +19,7 @@ let Auth = (() => {
         // Store locally the user for future offline login
         let user = response.data;
 
-        UserRepository.storeLocally(user);
+        UserRepository.updateUser(user);
         return response;
       })
       .catch((error) => {
@@ -34,13 +34,15 @@ let Auth = (() => {
    */
   async function localAuthenticate (credentials) {
     const { username, password } = credentials;
-    let config = Configuration.getLocal();
+    let config = await Configuration.getLocal();
+
     // Hash password
     const hashedPassword = md5(password, config.MD5_KEY);
     // Get the user
     let dbUser = await User.local().findOne({
       'data.data.email': username
     });
+
     // Compare hashed passwords
     const isValidUser = dbUser.data.data.hashedPassword === hashedPassword;
 
@@ -57,9 +59,7 @@ let Auth = (() => {
    * @return {Promise}             [description]
    */
   function authenticate (credentials, baseUrl, role) {
-    let isOnline = Connection.isOnline();
-
-    if (isOnline) {
+    if (Connection.isOnline()) {
       return remoteAuthenticate(credentials, baseUrl, role).catch(() => {
         console.log('Remote Auth failed, trying locally');
         return localAuthenticate(credentials, baseUrl);

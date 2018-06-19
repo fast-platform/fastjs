@@ -10,6 +10,7 @@ import Roles from 'repositories/Auth/Role';
 import Formio from 'formiojs';
 import _isEmpty from 'lodash/isEmpty';
 import _get from 'lodash/get';
+import Connection from './Wrappers/Connection';
 /* eslint-disable no-unused-vars */
 let FAST = (() => {
   async function loadRemainingConfig ({ interval = true }) {
@@ -100,21 +101,22 @@ let FAST = (() => {
 
     let date = _get(currentConf, 'meta.formsLastUpdated', 1);
 
-    let data = await Formio.request(
-      config.APP_URL + '/form?modified__gt=' + new Date(date * 1000).toISOString() + '&select=path',
-      'GET'
-    );
+    if (Connection.isOnline()) {
+      let data = await Formio.request(
+        config.APP_URL + '/form?modified__gt=' + new Date(date * 1000).toISOString() + '&select=path',
+        'GET'
+      );
 
-    Configuration.setLastUpdated({ element: 'Forms', data });
-
-    let shouldUpdate = data.some((form) => {
-      return form.path === 'userregister';
-    });
-
-    if (shouldUpdate) {
-      Form.update({
-        filter: [{ element: 'path', query: '=', value: 'userregister' }]
+      Configuration.setLastUpdated({ element: 'Forms', data });
+      let shouldUpdate = data.some((form) => {
+        return form.path === 'userregister';
       });
+
+      if (shouldUpdate) {
+        Form.update({
+          filter: [{ element: 'path', query: '=', value: 'userregister' }]
+        });
+      }
     }
 
     let appTranslations = await Localization.setLocales();
