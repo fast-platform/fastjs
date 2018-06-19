@@ -8,26 +8,6 @@ import _find from 'lodash/find';
 
 let Auth = (() => {
   /**
-   * [remoteAuthenticate description]
-   * @param  {[type]} credentials [description]
-   * @param  {[type]} baseUrl     [description]
-   * @return {[type]}             [description]
-   */
-  function remoteAuthenticate (credentials, baseUrl, role) {
-    return UserRepository.login({ credentials: credentials, role: role })
-      .then((response) => {
-        // Store locally the user for future offline login
-        let user = response.data;
-
-        UserRepository.updateUser(user);
-        return response;
-      })
-      .catch((error) => {
-        console.log('Error from remote auth', error);
-      });
-  }
-
-  /**
    * [localAuthenticate description]
    * @param  {[type]} credentials [description]
    * @return {[type]}             [description]
@@ -38,19 +18,45 @@ let Auth = (() => {
 
     // Hash password
     const hashedPassword = md5(password, config.MD5_KEY);
+
+    console.log('----------------------');
+    console.log('username===>', username);
+    console.log('----------------------');
+
     // Get the user
-    let dbUser = await User.local().findOne({
+    let dbUser = await User.local().find({
       'data.data.email': username
     });
+    let userFound = dbUser && dbUser[0] ? dbUser[0] : undefined;
+
+    console.log('user', userFound);
+    if (!userFound) {
+      throw new Error();
+    }
 
     // Compare hashed passwords
-    const isValidUser = dbUser.data.data.hashedPassword === hashedPassword;
+    const isValidUser = userFound.data.data.hashedPassword === hashedPassword;
 
     if (!isValidUser) {
       throw new Error();
     }
     // If is valid, return the user
-    return dbUser;
+    return userFound;
+  }
+  /**
+   * [remoteAuthenticate description]
+   * @param  {[type]} credentials [description]
+   * @param  {[type]} baseUrl     [description]
+   * @return {[type]}             [description]
+   */
+  function remoteAuthenticate (credentials, baseUrl, role) {
+    return UserRepository.login({ credentials: credentials, role: role }).then((response) => {
+      // Store locally the user for future offline login
+      let user = response.data;
+
+      UserRepository.updateUser(user);
+      return response;
+    });
   }
 
   /**
@@ -58,12 +64,11 @@ let Auth = (() => {
    * @param  {[type]} credentials [description]
    * @return {Promise}             [description]
    */
-  function authenticate (credentials, baseUrl, role) {
-    if (Connection.isOnline()) {
-      return remoteAuthenticate(credentials, baseUrl, role).catch(() => {
-        console.log('Remote Auth failed, trying locally');
-        return localAuthenticate(credentials, baseUrl);
-      });
+  async function authenticate (credentials, baseUrl, role) {
+    let isOnline = await Connection.isOnline();
+
+    if (isOnline) {
+      return remoteAuthenticate(credentials, baseUrl, role);
     }
     return localAuthenticate(credentials, baseUrl);
   }

@@ -89,8 +89,8 @@ let Form = (args) => {
 
       queryParams = { ...queryParams, ...filterQuery };
     }
-
-    let remoteForms = Connection.isOnline() ?
+    let isOnline = await Connection.isOnline();
+    let remoteForms = isOnline ?
       await formio.loadForms({
         params: queryParams
       }) :

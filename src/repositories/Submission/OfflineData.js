@@ -10,8 +10,9 @@ let OfflineData = (() => {
   async function send (data) {
     let offlineSubmissions = data;
     let offlinePlugin = FormioJS.getPlugin('offline');
+    let isOnline = await Connection.isOnline();
 
-    if (Connection.isOnline()) {
+    if (isOnline) {
       Promise.each(offlineSubmissions, async function (offlineSubmission) {
         let formio = new FormioJS(offlineSubmission.data.formio.formUrl);
         let postData = {

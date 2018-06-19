@@ -1,7 +1,6 @@
 import _filter from 'lodash/filter';
 import User from 'database/models/User';
 import Auth from 'repositories/Auth/Auth';
-import Connection from 'Wrappers/Connection';
 import Submission from 'database/models/Submission';
 import OfflineData from 'repositories/Submission/OfflineData';
 
@@ -11,12 +10,9 @@ let Sync = class {
    * @param {*} vm
    */
   static async now (vm) {
-    const isOnline = Connection.isOnline();
+    await this.syncUsers();
 
-    if (isOnline) {
-      await this.syncUsers({ isOnline });
-    }
-    if (isOnline && Auth.check()) {
+    if (Auth.check()) {
       await this.syncSubmission(vm);
     }
   }
@@ -62,7 +58,7 @@ let Sync = class {
    *
    * @param {*} param
    */
-  static async syncUsers ({ isOnline }) {
+  static async syncUsers () {
     let users = await this.getUsersToSync();
 
     users = _filter(users, function (o) {

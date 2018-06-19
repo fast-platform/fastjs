@@ -1,6 +1,7 @@
 import axios from 'axios';
 import _debounce from 'lodash/debounce';
 import Event from './Event';
+import Promise from 'bluebird';
 /* eslint-disable no-unused-vars */
 let Connection = (() => {
   let online = window.navigator.onLine;
@@ -55,7 +56,18 @@ let Connection = (() => {
   }
 
   function isOnline () {
-    return window.navigator.onLine;
+    return new Promise((resolve, reject) => {
+      var xhr = XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHttp');
+
+      xhr.onload = function () {
+        resolve(true);
+      };
+      xhr.onerror = function (e) {
+        resolve(false);
+      };
+      xhr.open('GET', 'https://yesno.wtf/api', true);
+      xhr.send();
+    });
   }
 
   function heartBeat (vm) {

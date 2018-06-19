@@ -14,41 +14,45 @@ import Connection from './Wrappers/Connection';
 /* eslint-disable no-unused-vars */
 let FAST = (() => {
   async function loadRemainingConfig ({ interval = true }) {
-    let pages, err;
+    try {
+      let pages, err;
 
-    Event.emit({
-      name: 'FAST:APPLICATION:LOADING',
-      data: {},
-      text: 'The application is loading'
-    });
-    [err, pages] = await to(Pages.set());
-    if (err) {
-      let e = 'The pages could not be retrieve from source';
+      Event.emit({
+        name: 'FAST:APPLICATION:LOADING',
+        data: {},
+        text: 'The application is loading'
+      });
+      [err, pages] = await to(Pages.set());
+      if (err) {
+        let e = 'The pages could not be retrieve from source';
 
-      console.log(e, err);
+        console.log(e, err);
+      }
+      let currentConf = await Configuration.getLocal();
+
+      let shouldUpdate = !_isEmpty(currentConf.meta.needUpdateForms);
+
+      if (shouldUpdate) {
+        await Form.update();
+      }
+
+      if (interval) {
+        SyncInterval.set(2000);
+      }
+      let info = {
+        pages: pages,
+        defaultLenguage: localStorage.getItem('defaultLenguage') || 'en'
+      };
+
+      Event.emit({
+        name: 'FAST:APPLICATION:LOADED',
+        data: info,
+        text: 'The application is fully loaded'
+      });
+      return info;
+    } catch (error) {
+      console.log('error', error);
     }
-    let currentConf = await Configuration.getLocal();
-
-    let shouldUpdate = !_isEmpty(currentConf.meta.needUpdateForms);
-
-    if (shouldUpdate) {
-      await Form.update();
-    }
-
-    if (interval) {
-      SyncInterval.set(2000);
-    }
-    let info = {
-      pages: pages,
-      defaultLenguage: localStorage.getItem('defaultLenguage') || 'en'
-    };
-
-    Event.emit({
-      name: 'FAST:APPLICATION:LOADED',
-      data: info,
-      text: 'The application is fully loaded'
-    });
-    return info;
   }
 
   async function sync ({ interval = true, appConf }) {
@@ -100,22 +104,27 @@ let FAST = (() => {
     let currentConf = await Configuration.getLocal();
 
     let date = _get(currentConf, 'meta.formsLastUpdated', 1);
+    let isOnline = await Connection.isOnline();
 
-    if (Connection.isOnline()) {
-      let data = await Formio.request(
-        config.APP_URL + '/form?modified__gt=' + new Date(date * 1000).toISOString() + '&select=path',
-        'GET'
-      );
+    if (isOnline) {
+      try {
+        let data = await Formio.request(
+          config.APP_URL + '/form?modified__gt=' + new Date(date * 1000).toISOString() + '&select=path',
+          'GET'
+        );
 
-      Configuration.setLastUpdated({ element: 'Forms', data });
-      let shouldUpdate = data.some((form) => {
-        return form.path === 'userregister';
-      });
-
-      if (shouldUpdate) {
-        Form.update({
-          filter: [{ element: 'path', query: '=', value: 'userregister' }]
+        Configuration.setLastUpdated({ element: 'Forms', data });
+        let shouldUpdate = data.some((form) => {
+          return form.path === 'userregister';
         });
+
+        if (shouldUpdate) {
+          Form.update({
+            filter: [{ element: 'path', query: '=', value: 'userregister' }]
+          });
+        }
+      } catch (error) {
+        console.log('error', error);
       }
     }
 

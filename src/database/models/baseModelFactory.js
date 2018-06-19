@@ -65,7 +65,9 @@ const baseModel = () => {
             form
           });
         }
-        return Connection.isOnline() ?
+        let isOnline = await Connection.isOnline();
+
+        return isOnline ?
           Remote.find({
             formPath: form || this.getFormPath(),
             filter,
@@ -87,7 +89,9 @@ const baseModel = () => {
         let remote;
 
         if (this.getFormPath() === 'custom') {
-          remote = Connection.isOnline() ?
+          let isOnline = await Connection.isOnline();
+
+          remote = isOnline ?
             await this.rFind({
               formPath: this.getFormPath(),
               filter,
@@ -99,7 +103,9 @@ const baseModel = () => {
             }) :
             [];
         } else {
-          remote = Connection.isOnline() ?
+          let isOnline = await Connection.isOnline();
+
+          remote = isOnline ?
             await Remote.find({
               formPath: form || this.getFormPath(),
               filter,

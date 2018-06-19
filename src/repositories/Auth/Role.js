@@ -12,8 +12,9 @@ let Role = (() => {
     let localRoles = await Roles.local().find();
 
     localRoles = _get(localRoles, '[0]', undefined);
+    let isOnline = await Connection.isOnline();
 
-    if (Connection.isOnline()) {
+    if (isOnline) {
       [error, remoteRoles] = await to(axios.get(url + '/access'));
 
       if (error) {

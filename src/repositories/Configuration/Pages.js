@@ -10,8 +10,9 @@ let PAGES = (() => {
 
     localPages = await Pages.local().find();
     localPages = _get(localPages, '[0]', undefined);
+    let isOnline = await Connection.isOnline();
 
-    if (Connection.isOnline()) {
+    if (isOnline) {
       [error, remotePages] = await to(Pages.remote().find({ limit: 500 }));
       if (error) {
         throw new Error(error);

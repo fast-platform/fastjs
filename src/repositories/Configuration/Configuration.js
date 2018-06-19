@@ -1,4 +1,4 @@
-// import Connection from 'Wrappers/Connection';
+import Connection from 'Wrappers/Connection';
 import CONFIGURATION from 'database/models/Configuration';
 import _get from 'lodash/get';
 
@@ -20,15 +20,16 @@ let Configuration = (() => {
 
   async function getRemote (appConf) {
     let remoteConfig;
+    let isOnline = await Connection.isOnline();
 
-    if (window.navigator.onLine) {
+    if (isOnline) {
       try {
         remoteConfig = await CONFIGURATION.remote().find({
           filter: [{ element: '_id', query: '=', value: appConf.appConfigId }],
           limit: 1
         });
       } catch (error) {
-        throw new Error(error);
+        console.log('error', error);
       }
     }
     return _get(remoteConfig, '[0].data', undefined);
