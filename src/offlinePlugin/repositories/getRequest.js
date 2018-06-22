@@ -1,6 +1,6 @@
 import Form from 'database/models/Form';
-import Auth from 'repositories/Auth/Auth';
-import Submission from 'database/models/Submission';
+// import Auth from 'repositories/Auth/Auth';
+// import Submission from 'database/models/Submission';
 
 const GetRequest = class {
   /**
@@ -44,6 +44,7 @@ const GetRequest = class {
    * @param {*} args
    */
   static async handleInternalResource (args) {
+    return null;
     let formID = args && args.url && args.url.split('/')[4];
     let form = await Form.local().find();
 
@@ -54,17 +55,18 @@ const GetRequest = class {
     if (!form) {
       return;
     }
-    let submissions = await Submission.local().find();
+    /* let submissions = await Submission.local().find();
 
     submissions = submissions.filter((s) => {
-      return s.data.formio.formId === form.data.path && (s.data.owner === Auth.user()._id);
+      return s.data.formio.formId === form.data.path && s.data.owner === Auth.user()._id;
     });
 
     submissions = submissions.map((s) => {
       return { data: s.data.data };
     });
 
-    return submissions;
+    // return submissions;
+    */
   }
 };
 

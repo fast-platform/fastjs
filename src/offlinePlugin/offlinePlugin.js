@@ -8,49 +8,13 @@ const OFFLINE_PLUGIN = class {
     let plugin = {
       priority: 0,
       staticRequest: async (args) => {
-        /*
-        return
-        // Try to get the form associated to the static request
-        let formArray = args.url.split('/')
-
-        // Making a static Request to Form.io using the Form path
-        let localformId = formArray[4] ? formArray[4] : ''
-
-        // Making a static Request to FORM.io Using formID instead of Name
-        if (formArray[5] && formArray[5] === 'form') {
-          localformId = formArray[6] ? formArray[6] : ''
-        }
-        let form = await Form.local().get(localformId)
-        // If its a external call outside FORM.io (Local Resources)
-        if (args.url.indexOf('form.io') === -1 && args.method === 'GET') {
-          let a = {
-            'count': 811,
-            'previous': null,
-            'results': [{
-              'url': 'https://pokeapi.co/api/v2/pokemon/1/',
-              'name': 'aaa'
-            }]
-          }
-          return a
-        }
-        // If there is no form associated, we stop
-        if (!form) {
-          console.log('there is no form associated')
-          return
-        }
-
-        let submissions = await Submission.local().stored(Auth.user()._id, form.path)
-        let jsonSubmissions = this.LocalToJson(submissions)
-        return jsonSubmissions
-        */
+        return null;
       },
       request: async (args) => {
         Formio.clearCache();
 
         if (args.method === 'GET') {
-          let result = GetRequest.handle(args);
-
-          return result;
+          return GetRequest.handle(args);
         }
 
         // If we are trying to save a submission
