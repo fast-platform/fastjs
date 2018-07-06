@@ -17,7 +17,7 @@ import User from 'database/models/User';
 import countryList from 'database/resources/countries.json';
 import FormLabels from 'repositories/Form/Labels';
 import OfflinePlugin from 'offlinePlugin/offlinePlugin';
-
+import Role from 'repositories/Auth/Role';
 export {
   Moment,
   Event,
@@ -37,5 +37,6 @@ export {
   User,
   countryList,
   FormLabels,
-  OfflinePlugin
+  OfflinePlugin,
+  Role
 };

@@ -4,7 +4,9 @@ import User from 'database/models/User';
 import UserRepository from 'repositories/User/User';
 import Connection from 'Wrappers/Connection';
 import Role from 'database/models/Role';
+import RoleRepo from 'repositories/Auth/Role';
 import _find from 'lodash/find';
+import _isEmpty from 'lodash/isEmpty';
 
 let Auth = (() => {
   /**
@@ -18,10 +20,6 @@ let Auth = (() => {
 
     // Hash password
     const hashedPassword = md5(password, config.MD5_KEY);
-
-    console.log('----------------------');
-    console.log('username===>', username);
-    console.log('----------------------');
 
     // Get the user
     let dbUser = await User.local().find({
@@ -156,6 +154,34 @@ let Auth = (() => {
     return typeof result !== 'undefined';
   }
 
+  function hasRoleIn (roles) {
+    if (!roles || _isEmpty(roles)) {
+      return true;
+    }
+    return roles.some((role) => {
+      return hasRole(role) || role === 'Authenticated';
+    });
+  }
+
+  async function hasRoleIdIn (rolesIds) {
+    if (!rolesIds || _isEmpty(rolesIds)) {
+      return true;
+    }
+    let appRoles = await RoleRepo.getLocal();
+
+    let roles = rolesIds.reduce((reducer, roleId) => {
+      Object.keys(appRoles).forEach(function (role) {
+        if (appRoles[role] && appRoles[role]._id && appRoles[role]._id === roleId) {
+          reducer.push(appRoles[role].title);
+        }
+      });
+      return reducer;
+    }, []);
+
+    return roles.some((role) => {
+      return hasRole(role) || role === 'Authenticated';
+    });
+  }
   /**
    * Checks if the current user is
    * Authenticated
@@ -177,6 +203,8 @@ let Auth = (() => {
   return Object.freeze({
     user,
     email,
+    hasRoleIn,
+    hasRoleIdIn,
     hasRole,
     check,
     logOut,
