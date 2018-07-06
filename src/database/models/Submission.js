@@ -7,6 +7,7 @@ import Auth from 'repositories/Auth/Auth';
 import moment from 'moment';
 import baseModel from './baseModelFactory';
 import _cloneDeep from 'lodash/cloneDeep';
+import Form from 'database/models/Form';
 
 let Submission = (args) => {
   var baseModel = args.baseModel;
@@ -157,6 +158,14 @@ let Submission = (args) => {
       };
       // submissions = submissions.slice(firstRecord - 1, lastRecord);
     }
+    let fullForm = await Form.get(form);
+    let templates = fullForm.components.reduce((templates, c) => {
+      if (c.properties && c.properties.table_view_template) {
+        templates.push({ key: c.key, template: c.properties.table_view_template });
+      }
+      return templates;
+    }, []);
+
     submissions = submissions.map((s) => {
       let sub = {
         _id: s._id,
@@ -170,6 +179,18 @@ let Submission = (args) => {
       if (s._lid) {
         sub._lid = s._lid;
       }
+
+      // Custom templates using table_view_template propertie
+      templates.forEach((t) => {
+        /* eslint-disable */
+        let newFx = Function('value', 'data', t.template );
+        /* eslint-enable */
+        try {
+          s[t.key] = newFx(s[t.key], s);
+        } catch (error) {
+          console.log('There is an error on one of your calculations', error);
+        }
+      });
 
       // We need to remove this from here and create
       // A proper extension to allow tables to have custom visuali
