@@ -158,7 +158,7 @@ const baseModel = () => {
    * @param  {[type]} document [description]
    * @return {[type]}          [description]
    */
-  async function remove (document) {
+  async function remove (document, id, formPath) {
     switch (getFrom) {
       case 'local':
         return Local.remove({
@@ -167,6 +167,14 @@ const baseModel = () => {
         });
         break;
       case 'remote':
+        let isOnline = await Connection.isOnline();
+
+        return isOnline ?
+          Remote.remove({
+            formPath,
+            id
+          }) :
+          undefined;
         return;
         break;
       case 'remote-local':

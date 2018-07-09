@@ -96,7 +96,7 @@ const remoteModel = (() => {
 
     Formio.clearCache();
     // Set URL in case of submission context
-    formUrl = submissionID ? formUrl + 'submission/' + submissionID : formUrl;
+    formUrl = submissionID ? formUrl + '/submission/' + submissionID : formUrl;
     return new Formio(formUrl);
   }
   /**
@@ -173,7 +173,14 @@ const remoteModel = (() => {
    * @param  {[type]} document [description]
    * @return {[type]}          [description]
    */
-  async function remove ({ formPath, document }) {}
+  async function remove ({ id, formPath }) {
+    let formio = await getFormioInstance({ formPath: formPath, submissionID: id });
+    let a = await formio.deleteSubmission();
+
+    console.log('----------------------');
+    console.log('===>removing', a);
+    console.log('----------------------');
+  }
   /**
    * [insert description]
    * @param  {[type]} element [description]
