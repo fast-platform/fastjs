@@ -183,6 +183,31 @@ const baseModel = () => {
     }
   }
   /**
+   * [remove description]
+   * @param  {[type]} document [description]
+   * @return {[type]}          [description]
+   */
+  async function softDelete ({ id, formPath }) {
+    switch (getFrom) {
+      case 'local':
+        break;
+      case 'remote':
+        let isOnline = await Connection.isOnline();
+
+        return isOnline ?
+          Remote.softDelete({
+            formPath,
+            id
+          }) :
+          undefined;
+        return;
+        break;
+      case 'remote-local':
+        return;
+        break;
+    }
+  }
+  /**
    * [insert description]
    * @param  {[type]} element [description]
    * @return {[type]}         [description]
@@ -271,6 +296,7 @@ const baseModel = () => {
     find,
     findOne,
     remove,
+    softDelete,
     insert,
     update,
     updateOrCreate,

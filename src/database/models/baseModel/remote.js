@@ -176,10 +176,20 @@ const remoteModel = (() => {
   async function remove ({ id, formPath }) {
     let formio = await getFormioInstance({ formPath: formPath, submissionID: id });
     let a = await formio.deleteSubmission();
+  }
 
-    console.log('----------------------');
-    console.log('===>removing', a);
-    console.log('----------------------');
+  async function softDelete ({ id, formPath }) {
+    let formio = await getFormioInstance({ formPath: formPath, submissionID: id });
+    let original = await formio.loadSubmission();
+
+    original.data.enabled = false;
+    let data = original.data;
+    let softDeleted = await formio.saveSubmission({
+      _id: id,
+      data
+    });
+
+    return softDeleted;
   }
   /**
    * [insert description]
@@ -220,7 +230,8 @@ const remoteModel = (() => {
     update,
     updateOrCreate,
     findAndRemove,
-    getFormioInstance
+    getFormioInstance,
+    softDelete
   });
 })();
 
