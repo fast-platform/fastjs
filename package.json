@@ -1,6 +1,6 @@
 {
   "name": "fast-fastjs",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "Formio interface for online and offline use",
   "main": "lib/fast-fastjs.js",
   "directories": {
@@ -17,12 +17,7 @@
     "type": "git",
     "url": "https://github.com/UN-FAO/fastjs.git"
   },
-  "keywords": [
-    "form.io",
-    "js",
-    "cordova",
-    "browser"
-  ],
+  "keywords": ["form.io", "js", "cordova", "browser"],
   "author": "Ignacio Cabrera",
   "license": "MIT",
   "bugs": {

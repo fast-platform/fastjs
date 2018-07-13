@@ -8,6 +8,7 @@ import moment from 'moment';
 import baseModel from './baseModelFactory';
 import _cloneDeep from 'lodash/cloneDeep';
 import Form from 'database/models/Form';
+import FormioUtils from 'formiojs/utils';
 
 let Submission = (args) => {
   var baseModel = args.baseModel;
@@ -159,12 +160,14 @@ let Submission = (args) => {
       // submissions = submissions.slice(firstRecord - 1, lastRecord);
     }
     let fullForm = await Form.get(form);
-    let templates = fullForm.components.reduce((templates, c) => {
-      if (c.properties && c.properties.table_view_template) {
-        templates.push({ key: c.key, template: c.properties.table_view_template });
+
+    let templates = [];
+
+    FormioUtils.eachComponent(fullForm.components, (c) => {
+      if (c.properties && c.properties.FAST_TABLE_TEMPLATE) {
+        templates.push({ key: c.key, template: c.properties.FAST_TABLE_TEMPLATE });
       }
-      return templates;
-    }, []);
+    });
 
     submissions = submissions.map((s) => {
       let sub = {
@@ -180,10 +183,10 @@ let Submission = (args) => {
         sub._lid = s._lid;
       }
 
-      // Custom templates using table_view_template propertie
+      // Custom templates using FAST_TABLE_TEMPLATE propertie
       templates.forEach((t) => {
         /* eslint-disable */
-        let newFx = Function('value', 'data', t.template );
+        let newFx = Function('value', 'data', t.template);
         /* eslint-enable */
         try {
           s[t.key] = newFx(s[t.key], s);
