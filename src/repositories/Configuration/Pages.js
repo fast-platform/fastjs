@@ -19,19 +19,16 @@ let PAGES = (() => {
       }
     }
     remotePages = _get(remotePages, '[0].data', undefined);
+    let newPages = localPages;
 
-    if (remotePages) {
+    if (remotePages && !_isEmpty(remotePages)) {
       if (localPages) {
         await Pages.local().remove(localPages);
       }
-      if (!_isEmpty(remotePages)) {
-        let insertedConfig = await Pages.local().insert(remotePages);
-
-        return insertedConfig;
-      }
-    } else {
-      return localPages;
+      newPages = await Pages.local().insert(remotePages);
     }
+
+    return newPages;
   }
 
   async function getLocal (submission) {

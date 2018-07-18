@@ -4,7 +4,7 @@ import _isEmpty from 'lodash/isEmpty';
 import Translation from 'database/models/Translation';
 import config from 'config';
 import Form from 'database/models/Form';
-
+import Pages from 'repositories/Configuration/Pages';
 class FormLabels {
   /**
    *
@@ -124,11 +124,36 @@ class FormLabels {
         true
       );
     });
-
+    // Include the Application translations
     if (formNameFilter.includes('Application')) {
       let translations = config.get().translations;
 
       componentLabels = componentLabels.concat(translations);
+    }
+
+    if (formNameFilter.includes('Pages')) {
+      let pagesTranslations = await Pages.getLocal();
+
+      pagesTranslations.pages.forEach((page) => {
+        page.cards.forEach((card) => {
+          if (card.title && card.title !== '') {
+            componentLabels.push(card.title);
+          }
+
+          if (card.subtitle && card.subtitle !== '') {
+            componentLabels.push(card.subtitle);
+          }
+
+          card.actions.forEach((action) => {
+            if (action.text && action.text !== '') {
+              componentLabels.push(action.text);
+            }
+          });
+        });
+        if (page.title && page.title !== '') {
+          componentLabels.push(page.title);
+        }
+      });
     }
     // Clean duplicated labels
     let uniqueLabels = Array.from(new Set(componentLabels)).sort();
