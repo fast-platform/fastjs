@@ -7,9 +7,6 @@ const OFFLINE_PLUGIN = class {
   static getPlugin ({ formio, hashField }) {
     let plugin = {
       priority: 0,
-      staticRequest: async (args) => {
-        return null;
-      },
       request: async (args) => {
         Formio.clearCache();
 

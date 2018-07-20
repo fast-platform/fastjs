@@ -26,7 +26,11 @@ const PostRequest = class {
       };
 
       submission = formSubmission;
+      // TODO we have to figure out how to do this call
+      // When we are working in offline mode
+      return null;
     }
+
     // let dStoreForm = _debounce(StoreForm.handle, 1500);
 
     let created = await StoreForm.handle({ submission, formio, hashField });

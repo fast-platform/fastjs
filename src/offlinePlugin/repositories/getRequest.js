@@ -13,8 +13,8 @@ const GetRequest = class {
       return GetRequest.handleExternalAPI(args);
     }
     // If we are trying to get a form we load it locally
-    // This action will get triggered when we create a
-    // resource from inside of another Form
+    // This action will get triggered when we load a create form
+    // of a resource from inside of another Form
     if (args.type === 'form') {
       return GetRequest.handleLocalForm(args);
     }
