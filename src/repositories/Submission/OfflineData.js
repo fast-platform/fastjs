@@ -23,7 +23,7 @@ let OfflineData = (() => {
         let model = Submission.local();
 
         if (offlineSubmission.data.formio.formId === 'userregister') {
-          model = User;
+          model = User.local();
         }
         // Set the submission as queuedForSync
         await model.update(offlineSubmission);

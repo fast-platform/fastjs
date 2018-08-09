@@ -18,6 +18,7 @@ import countryList from 'database/resources/countries.json';
 import FormLabels from 'repositories/Form/Labels';
 import OfflinePlugin from 'offlinePlugin/offlinePlugin';
 import Role from 'repositories/Auth/Role';
+import Hash from 'repositories/Submission/Hash';
 export {
   Moment,
   Event,
@@ -38,5 +39,6 @@ export {
   countryList,
   FormLabels,
   OfflinePlugin,
-  Role
+  Role,
+  Hash
 };
