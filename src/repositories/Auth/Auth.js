@@ -198,6 +198,8 @@ let Auth = (() => {
    */
   async function logOut () {
     await localStorage.removeItem('authUser');
+    await localStorage.removeItem('formioToken');
+    await localStorage.removeItem('formioUser');
   }
 
   return Object.freeze({

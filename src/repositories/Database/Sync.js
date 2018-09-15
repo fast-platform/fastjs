@@ -3,6 +3,7 @@ import User from 'database/models/User';
 import Auth from 'repositories/Auth/Auth';
 import Submission from 'database/models/Submission';
 import OfflineData from 'repositories/Submission/OfflineData';
+import Scheduler from 'repositories/Database/Scheduler';
 
 let Sync = class {
   /**
@@ -30,7 +31,9 @@ let Sync = class {
 
     let unsyncSubmissions = await Submission.local().getUnsync();
 
-    if (unsyncSubmissions.length > 0) {
+    let isSyncing = await Scheduler.isSyncing();
+
+    if (unsyncSubmissions.length > 0 && !isSyncing) {
       OfflineData.send(unsyncSubmissions);
     }
   }

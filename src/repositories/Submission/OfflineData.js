@@ -5,6 +5,7 @@ import FormioJS from 'formiojs';
 // import Raven from 'config/raven';
 import Event from 'Wrappers/Event';
 import Promise from 'bluebird';
+import Scheduler from 'repositories/Database/Scheduler';
 
 let OfflineData = (() => {
   async function send (data) {
@@ -13,6 +14,7 @@ let OfflineData = (() => {
     let isOnline = await Connection.isOnline();
 
     if (isOnline) {
+      await Scheduler.startSync();
       Promise.each(offlineSubmissions, async function (offlineSubmission) {
         let formio = new FormioJS(offlineSubmission.data.formio.formUrl);
         let postData = {
@@ -83,6 +85,7 @@ let OfflineData = (() => {
           }
         }
       }).then((result) => {
+        Scheduler.stopSync();
         Event.emit({
           name: 'FAST:SUBMISSION:SYNCED',
           data: {},
