@@ -68,7 +68,9 @@ let Sync = class {
       return o.data.sync === false && !o.data.queuedForSync && !o.data.syncError;
     });
 
-    if (Array.isArray(users) && users.length > 0) {
+    let isSyncing = await Scheduler.isSyncing();
+
+    if (Array.isArray(users) && users.length > 0 && !isSyncing) {
       OfflineData.send(users);
     }
   }
