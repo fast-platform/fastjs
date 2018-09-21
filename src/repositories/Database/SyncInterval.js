@@ -1,4 +1,6 @@
 import Sync from './Sync';
+import _debounce from 'lodash/debounce';
+
 let SyncInterval = (() => {
   async function set (milliseconds) {
     let rInterval = function (callback, delay) {
@@ -21,9 +23,9 @@ let SyncInterval = (() => {
       };
     };
 
-    rInterval(() => {
-      return Sync.now();
-    }, milliseconds);
+    var _debouncedSync = _debounce(Sync.now, 2000);
+
+    rInterval(_debouncedSync, milliseconds);
   }
 
   return Object.freeze({

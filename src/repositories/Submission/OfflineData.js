@@ -84,14 +84,19 @@ let OfflineData = (() => {
             FormioJS.registerPlugin(offlinePlugin, 'offline');
           }
         }
-      }).then((result) => {
-        Scheduler.stopSync();
-        Event.emit({
-          name: 'FAST:SUBMISSION:SYNCED',
-          data: {},
-          text: 'The submissions have been synced'
+      })
+        .then((result) => {
+          Scheduler.stopSync();
+          Event.emit({
+            name: 'FAST:SUBMISSION:SYNCED',
+            data: {},
+            text: 'The submissions have been synced'
+          });
+        })
+        .catch((e) => {
+          console.log(e);
+          Scheduler.stopSync();
         });
-      });
     }
   }
 

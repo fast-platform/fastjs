@@ -6,8 +6,6 @@ import LokiIndexedAdapter from 'lokijs/src/loki-indexed-adapter';
 | LockiDB Config
 |--------------------------------------------------------------------------
 | This is the configuration for the Local DB creation.
-| Also you will find the sync methods for
-| the external server (FORM.io)
 |
 */
 var DB;
@@ -60,7 +58,7 @@ const _create = function () {
         db.addCollection('Role');
       }
 
-      db.saveDatabase();
+      // db.saveDatabase();
       resolve(db);
     }
   });

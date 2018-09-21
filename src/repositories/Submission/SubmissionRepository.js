@@ -35,7 +35,7 @@ let Submission = (() => {
     // Cases where we want to update
     let sendingSubmission = submission.draft === false;
     let fromDraftToSubmission = localSubmission.data.draft === false && submission.draft === false;
-    let autoSave = submission.trigger === 'autoSaveAsDraft';
+    let autoSave = submission.trigger === 'autoSaveAsDraft' || submission.trigger === 'saveAsLocalDraft';
     let isSynced = !!(localSubmission.data.access && Array.isArray(localSubmission.data.access));
     let hasError = localSubmission.data.syncError !== false && typeof localSubmission.data.syncError !== 'undefined';
 

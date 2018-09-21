@@ -10,6 +10,10 @@ const remoteModel = (() => {
     // Condition {element: '_id', query: 'in', value: ''}
     let filterQuery = {};
 
+    filter = filter.filter((e) => {
+      return !e.type || e.type !== 'local';
+    });
+
     filter.forEach((condition) => {
       let valueString = '';
 

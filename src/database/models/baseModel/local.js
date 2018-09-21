@@ -12,13 +12,28 @@ const localModel = (() => {
 
     return DB.getCollection(model);
   }
+
   /**
    * [find description]
    * @param  {[type]} filter [description]
    * @return {[type]}        [description]
    */
-  async function find ({ modelName, filter, limit, select, pagination }) {
+  async function find ({ modelName, filter, limit, select, pagination, form }) {
     const model = await getModel({ model: modelName });
+
+    if (filter && Array.isArray(filter)) {
+      let owner = filter.find((e) => {
+        return e.element === 'owner' && e.type === 'local';
+      });
+
+      if (owner) {
+        filter = { 'data.user_email': owner.value };
+      }
+
+      if (form) {
+        filter = { ...filter, 'data.formio.formId': form };
+      }
+    }
 
     return model.find(filter);
   }
@@ -49,9 +64,11 @@ const localModel = (() => {
    */
   async function insert ({ modelName, element }) {
     element = _cloneDeep(element);
+
     const model = await getModel({ model: modelName });
 
     element._id = uuidv4() + '_local';
+
     return model.insert(element);
   }
   /**
@@ -80,6 +97,12 @@ const localModel = (() => {
     return model.findAndRemove(filter);
   }
 
+  async function clear ({ modelName }) {
+    const model = await getModel({ model: modelName });
+
+    return model.clear({ removeIndices: true });
+  }
+
   return Object.freeze({
     getModel,
     find,
@@ -88,7 +111,8 @@ const localModel = (() => {
     insert,
     update,
     updateOrCreate,
-    findAndRemove
+    findAndRemove,
+    clear
   });
 })();
 

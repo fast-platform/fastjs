@@ -42,7 +42,7 @@ const baseModel = () => {
    * @param  {[type]} filter [description]
    * @return {[type]}        [description]
    */
-  async function find ({ filter, limit = undefined, select, pagination, form, populate } = {}) {
+  async function find ({ filter, limit = undefined, select, pagination, form, populate, reviewer } = {}) {
     switch (getFrom) {
       case 'local':
         return Local.find({
@@ -50,7 +50,8 @@ const baseModel = () => {
           filter,
           limit,
           select,
-          pagination
+          pagination,
+          form
         });
         break;
       case 'remote':
@@ -84,7 +85,8 @@ const baseModel = () => {
           filter,
           limit,
           select,
-          pagination
+          pagination,
+          form
         });
         let remote;
 
@@ -98,8 +100,7 @@ const baseModel = () => {
               limit,
               select,
               pagination,
-              populate,
-              form
+              populate
             }) :
             [];
         } else {
@@ -253,6 +254,21 @@ const baseModel = () => {
     }
   }
 
+  async function clear () {
+    switch (getFrom) {
+      case 'local':
+        return Local.clear({
+          modelName: this.getOwnName()
+        });
+        break;
+      case 'remote':
+        break;
+      case 'remote-local':
+        return;
+        break;
+    }
+  }
+
   async function updateOrCreate (document) {
     switch (getFrom) {
       case 'local':
@@ -300,7 +316,8 @@ const baseModel = () => {
     insert,
     update,
     updateOrCreate,
-    findAndRemove
+    findAndRemove,
+    clear
   });
 };
 

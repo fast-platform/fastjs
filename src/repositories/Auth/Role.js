@@ -3,9 +3,30 @@ import Roles from 'database/models/Role';
 import _get from 'lodash/get';
 import to from 'await-to-js';
 import axios from 'axios';
+import moment from 'moment';
 
 let Role = (() => {
-  async function set (url) {
+  function getRolesDate (localRoles) {
+    let localConfigDate;
+
+    if (_get(localRoles, 'meta.created', null)) {
+      localConfigDate = _get(localRoles, 'meta.created', null);
+    } else if (_get(localRoles, 'updated', null)) {
+      localConfigDate = _get(localRoles, 'updated', null);
+    } else {
+      localConfigDate = 0;
+    }
+
+    return moment(localConfigDate).unix();
+  }
+
+  async function getLocal () {
+    let roles = await Roles.local().find();
+
+    return _get(roles, '[0]', undefined);
+  }
+
+  async function setOnlineRoles ({ url }) {
     let error;
     let remoteRoles;
 
@@ -26,7 +47,7 @@ let Role = (() => {
 
     if (remoteRoles) {
       if (localRoles) {
-        await Roles.local().remove(localRoles);
+        await Roles.local().clear();
       }
       let insertedRoles = await Roles.local().insert(remoteRoles);
 
@@ -35,10 +56,29 @@ let Role = (() => {
     return localRoles;
   }
 
-  async function getLocal (submission) {
-    let pages = await Roles.local().find();
+  async function setOfflineRoles ({ appConf }) {
+    let localRoles = await getLocal();
 
-    return _get(pages, '[0]', {});
+    let rolesDate = getRolesDate(localRoles);
+    let offlineRolesDate = appConf.offlineFiles.lastUpdated.date;
+
+    if (offlineRolesDate > rolesDate || !localRoles) {
+      if (localRoles) {
+        await Roles.local().clear();
+      }
+      let insertedRoles = await Roles.local().insert(appConf.offlineFiles.Roles);
+
+      return insertedRoles;
+    }
+
+    return localRoles;
+  }
+
+  async function set ({ url, appConf }) {
+    if (appConf.offlineStart === 'true') {
+      return setOfflineRoles({ appConf });
+    }
+    return setOnlineRoles({ url });
   }
 
   return Object.freeze({

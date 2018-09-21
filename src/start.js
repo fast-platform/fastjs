@@ -7,10 +7,10 @@ import SyncInterval from './repositories/Database/SyncInterval';
 import fastConfig from './config';
 import to from 'await-to-js';
 import Roles from 'repositories/Auth/Role';
-import Formio from 'formiojs';
+// import Formio from 'formiojs';
 import _isEmpty from 'lodash/isEmpty';
-import _get from 'lodash/get';
-import Connection from './Wrappers/Connection';
+// import _get from 'lodash/get';
+// import Connection from './Wrappers/Connection';
 /* eslint-disable no-unused-vars */
 let FAST = (() => {
   async function loadRemainingConfig ({ interval = true }) {
@@ -22,6 +22,7 @@ let FAST = (() => {
         data: {},
         text: 'The application is loading'
       });
+
       [err, pages] = await to(Pages.set());
       if (err) {
         let e = 'The pages could not be retrieve from source';
@@ -37,7 +38,7 @@ let FAST = (() => {
       }
 
       if (interval) {
-        SyncInterval.set(2000);
+        SyncInterval.set(3000);
       }
       let info = {
         pages: pages,
@@ -99,8 +100,9 @@ let FAST = (() => {
     // Change the Base URL for all the other calls
     fastConfig.setBaseUrl(config.APP_URL);
 
-    Roles.set(config.APP_URL);
+    Roles.set({ url: config.APP_URL, appConf });
 
+    /*
     let currentConf = await Configuration.getLocal();
 
     let date = _get(currentConf, 'meta.formsLastUpdated', 1);
@@ -127,7 +129,7 @@ let FAST = (() => {
         console.log('error', error);
       }
     }
-
+    */
     let appTranslations = await Localization.setLocales();
 
     return {

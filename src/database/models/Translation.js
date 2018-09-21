@@ -14,9 +14,7 @@ let Translation = (args) => {
   }
 
   async function getFormTranslations () {
-    let formTranslations = {
-      i18n: {}
-    };
+    let i18n = {};
 
     let localTranslations = await Translation.local().findOne();
 
@@ -24,11 +22,10 @@ let Translation = (args) => {
 
     _forEach(localTranslations, (lenguage, index) => {
       if (index !== 'type') {
-        formTranslations.i18n[index] = lenguage;
+        i18n[index] = lenguage;
       }
     });
-
-    return formTranslations;
+    return i18n;
   }
   /**
    *

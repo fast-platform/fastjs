@@ -98,7 +98,7 @@ let Submission = (args) => {
       filter,
       populate
     });
-    // Need to clone the object for as it is Dynamic LokiJs
+    // Need to clone the object as it is Dynamic LokiJs
     submissions = _cloneDeep(submissions);
 
     submissions = submissions.map((o) => {

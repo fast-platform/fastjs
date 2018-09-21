@@ -1,6 +1,7 @@
 import Connection from 'Wrappers/Connection';
 import CONFIGURATION from 'database/models/Configuration';
 import _get from 'lodash/get';
+import moment from 'moment';
 
 let Configuration = (() => {
   /* eslint-disable no-unused-vars */
@@ -35,11 +36,45 @@ let Configuration = (() => {
     return _get(remoteConfig, '[0].data', undefined);
   }
 
-  async function set ({ Vue, appConf }) {
-    let localConfig, remoteConfig;
+  function getConfigDate (localConfig) {
+    let localConfigDate;
 
-    localConfig = await getLocal();
-    remoteConfig = await getRemote(appConf);
+    if (_get(localConfig, 'meta.updated', null)) {
+      localConfigDate = moment(_get(localConfig, 'meta.updated', null)).unix();
+    } else if (_get(localConfig, 'updated', null)) {
+      localConfigDate = _get(localConfig, 'updated', null);
+    } else {
+      localConfigDate = moment(0);
+    }
+    return localConfigDate;
+  }
+  async function setOfflineConfig ({ Vue, appConf }) {
+    let localConfig = await getLocal();
+
+    let localConfigDate = getConfigDate(localConfig);
+    let offlineConfigDate = appConf.offlineFiles.lastUpdated.date;
+
+    if (offlineConfigDate > localConfigDate) {
+      let offlineConfig = {
+        ...appConf.offlineFiles.Configuration.data,
+        updated: moment(appConf.offlineFiles.Configuration.modified).unix()
+      };
+
+      if (localConfig) {
+        await CONFIGURATION.local().clear();
+      }
+      let insertedConfig = await CONFIGURATION.local().insert(offlineConfig);
+
+      assingGlobalVariable(Vue, insertedConfig);
+      return insertedConfig;
+    }
+    assingGlobalVariable(Vue, localConfig);
+    return localConfig;
+  }
+  async function setOnlineConfig ({ Vue, appConf }) {
+    let localConfig = await getLocal();
+
+    let remoteConfig = await getRemote(appConf);
 
     if (!localConfig && !remoteConfig) {
       throw new Error('Application is not connected to internet, or the configuration file cannot be pulled');
@@ -53,12 +88,19 @@ let Configuration = (() => {
     remoteConfig.meta = localConfig && localConfig.meta ? localConfig.meta : {};
 
     if (localConfig) {
-      await CONFIGURATION.local().remove(localConfig);
+      await CONFIGURATION.local().clear();
     }
+
     let insertedConfig = await CONFIGURATION.local().insert(remoteConfig);
 
     assingGlobalVariable(Vue, insertedConfig);
     return insertedConfig;
+  }
+  async function set ({ Vue, appConf }) {
+    if (appConf.offlineStart === 'true') {
+      return setOfflineConfig({ Vue, appConf });
+    }
+    return setOnlineConfig({ Vue, appConf });
   }
 
   async function setLastUpdated ({ element, data }) {
@@ -91,7 +133,7 @@ let Configuration = (() => {
 
     let updated = await CONFIGURATION.local().update(localConfig);
 
-    return updated;
+    return localConfig;
   }
 
   return Object.freeze({
