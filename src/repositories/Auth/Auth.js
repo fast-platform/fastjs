@@ -91,7 +91,7 @@ let Auth = (() => {
 
           // Save auth user
           localStorage.setItem('authUser', JSON.stringify(user));
-
+          localStorage.setItem('formioToken', headers['x-jwt-token']);
           // user.isAdmin = true
           let roles = await Role.local().find();
 

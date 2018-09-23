@@ -1,6 +1,6 @@
 import FormioUtils from 'formiojs/utils';
 import _forEach from 'lodash/forEach';
-import _isEmpty from 'lodash/isEmpty';
+// import _isEmpty from 'lodash/isEmpty';
 import Translation from 'database/models/Translation';
 import config from 'config';
 import Form from 'database/models/Form';
@@ -19,104 +19,246 @@ class FormLabels {
    * @param {*} formNameFilter
    * @param {*} languageFilter
    */
-  static async handle (formNameFilter, languageFilter) {
-    let allLanguages = require('database/resources/isoLanguages.json');
+  static async handle () {
+    let labels = await this.fetchAllLabels();
 
-    allLanguages = allLanguages.map((o) => o.code);
-    formNameFilter = formNameFilter || undefined;
-    languageFilter = languageFilter || allLanguages;
+    let translations = (await Translation.local().find())[0].data;
 
-    languageFilter.push('label');
+    Object.keys(translations).forEach(function (languageCode) {
+      let translationsLabels = translations[languageCode];
 
-    let formFilter = formNameFilter && {
-      'data.title': {
-        // $containsAny
-        $in: formNameFilter
+      Object.keys(translationsLabels).forEach(function (translationLabel) {
+        if (
+          labels[translationLabel] &&
+          translationsLabels[translationLabel] &&
+          translationsLabels[translationLabel] !== ''
+        ) {
+          labels[translationLabel].translations[languageCode] = translationsLabels[translationLabel];
+        }
+      });
+    });
+
+    return labels;
+  }
+
+  static async fetchAllLabels () {
+    let allLabels = {};
+
+    let forms = (await Form.local().find()).map((form) => {
+      return form.data;
+    });
+
+    let formLabels = this.getFormLabels(forms);
+
+    let appLabels = await this.getAppLabels(config.get().translations);
+
+    allLabels = this.mergeLabels(formLabels, appLabels);
+
+    let pagesLabels = await this.getPagesLabels(await Pages.getLocal());
+
+    allLabels = this.mergeLabels(allLabels, pagesLabels);
+
+    return allLabels;
+  }
+  /**
+   * Given an Object with text labels and a label Object
+   * to add it checks if it already exists or
+   * creates it if needed
+   * @param {Object} labels
+   * @param {Object} label
+   */
+  static createOrAdd ({ labels, label }) {
+    let newObject = { ...labels };
+
+    // If the label already exists
+    if (newObject[label.text]) {
+      // If the location is an Array of Locations
+      if (label.location && Array.isArray(label.location)) {
+        label.location.forEach((l) => {
+          newObject[label.text].location.push({
+            text: label.text,
+            template: label.template,
+            type: l.type,
+            picture: l.picture
+          });
+        });
+      } else {
+        newObject[label.text].location.push(label);
       }
-    };
-    let stats = {};
+    } else {
+      if (label.location && Array.isArray(label.location)) {
+        newObject[label.text] = {
+          location: [],
+          template: label.template,
+          translations: {}
+        };
+        label.location.forEach((l) => {
+          newObject[label.text].location.push({
+            text: label.text,
+            template: label.template,
+            type: l.type,
+            picture: l.picture
+          });
+        });
+      } else {
+        newObject[label.text] = {
+          location: [label],
+          translations: {}
+        };
+      }
+    }
+    return newObject;
+  }
+  static mergeLabels (labelsObject1, labelsObject2) {
+    let merged = { ...labelsObject1 };
 
-    stats.translations = {};
-    stats.missingTranslations = [];
-    let translations = await Translation.local().find();
-
-    translations = translations[0].data;
-    let forms = await Form.local().find({ filter: formFilter });
-
-    let componentLabels = [];
-
+    Object.keys(labelsObject2).forEach((key) => {
+      merged = this.createOrAdd({
+        labels: merged,
+        label: {
+          ...labelsObject2[key],
+          text: key
+        }
+      });
+    });
+    return merged;
+  }
+  /**
+   * Extracts all labels that could potentially
+   * be translated from the Form.io forms
+   * @param {Array} Forms
+   */
+  static getFormLabels (Forms) {
+    let componentLabels = {};
     // Extranct all labels for all available forms
-    _forEach(forms, (form) => {
-      componentLabels.push(form.data.title);
 
+    let formioLabelsPositions = [
+      'suffix',
+      'prefix',
+      'addAnother',
+      'removeRow',
+      'saveRow',
+      'legend',
+      'title',
+      'label',
+      'placeholder',
+      'tooltip'
+    ];
+
+    Forms.forEach((form) => {
+      // Add title of the Forms to the translations
+      componentLabels = this.createOrAdd({
+        labels: componentLabels,
+        label: {
+          text: form.title,
+          type: 'formTitle',
+          component: form,
+          form: form,
+          picture: null
+        }
+      });
       // Go across every component
       FormioUtils.eachComponent(
-        form.data.components,
+        form.components,
         (component) => {
-          if (component.suffix && component.suffix !== '') {
-            componentLabels.push(component.suffix);
-          }
-          if (component.prefix && component.prefix !== '') {
-            componentLabels.push(component.prefix);
-          }
-          if (component.addAnother && component.addAnother !== '') {
-            componentLabels.push(component.addAnother);
-          }
-          if (component.removeRow && component.removeRow !== '') {
-            componentLabels.push(component.removeRow);
-          }
-          if (component.saveRow && component.saveRow !== '') {
-            componentLabels.push(component.saveRow);
-          }
-          if (component.legend && component.legend !== '') {
-            componentLabels.push(component.legend);
-          }
+          // Check for the common translated Items listed above
+          formioLabelsPositions.forEach((position) => {
+            if (component[position] && component[position] !== '') {
+              // Add the Label if is not empty
+              componentLabels = this.createOrAdd({
+                labels: componentLabels,
+                label: {
+                  text: component[position],
+                  type: position,
+                  component: component,
+                  form: form,
+                  picture: null
+                }
+              });
+            }
+          });
 
-          if (component.title && component.title !== '') {
-            componentLabels.push(component.title);
-          }
-          // If it has a label
-          if (component.label && component.label !== '') {
-            componentLabels.push(component.label);
-          }
-          // If it has a placeholder
-          if (component.placeholder && component.placeholder !== '') {
-            componentLabels.push(component.placeholder);
-          }
-          // If it has a tooltip
-          if (component.tooltip && component.tooltip !== '?' && component.tooltip !== '') {
-            componentLabels.push(component.tooltip);
-          }
-          // If it has values that have labels (radio)
+          // Check for components that have values with labels (i.e: radio)
           if (component.values) {
             _forEach(component.values, (value) => {
               if (value.label && value.label !== '') {
-                componentLabels.push(value.label);
+                componentLabels = this.createOrAdd({
+                  labels: componentLabels,
+                  label: {
+                    text: value.label,
+                    type: 'value',
+                    component: component,
+                    form: form,
+                    picture: null
+                  }
+                });
               }
             });
           }
-          // If it is an HTML element
+
+          // Check for HTML tag elements in the forms
           if (component.type === 'htmlelement' && component.content !== '') {
-            componentLabels.push(component.content);
+            componentLabels = this.createOrAdd({
+              labels: componentLabels,
+              label: {
+                text: component.content,
+                type: 'htmlElement',
+                component: component,
+                form: form,
+                picture: null
+              }
+            });
           }
 
-          // If it is a select component
+          // Check specificaly for select elements
           if (component.type === 'select') {
             if (component.data && component.data.values) {
               _forEach(component.data.values, (value) => {
                 if (value.label && value.label !== '') {
-                  componentLabels.push(value.label);
+                  componentLabels = this.createOrAdd({
+                    labels: componentLabels,
+                    label: {
+                      text: value.label,
+                      type: 'selectValue',
+                      component: component,
+                      form: form,
+                      picture: null
+                    }
+                  });
                 }
               });
             }
           }
+
+          // Check for survey elements
           if (component.type && component.type === 'survey') {
             if (component.questions) {
+              // Check for every question on the survey
               component.questions.forEach((q) => {
-                componentLabels.push(q.label);
+                componentLabels = this.createOrAdd({
+                  labels: componentLabels,
+                  label: {
+                    text: q.label,
+                    type: 'surveyLabel',
+                    component: component,
+                    form: form,
+                    picture: null
+                  }
+                });
               });
+              // Check every text of the answers
               component.values.forEach((v) => {
                 componentLabels.push(v.label);
+                componentLabels = this.createOrAdd({
+                  labels: componentLabels,
+                  label: {
+                    text: v.label,
+                    type: 'surveyValues',
+                    component: component,
+                    form: form,
+                    picture: null
+                  }
+                });
               });
             }
           }
@@ -124,102 +266,91 @@ class FormLabels {
         true
       );
     });
-    // Include the Application translations
-    if (formNameFilter.includes('Application')) {
-      let translations = config.get().translations;
 
-      componentLabels = componentLabels.concat(translations);
-    }
+    return componentLabels;
+  }
+  /**
+   *  Creates the Labels Object for the
+   *  App translations
+   * @param {Array} appLabels
+   */
+  static async getAppLabels (appLabels) {
+    let translations = {};
 
-    if (formNameFilter.includes('Pages')) {
-      let pagesTranslations = await Pages.getLocal();
+    appLabels.forEach((l) => {
+      translations = this.createOrAdd({
+        labels: translations,
+        label: l
+      });
+    });
 
-      pagesTranslations.pages.forEach((page) => {
-        page.cards.forEach((card) => {
-          if (card.title && card.title !== '') {
-            componentLabels.push(card.title);
-          }
+    return translations;
+  }
+  /**
+   *  Creates the Labels Object for the
+   *  App Pages
+   * @param {Array} appLabels
+   */
+  static async getPagesLabels (Pages) {
+    let pagesLabels = {};
 
-          if (card.subtitle && card.subtitle !== '') {
-            componentLabels.push(card.subtitle);
-          }
-
-          card.actions.forEach((action) => {
-            if (action.text && action.text !== '') {
-              componentLabels.push(action.text);
+    Pages.pages.forEach((page) => {
+      page.cards.forEach((card) => {
+        if (card.title && card.title !== '') {
+          this.createOrAdd({
+            labels: pagesLabels,
+            label: {
+              text: card.title,
+              type: 'pageCardTitle',
+              picture: null,
+              card: card,
+              page: page
             }
           });
-        });
-        if (page.title && page.title !== '') {
-          componentLabels.push(page.title);
         }
-      });
-    }
-    // Clean duplicated labels
-    let uniqueLabels = Array.from(new Set(componentLabels)).sort();
 
-    let columnNames = [];
-    let labelsArray = [];
-    let labelsObject = [];
-
-    // First column will always be the Form Label
-    columnNames.push('Form Label');
-
-    if (_isEmpty(translations)) {
-      stats.missingTranslations = uniqueLabels;
-    }
-    // Match the labels with local translations
-    _forEach(uniqueLabels, (uniqueLabel) => {
-      let translation = [];
-      let languages = {};
-
-      translation.push(uniqueLabel);
-
-      _forEach(translations, (language, lenguageCode) => {
-        // Dont include if the language is not supported
-        if (languageFilter.indexOf(lenguageCode) === -1) {
-          return;
+        if (card.subtitle && card.subtitle !== '') {
+          this.createOrAdd({
+            labels: pagesLabels,
+            label: {
+              text: card.subtitle,
+              type: 'pageCardSubtitle',
+              picture: null,
+              card: card,
+              page: page
+            }
+          });
         }
-        columnNames.push(lenguageCode);
-        languages['label'] = uniqueLabel;
-        if (typeof language[uniqueLabel] !== 'undefined' && language[uniqueLabel] !== '') {
-          // If the language doesn't exist, create it
-          if (!stats.translations[lenguageCode]) {
-            stats.translations[lenguageCode] = {};
-            stats.translations[lenguageCode].total = 0;
+
+        card.actions.forEach((action) => {
+          if (action.text && action.text !== '') {
+            this.createOrAdd({
+              labels: pagesLabels,
+              label: {
+                text: action.text,
+                type: 'pageActionButtonText',
+                picture: null,
+                card: card,
+                page: page
+              }
+            });
           }
-          // Add 1 every time we have a translation
-          stats.translations[lenguageCode].total = stats.translations[lenguageCode].total + 1;
-        }
-        languages[lenguageCode] = language[uniqueLabel];
-        if (typeof language[uniqueLabel] === 'undefined' && lenguageCode === 'label') {
-          stats.missingTranslations.push(uniqueLabel);
-        }
-        translation.push(language[uniqueLabel]);
+        });
       });
-      labelsObject.push(languages);
-      labelsArray.push(translation);
+      if (page.title && page.title !== '') {
+        this.createOrAdd({
+          labels: pagesLabels,
+          label: {
+            text: page.title,
+            type: 'pageTitle',
+            picture: null,
+            page: page
+          }
+        });
+      }
     });
 
-    // Clean the column Names
-    let uniqueColumsNames = Array.from(new Set(columnNames));
-
-    stats.missingTranslations = Array.from(new Set(stats.missingTranslations));
-
-    stats.totalTranslations = labelsArray.length;
-
-    _forEach(stats.translations, (language, index) => {
-      stats.translations[index].translated = stats.translations[index].total / stats.totalTranslations;
-    });
-
-    let result = {
-      labels: labelsArray,
-      columns: uniqueColumsNames,
-      stats: stats,
-      labelsObject: labelsObject
-    };
-
-    return result;
+    return pagesLabels;
   }
 }
 export default FormLabels;

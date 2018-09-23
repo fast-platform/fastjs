@@ -3,21 +3,10 @@ import Roles from 'database/models/Role';
 import _get from 'lodash/get';
 import to from 'await-to-js';
 import axios from 'axios';
-import moment from 'moment';
 
 let Role = (() => {
   function getRolesDate (localRoles) {
-    let localConfigDate;
-
-    if (_get(localRoles, 'meta.created', null)) {
-      localConfigDate = _get(localRoles, 'meta.created', null);
-    } else if (_get(localRoles, 'updated', null)) {
-      localConfigDate = _get(localRoles, 'updated', null);
-    } else {
-      localConfigDate = 0;
-    }
-
-    return moment(localConfigDate).unix();
+    return _get(localRoles, 'fastUpdated', 0);
   }
 
   async function getLocal () {

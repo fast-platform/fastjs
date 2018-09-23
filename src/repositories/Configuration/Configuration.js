@@ -37,17 +37,9 @@ let Configuration = (() => {
   }
 
   function getConfigDate (localConfig) {
-    let localConfigDate;
-
-    if (_get(localConfig, 'meta.updated', null)) {
-      localConfigDate = moment(_get(localConfig, 'meta.updated', null)).unix();
-    } else if (_get(localConfig, 'updated', null)) {
-      localConfigDate = _get(localConfig, 'updated', null);
-    } else {
-      localConfigDate = moment(0);
-    }
-    return localConfigDate;
+    return _get(localConfig, 'fastUpdated', 0);
   }
+
   async function setOfflineConfig ({ Vue, appConf }) {
     let localConfig = await getLocal();
 
@@ -57,7 +49,7 @@ let Configuration = (() => {
     if (offlineConfigDate > localConfigDate) {
       let offlineConfig = {
         ...appConf.offlineFiles.Configuration.data,
-        updated: moment(appConf.offlineFiles.Configuration.modified).unix()
+        fastUpdated: moment().unix()
       };
 
       if (localConfig) {

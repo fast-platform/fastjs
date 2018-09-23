@@ -3,9 +3,33 @@ import Pages from 'database/models/Pages';
 import _isEmpty from 'lodash/isEmpty';
 import _get from 'lodash/get';
 import to from 'await-to-js';
+import Configuration from 'repositories/Configuration/Configuration';
+import moment from 'moment';
 
 let PAGES = (() => {
-  async function set () {
+  function getLocalPagesDate (localPages) {
+    return _get(localPages, '[0].fastUpdated', 0);
+  }
+  async function setOfflinePages ({ appConf }) {
+    let localPages = await Pages.local().find();
+
+    let localDate = getLocalPagesDate(localPages);
+    let config = await Configuration.getLocal();
+    let offlinePages = _get(appConf.offlineFiles.Pages, '[0].data', undefined);
+
+    if (config.fastUpdated >= localDate) {
+      if (localPages) {
+        await Pages.local().clear();
+      }
+      let newPages = await Pages.local().insert({ ...offlinePages, fastUpdated: moment().unix() });
+
+      return newPages;
+    }
+
+    return _get(localPages, '[0].data', undefined);
+  }
+
+  async function setOnlinePages () {
     let localPages, remotePages, error;
 
     localPages = await Pages.local().find();
@@ -23,12 +47,19 @@ let PAGES = (() => {
 
     if (remotePages && !_isEmpty(remotePages)) {
       if (localPages) {
-        await Pages.local().remove(localPages);
+        await Pages.local().clear();
       }
       newPages = await Pages.local().insert(remotePages);
     }
 
     return newPages;
+  }
+
+  async function set ({ appConf }) {
+    if (appConf.offlineStart === 'true') {
+      return setOfflinePages({ appConf });
+    }
+    return setOnlinePages();
   }
 
   async function getLocal (submission) {

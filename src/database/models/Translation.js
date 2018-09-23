@@ -52,6 +52,11 @@ let Translation = (args) => {
     languages = _orderBy(languages, ['label'], ['asc']);
     return languages;
   }
+
+  async function getTranslationStatus () {
+    // let languages = supportedLanguages();
+
+  }
   /**
    *
    */
@@ -66,7 +71,8 @@ let Translation = (args) => {
       getFormPath,
       getFormTranslations,
       supportedLanguages,
-      getIsoLanguages
+      getIsoLanguages,
+      getTranslationStatus
     })
   );
 };

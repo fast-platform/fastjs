@@ -94,6 +94,10 @@ let FAST = (() => {
       i18n: appConf.i18n
     });
 
+    if (interval) {
+      SyncInterval.set(3000);
+    }
+
     // Pull the configuration
     let config = await Configuration.set({ Vue, appConf });
 
@@ -101,6 +105,10 @@ let FAST = (() => {
     fastConfig.setBaseUrl(config.APP_URL);
 
     Roles.set({ url: config.APP_URL, appConf });
+
+    Pages.set({ appConf });
+
+    Form.set({ appConf });
 
     /*
     let currentConf = await Configuration.getLocal();
@@ -130,7 +138,7 @@ let FAST = (() => {
       }
     }
     */
-    let appTranslations = await Localization.setLocales();
+    let appTranslations = await Localization.setLocales({ appConf });
 
     return {
       config: config,
