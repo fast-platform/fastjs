@@ -1,7 +1,4 @@
-import axios from 'axios';
-import _debounce from 'lodash/debounce';
 import Event from './Event';
-import Promise from 'bluebird';
 /* eslint-disable no-unused-vars */
 let Connection = (() => {
   let online = window.navigator.onLine;
@@ -26,12 +23,6 @@ let Connection = (() => {
         text: 'Application is now offline'
       });
     }
-  }
-
-  function check () {
-    let dHeartBeat = _debounce(this.heartBeat, 3000);
-
-    return dHeartBeat;
   }
 
   /**
@@ -70,20 +61,7 @@ let Connection = (() => {
     });
   }
 
-  function heartBeat (vm) {
-    return axios
-      .get('https://google.com')
-      .then(() => {
-        this.setOnline.bind(this)(vm);
-        return online;
-      })
-      .catch(() => {
-        this.setOffline.bind(this)(vm);
-        return online;
-      });
-  }
   return Object.freeze({
-    check,
     isOnline,
     initEventListeners
   });

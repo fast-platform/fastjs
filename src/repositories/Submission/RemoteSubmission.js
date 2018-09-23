@@ -1,4 +1,4 @@
-import FormioJS from 'formiojs';
+import FormioJS from 'formiojs/Formio';
 import Auth from 'repositories/Auth/Auth';
 import Config from 'database/models/Configuration';
 

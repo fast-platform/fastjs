@@ -1,10 +1,8 @@
 import Connection from 'Wrappers/Connection';
 import Submission from 'database/models/Submission';
 import User from 'database/models/User';
-import FormioJS from 'formiojs';
-// import Raven from 'config/raven';
+import FormioJS from 'formiojs/Formio';
 import Event from 'Wrappers/Event';
-import Promise from 'bluebird';
 import Scheduler from 'repositories/Database/Scheduler';
 
 let OfflineData = (() => {
@@ -13,9 +11,13 @@ let OfflineData = (() => {
     let offlinePlugin = FormioJS.getPlugin('offline');
     let isOnline = await Connection.isOnline();
 
+    let PromiseEach = async function (arr, fn) {
+      for (const item of arr) await fn(item);
+    };
+
     if (isOnline) {
       await Scheduler.startSync();
-      Promise.each(offlineSubmissions, async function (offlineSubmission) {
+      PromiseEach(offlineSubmissions, async function (offlineSubmission) {
         let formio = new FormioJS(offlineSubmission.data.formio.formUrl);
         let postData = {
           data: offlineSubmission.data.data

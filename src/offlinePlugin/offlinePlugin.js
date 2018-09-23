@@ -1,4 +1,4 @@
-import Formio from 'formiojs';
+import Formio from 'formiojs/Formio';
 import Translation from 'database/models/Translation';
 import GetRequest from './repositories/getRequest';
 import PostRequest from './repositories/postRequest';

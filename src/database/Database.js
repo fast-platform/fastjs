@@ -1,5 +1,4 @@
 import Loki from 'lokijs';
-import Promise from 'bluebird';
 import LokiIndexedAdapter from 'lokijs/src/loki-indexed-adapter';
 /*
 |--------------------------------------------------------------------------

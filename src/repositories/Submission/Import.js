@@ -1,6 +1,5 @@
-import Formio from 'formiojs';
+import Formio from 'formiojs/Formio';
 import offlinePlugin from 'offlinePlugin/offlinePlugin';
-import Promise from 'bluebird';
 import Submission from 'repositories/Submission/SubmissionRepository';
 import Event from 'Wrappers/Event';
 let Import = class {
@@ -36,9 +35,13 @@ let Import = class {
     // let totalSubmissions = json.length;
     let formio = Import.getFormIOInstance(vm);
 
+    let PromiseEach = async function (arr, fn) {
+      for (const item of arr) await fn(item);
+    };
     // Loading.show({ message: 'Importing ' + totalSubmissions + ' submissions' });
     // json = json.slice(151, 200);
-    Promise.each(json, async function (row, index) {
+
+    PromiseEach(json, async function (row, index) {
       // await Uploader.sendDataToFormIO(row)
       let submission = Import.prepareSubmission(row);
 

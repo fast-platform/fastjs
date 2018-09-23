@@ -1,4 +1,4 @@
-import Formio from 'formiojs';
+import Formio from 'formiojs/Formio';
 import config from 'config';
 import to from 'await-to-js';
 

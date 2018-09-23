@@ -24,6 +24,7 @@ class FormLabels {
 
     let translations = (await Translation.local().find())[0].data;
 
+    // Merge labels and translations
     Object.keys(translations).forEach(function (languageCode) {
       let translationsLabels = translations[languageCode];
 
@@ -40,7 +41,11 @@ class FormLabels {
 
     return labels;
   }
-
+  /**
+   *  Fetches all Labels for the different
+   *  types of labels inputs that the
+   *  application has
+   */
   static async fetchAllLabels () {
     let allLabels = {};
 
@@ -109,6 +114,13 @@ class FormLabels {
     }
     return newObject;
   }
+  /**
+   * Merges 2 different sets of translations
+   * into a single one with no repeted
+   * elements
+   * @param {Object} labelsObject1
+   * @param {Object} labelsObject2
+   */
   static mergeLabels (labelsObject1, labelsObject2) {
     let merged = { ...labelsObject1 };
 
@@ -152,8 +164,8 @@ class FormLabels {
         label: {
           text: form.title,
           type: 'formTitle',
-          component: form,
-          form: form,
+          component: form.path,
+          form: form.path,
           picture: null
         }
       });
@@ -171,7 +183,7 @@ class FormLabels {
                   text: component[position],
                   type: position,
                   component: component,
-                  form: form,
+                  form: form.path,
                   picture: null
                 }
               });
@@ -188,7 +200,7 @@ class FormLabels {
                     text: value.label,
                     type: 'value',
                     component: component,
-                    form: form,
+                    form: form.path,
                     picture: null
                   }
                 });
@@ -204,7 +216,7 @@ class FormLabels {
                 text: component.content,
                 type: 'htmlElement',
                 component: component,
-                form: form,
+                form: form.path,
                 picture: null
               }
             });
@@ -221,7 +233,7 @@ class FormLabels {
                       text: value.label,
                       type: 'selectValue',
                       component: component,
-                      form: form,
+                      form: form.path,
                       picture: null
                     }
                   });
@@ -241,7 +253,7 @@ class FormLabels {
                     text: q.label,
                     type: 'surveyLabel',
                     component: component,
-                    form: form,
+                    form: form.path,
                     picture: null
                   }
                 });
@@ -255,7 +267,7 @@ class FormLabels {
                     text: v.label,
                     type: 'surveyValues',
                     component: component,
-                    form: form,
+                    form: form.path,
                     picture: null
                   }
                 });
