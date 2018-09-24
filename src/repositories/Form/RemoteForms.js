@@ -27,9 +27,10 @@ let RemoteForms = (() => {
     return localForms;
   }
 
-  async function setOnlineForms ({ filter = undefined } = {}) {
-    let remoteForms = await Form.remote().find({ filter });
+  async function setOnlineForms () {
+    let remoteForms = await Form.remote().find();
     // For every new or updated entry
+    let unixDate = moment().unix();
 
     remoteForms.forEach(async function (form) {
       // Find the local Form
@@ -45,15 +46,12 @@ let RemoteForms = (() => {
       } else {
         // If it doesn't, create a new one
         await Form.local().insert({
-          data: form
+          data: form,
+          fastUpdated: unixDate
         });
       }
     });
-    if (!_isEmpty(remoteForms) && filter) {
-      await Configuration.setLastUpdated({ element: 'register' });
-    } else if (!_isEmpty(remoteForms)) {
-      await Configuration.setLastUpdated({ element: 'Form' });
-    }
+
     Event.emit({
       name: 'FAST:FORMS:UPDATED',
       data: remoteForms.length,
@@ -61,8 +59,8 @@ let RemoteForms = (() => {
     });
   }
 
-  async function set ({ appConf }) {
-    if (appConf.offlineStart === 'true') {
+  async function set ({ appConf, forceOnline }) {
+    if (appConf.offlineStart === 'true' && !forceOnline) {
       return setOfflineForms({ appConf });
     }
     return setOnlineForms();

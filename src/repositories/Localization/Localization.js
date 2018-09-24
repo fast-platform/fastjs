@@ -2,7 +2,6 @@ import _forEach from 'lodash/forEach';
 import _map from 'lodash/map';
 import _isEmpty from 'lodash/isEmpty';
 import Translation from 'database/models/Translation';
-import _assign from 'lodash/assign';
 import Configuration from 'repositories/Configuration/Configuration';
 import moment from 'moment';
 import _get from 'lodash/get';
@@ -45,8 +44,8 @@ const Localization = class {
    * @param  {[type]} password [description]
    * @return {[type]}          [description]
    */
-  static async setLocales ({ appConf }) {
-    if (appConf.offlineStart === 'true') {
+  static async set ({ appConf, forceOnline }) {
+    if (appConf.offlineStart === 'true' && !forceOnline) {
       return this.setOfflineLocales({ appConf });
     }
     return this.setOnlineLocales({ appConf });
@@ -125,15 +124,14 @@ const Localization = class {
     });
   }
 
-  static async setTranslations (label, translations) {
+  static async setTranslations (translations) {
     let trans = await Translation.remote().find({
-      filter: [{ element: 'data.label', query: '=', value: label }]
+      filter: [{ element: 'data.label', query: '=', value: translations.label }]
     });
     let id = trans[0]._id;
-    let mergedTranslations = _assign(trans[0].data, translations);
     let result = await Translation.remote().update({
       _id: id,
-      data: mergedTranslations
+      data: translations
     });
 
     return result;

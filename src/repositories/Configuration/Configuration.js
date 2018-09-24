@@ -63,6 +63,7 @@ let Configuration = (() => {
     assingGlobalVariable(Vue, localConfig);
     return localConfig;
   }
+
   async function setOnlineConfig ({ Vue, appConf }) {
     let localConfig = await getLocal();
 
@@ -77,7 +78,7 @@ let Configuration = (() => {
       return localConfig;
     }
 
-    remoteConfig.meta = localConfig && localConfig.meta ? localConfig.meta : {};
+    remoteConfig.fastUpdated = moment().unix();
 
     if (localConfig) {
       await CONFIGURATION.local().clear();
@@ -88,8 +89,9 @@ let Configuration = (() => {
     assingGlobalVariable(Vue, insertedConfig);
     return insertedConfig;
   }
-  async function set ({ Vue, appConf }) {
-    if (appConf.offlineStart === 'true') {
+
+  async function set ({ Vue, appConf, forceOnline }) {
+    if (appConf.offlineStart === 'true' && !forceOnline) {
       return setOfflineConfig({ Vue, appConf });
     }
     return setOnlineConfig({ Vue, appConf });

@@ -49,14 +49,16 @@ let PAGES = (() => {
       if (localPages) {
         await Pages.local().clear();
       }
+      remotePages.fastUpdated = moment().unix();
+
       newPages = await Pages.local().insert(remotePages);
     }
 
     return newPages;
   }
 
-  async function set ({ appConf }) {
-    if (appConf.offlineStart === 'true') {
+  async function set ({ appConf, forceOnline }) {
+    if (appConf.offlineStart === 'true' && !forceOnline) {
       return setOfflinePages({ appConf });
     }
     return setOnlinePages();

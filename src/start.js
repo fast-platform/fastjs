@@ -56,36 +56,30 @@ let FAST = (() => {
     }
   }
 
-  async function sync ({ interval = true, appConf }) {
-    let pages, err;
+  async function sync ({ appConf }) {
+    let forceOnline = true;
     // Pull the configuration
-    let config = await Configuration.set({ appConf });
+    let config = await Configuration.set({ appConf, forceOnline });
 
     // Change the Base URL for all the other calls
     fastConfig.setBaseUrl(config.APP_URL);
 
-    [err, pages] = await to(Pages.set());
-    if (err) {
-      let e = 'The pages could not be retrieve from source';
+    await Roles.set({ url: config.APP_URL, appConf, forceOnline });
 
-      console.log(e, err);
-    }
-    let appTranslations = await Localization.setLocales();
+    await Pages.set({ appConf, forceOnline });
 
-    await Form.update();
+    await Form.set({ appConf, forceOnline });
 
-    if (interval) {
-      SyncInterval.set(2000);
-    }
+    let appTranslations = await Localization.set({ appConf, forceOnline });
+
     return {
       translations: appTranslations,
-      pages: pages,
       defaultLenguage: localStorage.getItem('defaultLenguage') || 'en',
       config: config
     };
   }
 
-  async function start ({ Vue, interval = true, appConf }) {
+  async function start ({ Vue, appConf }) {
     let pages, err;
 
     fastConfig.set({
@@ -94,9 +88,7 @@ let FAST = (() => {
       i18n: appConf.i18n
     });
 
-    if (interval) {
-      SyncInterval.set(3000);
-    }
+    SyncInterval.set(3000);
 
     // Pull the configuration
     let config = await Configuration.set({ Vue, appConf });
@@ -104,11 +96,13 @@ let FAST = (() => {
     // Change the Base URL for all the other calls
     fastConfig.setBaseUrl(config.APP_URL);
 
-    Roles.set({ url: config.APP_URL, appConf });
+    await Roles.set({ url: config.APP_URL, appConf });
 
-    Pages.set({ appConf });
+    await Pages.set({ appConf });
 
-    Form.set({ appConf });
+    await Form.set({ appConf });
+
+    let appTranslations = await Localization.set({ appConf });
 
     /*
     let currentConf = await Configuration.getLocal();
@@ -138,7 +132,6 @@ let FAST = (() => {
       }
     }
     */
-    let appTranslations = await Localization.setLocales({ appConf });
 
     return {
       config: config,

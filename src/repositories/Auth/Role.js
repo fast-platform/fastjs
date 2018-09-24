@@ -3,6 +3,7 @@ import Roles from 'database/models/Role';
 import _get from 'lodash/get';
 import to from 'await-to-js';
 import axios from 'axios';
+import moment from 'moment';
 
 let Role = (() => {
   function getRolesDate (localRoles) {
@@ -38,6 +39,8 @@ let Role = (() => {
       if (localRoles) {
         await Roles.local().clear();
       }
+      remoteRoles.fastUpdated = moment().unix();
+
       let insertedRoles = await Roles.local().insert(remoteRoles);
 
       return insertedRoles;
@@ -63,8 +66,8 @@ let Role = (() => {
     return localRoles;
   }
 
-  async function set ({ url, appConf }) {
-    if (appConf.offlineStart === 'true') {
+  async function set ({ url, appConf, forceOnline }) {
+    if (appConf.offlineStart === 'true' && !forceOnline) {
       return setOfflineRoles({ appConf });
     }
     return setOnlineRoles({ url });
