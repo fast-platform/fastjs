@@ -1,5 +1,6 @@
 import Loki from 'lokijs';
 import LokiIndexedAdapter from 'lokijs/src/loki-indexed-adapter';
+import Promise from 'bluebird';
 /*
 |--------------------------------------------------------------------------
 | LockiDB Config

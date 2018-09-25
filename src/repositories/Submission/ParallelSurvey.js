@@ -3,6 +3,7 @@ import _get from 'lodash/get';
 import Formio from 'formiojs/Formio';
 import Submission from 'database/models/Submission';
 import OFFLINE_PLUGIN from 'offlinePlugin/offlinePlugin';
+import Promise from 'bluebird';
 
 let ParallelSurvey = (() => {
   function getNewGroupWizard (vm) {

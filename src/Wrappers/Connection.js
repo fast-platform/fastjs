@@ -1,4 +1,5 @@
 import Event from './Event';
+import Promise from 'bluebird';
 /* eslint-disable no-unused-vars */
 let Connection = (() => {
   let online = window.navigator.onLine;

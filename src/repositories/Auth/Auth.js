@@ -7,6 +7,7 @@ import Role from 'database/models/Role';
 import RoleRepo from 'repositories/Auth/Role';
 import _find from 'lodash/find';
 import _isEmpty from 'lodash/isEmpty';
+import Promise from 'bluebird';
 
 let Auth = (() => {
   /**

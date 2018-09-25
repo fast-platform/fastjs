@@ -1,4 +1,6 @@
 var request = require('request');
+
+import Promise from 'bluebird';
 let Uploader = class {
   static async sendDataToFormIO (submission) {
     return new Promise((resolve, reject) => {

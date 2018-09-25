@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 const Position = class {
   /**
    * [getConfig description]

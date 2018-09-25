@@ -1,61 +1,13 @@
 import Configuration from 'repositories/Configuration/Configuration';
-import Event from './Wrappers/Event';
 import Form from './repositories/Form/RemoteForms';
 import Localization from './repositories/Localization/Localization';
 import Pages from './repositories/Configuration/Pages';
 import SyncInterval from './repositories/Database/SyncInterval';
 import fastConfig from './config';
-import to from 'await-to-js';
 import Roles from 'repositories/Auth/Role';
-// import Formio from 'formiojs';
-import _isEmpty from 'lodash/isEmpty';
-// import _get from 'lodash/get';
-// import Connection from './Wrappers/Connection';
+
 /* eslint-disable no-unused-vars */
 let FAST = (() => {
-  async function loadRemainingConfig ({ interval = true }) {
-    try {
-      let pages, err;
-
-      Event.emit({
-        name: 'FAST:APPLICATION:LOADING',
-        data: {},
-        text: 'The application is loading'
-      });
-
-      [err, pages] = await to(Pages.set());
-      if (err) {
-        let e = 'The pages could not be retrieve from source';
-
-        console.log(e, err);
-      }
-      let currentConf = await Configuration.getLocal();
-
-      let shouldUpdate = !_isEmpty(currentConf.meta.needUpdateForms);
-
-      if (shouldUpdate) {
-        await Form.update();
-      }
-
-      if (interval) {
-        SyncInterval.set(3000);
-      }
-      let info = {
-        pages: pages,
-        defaultLenguage: localStorage.getItem('defaultLenguage') || 'en'
-      };
-
-      Event.emit({
-        name: 'FAST:APPLICATION:LOADED',
-        data: info,
-        text: 'The application is fully loaded'
-      });
-      return info;
-    } catch (error) {
-      console.log('error', error);
-    }
-  }
-
   async function sync ({ appConf }) {
     let forceOnline = true;
     // Pull the configuration
@@ -142,8 +94,7 @@ let FAST = (() => {
 
   return Object.freeze({
     start,
-    sync,
-    loadRemainingConfig
+    sync
   });
 })();
 
