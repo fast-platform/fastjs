@@ -1,17 +1,18 @@
 {
   "name": "fast-fastjs",
-  "version": "0.2.4",
+  "version": "0.2.6",
   "description": "Formio interface for online and offline use",
-  "main": "lib/fast-fastjs.js",
+  "main": "lib/fast-fastjs.min.js",
   "directories": {
     "lib": "lib",
     "test": "test"
   },
   "scripts": {
-    "build": "webpack --env dev && webpack --env build && npm run test",
+    "build": "rm -rf lib/*;webpack --env dev && webpack --env build",
+    "rebuild": "rm -rf node_modules;npm install;npm run build",
     "dev": "webpack --progress --colors --watch --env dev",
-    "test": "mocha --require babel-core/register -r jsdom-global/register --colors ./test/*.spec.js",
-    "test:watch": "mocha --require babel-core/register --colors -w ./test/*.spec.js"
+    "test": "mocha --require babel-core/register -r jsdom-global/register --exit --colors ./test/**/*.spec.js",
+    "test:watch": "mocha --require babel-core/register --require babel-polyfill --compilers js:babel-register --colors -w ./test/*.spec.js"
   },
   "repository": {
     "type": "git",
@@ -35,18 +36,21 @@
     "babel-eslint": "^8.2.3",
     "babel-loader": "^7.1.4",
     "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-lodash": "^3.3.4",
     "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
-    "babel-preset-env": "^1.6.1",
+    "babel-preset-env": "^1.7.0",
     "babel-preset-stage-2": "^6.24.1",
     "chai": "^4.1.2",
     "eslint": "^4.19.1",
     "eslint-loader": "^2.0.0",
     "jsdom": "11.11.0",
     "jsdom-global": "3.0.2",
-    "mocha": "^5.1.1",
-    "webpack": "^4.6.0",
+    "lodash-webpack-plugin": "^0.11.5",
+    "mocha": "^5.2.0",
+    "mocha-webpack": "^1.1.0",
+    "webpack": "^4.20.2",
     "webpack-bundle-analyzer": "^2.13.1",
-    "webpack-cli": "^2.1.2",
+    "webpack-cli": "^3.1.1",
     "yargs": "^11.0.0"
   },
   "dependencies": {
@@ -57,7 +61,7 @@
     "lodash": "^4.17.10",
     "lokijs": "^1.5.5",
     "md5": "^2.2.1",
-    "moment": "^2.22.1",
+    "moment": "^2.22.2",
     "uuid": "^3.2.1"
   }
 }

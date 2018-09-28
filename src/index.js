@@ -20,6 +20,7 @@ import OfflinePlugin from 'offlinePlugin/offlinePlugin';
 import Role from 'repositories/Auth/Role';
 import Hash from 'repositories/Submission/Hash';
 import Sync from 'repositories/Database/Sync';
+
 export {
   Moment,
   Event,

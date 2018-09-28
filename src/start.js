@@ -1,10 +1,10 @@
-import Configuration from 'repositories/Configuration/Configuration';
+import Configuration from './repositories/Configuration/Configuration';
 import Form from './repositories/Form/RemoteForms';
 import Localization from './repositories/Localization/Localization';
 import Pages from './repositories/Configuration/Pages';
 import SyncInterval from './repositories/Database/SyncInterval';
 import fastConfig from './config';
-import Roles from 'repositories/Auth/Role';
+import Roles from './repositories/Auth/Role';
 
 /* eslint-disable no-unused-vars */
 let FAST = (() => {

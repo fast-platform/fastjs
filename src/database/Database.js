@@ -8,24 +8,37 @@ import Promise from 'bluebird';
 | This is the configuration for the Local DB creation.
 |
 */
-var DB;
-const _create = function () {
+var DB = null;
+const _create = function ({ env }) {
   return new Promise((resolve) => {
-    var idbAdapter = new LokiIndexedAdapter('FAST');
+    var idbAdapter;
+    var pa;
+    var db;
 
-    var pa = new Loki.LokiPartitioningAdapter(idbAdapter, {
-      paging: true
-    });
-    /*
+    if (env === 'production') {
+      idbAdapter = new LokiIndexedAdapter('FAST');
+
+      pa = new Loki.LokiPartitioningAdapter(idbAdapter, {
+        paging: true
+      });
+      /*
     eslint-disable
     */
-    var db = new Loki('FAST', {
-      adapter: pa,
-      autosave: true,
-      autosaveInterval: 1000,
-      autoload: true,
-      autoloadCallback: databaseInitialize
-    });
+      db = new Loki('FAST', {
+        adapter: pa,
+        autosave: true,
+        autosaveInterval: 1000,
+        autoload: true,
+        autoloadCallback: databaseInitialize
+      });
+    } else {
+      db = new Loki('FAST', {
+        autoloadCallback: databaseInitialize,
+        autoload: true,
+        autosave: true,
+        autosaveInterval: 1000
+      });
+    }
 
     function databaseInitialize() {
       var submissions = db.getCollection('Submission');
@@ -57,16 +70,14 @@ const _create = function () {
       if (roles === null) {
         db.addCollection('Role');
       }
-
-      // db.saveDatabase();
       resolve(db);
     }
   });
 };
 
-export async function get() {
+export async function get({ env }) {
   if (!DB) {
-    DB = await _create();
+    DB = await _create({ env });
   }
   return DB;
 }

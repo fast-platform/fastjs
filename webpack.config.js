@@ -1,11 +1,12 @@
 /* global __dirname, require, module*/
-// const webpack = require('webpack');
+const webpack = require('webpack');
 const path = require('path');
 const env = require('yargs').argv.env; // use --env with webpack 2
 const pkg = require('./package.json');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const showBundle = false;
-let plugins = [];
+var LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+let plugins = [new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/), new LodashModuleReplacementPlugin()];
 
 if (showBundle) {
   plugins.push(new BundleAnalyzerPlugin());
@@ -41,7 +42,11 @@ const config = {
       {
         test: /(\.jsx|\.js)$/,
         loader: 'babel-loader',
-        exclude: /(node_modules|bower_components)/
+        exclude: /(node_modules|bower_components)/,
+        options: {
+          plugins: ['lodash'],
+          presets: [['env', { modules: false, targets: { node: 4 } }]]
+        }
       },
       {
         test: /(\.jsx|\.js)$/,
@@ -64,7 +69,14 @@ const config = {
       commonjs2: 'lodash',
       amd: '_',
       root: '_'
-    }
+    },
+    axios: 'axios',
+    bluebird: 'bluebird',
+    formiojs: 'formiojs',
+    lokijs: 'lokijs',
+    md5: 'md5',
+    moment: 'moment',
+    uuid: 'uuid'
   },
   node: {
     // prevent webpack from injecting mocks to Node native modules
