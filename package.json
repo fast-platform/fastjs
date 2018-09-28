@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/UN-FAO/fastjs.git"
+    "url": "https://github.com/fast-platform/fastjs.git"
   },
   "keywords": [
     "form.io",
