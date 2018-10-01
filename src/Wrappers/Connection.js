@@ -48,6 +48,7 @@ let Connection = (() => {
   }
 
   function isOnline () {
+    return true;
     return new Promise((resolve, reject) => {
       var xhr = XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHttp');
 

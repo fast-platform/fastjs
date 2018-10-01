@@ -1,21 +1,29 @@
-import * as Database from '../../Database';
+import Database from '../../Database';
 import _cloneDeep from 'lodash/cloneDeep';
 import uuidv4 from 'uuid/v4';
 
 const localModel = (() => {
   /**
-   * [getModel description]
-   * @return {[type]} [description]
+   *
+   * @param {Object} db The name of the model to fetch
+   * @param {String} db.model The name of the model to fetch
+   * @returns {Promise} The DB model
    */
-  async function getModel ({ model }) {
+  let getModel = async function ({ model }) {
     const DB = await Database.get();
 
     return DB.getCollection(model);
-  }
+  };
 
   /**
    * [find description]
-   * @param  {[type]} filter [description]
+   * @param  {Object} query [description]
+   * @param  {Object} query.modelName [description]
+   * @param  {Object} query.filter [description]
+   * @param  {Object} query.limit [description]
+   * @param  {Object} query.select [description]
+   * @param  {Object} query.pagination [description]
+   * @param  {Object} query.form [description]
    * @return {[type]}        [description]
    */
   async function find ({ modelName, filter, limit, select, pagination, form }) {

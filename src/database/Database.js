@@ -1,83 +1,83 @@
+import Promise from 'bluebird';
 import Loki from 'lokijs';
 import LokiIndexedAdapter from 'lokijs/src/loki-indexed-adapter';
-import Promise from 'bluebird';
-/*
-|--------------------------------------------------------------------------
-| LockiDB Config
-|--------------------------------------------------------------------------
-| This is the configuration for the Local DB creation.
-|
-*/
-var DB = null;
-const _create = function ({ env }) {
-  return new Promise((resolve) => {
-    var idbAdapter;
-    var pa;
-    var db;
 
-    if (env === 'production') {
-      idbAdapter = new LokiIndexedAdapter('FAST');
+let Database = (() => {
+  var DB = null;
 
-      pa = new Loki.LokiPartitioningAdapter(idbAdapter, {
-        paging: true
-      });
-      /*
-    eslint-disable
-    */
-      db = new Loki('FAST', {
-        adapter: pa,
+  /*
+  |--------------------------------------------------------------------------
+  | LockiDB Config
+  |--------------------------------------------------------------------------
+  | Configuration for the Local DB creation.
+  |
+  */
+
+  /**
+   *
+   *
+   * @param {Object} configuration- The configuration for the DB
+   * @param {string} configuration.env - Environment i.e 'production'
+   * @returns
+   */
+  const _create = function ({ env }) {
+    return new Promise((resolve) => {
+      let idbAdapter;
+      let pa;
+      let db;
+
+      let dbConfig = {
         autosave: true,
         autosaveInterval: 1000,
         autoload: true,
+        /* eslint-disable no-use-before-define */
         autoloadCallback: databaseInitialize
-      });
-    } else {
-      db = new Loki('FAST', {
-        autoloadCallback: databaseInitialize,
-        autoload: true,
-        autosave: true,
-        autosaveInterval: 1000
-      });
-    }
+      };
 
-    function databaseInitialize() {
-      var submissions = db.getCollection('Submission');
-      var forms = db.getCollection('Form');
-      var translations = db.getCollection('Translation');
-      var users = db.getCollection('User');
-      var roles = db.getCollection('Role');
-      var configuration = db.getCollection('Configuration');
-      var pages = db.getCollection('Pages');
+      if (env && env === 'testing') {
+        db = new Loki('FAST', dbConfig);
+      } else {
+        idbAdapter = new LokiIndexedAdapter('FAST');
+        pa = new Loki.LokiPartitioningAdapter(idbAdapter, {
+          paging: true
+        });
 
-      if (submissions === null) {
-        db.addCollection('Submission');
+        db = new Loki('FAST', { ...dbConfig, adapter: pa });
       }
-      if (configuration === null) {
-        db.addCollection('Configuration');
+
+      function databaseInitialize () {
+        const baseModels = ['Submission', 'Form', 'Translation', 'User', 'Role', 'Configuration', 'Pages'];
+
+        baseModels.forEach((model) => {
+          const dbModel = db.getCollection(model);
+
+          if (!dbModel) {
+            db.addCollection(model);
+          }
+        });
+        resolve(db);
       }
-      if (pages === null) {
-        db.addCollection('Pages');
-      }
-      if (forms === null) {
-        db.addCollection('Form');
-      }
-      if (translations === null) {
-        db.addCollection('Translation');
-      }
-      if (users === null) {
-        db.addCollection('User');
-      }
-      if (roles === null) {
-        db.addCollection('Role');
-      }
-      resolve(db);
+    });
+  };
+
+  /**
+   *
+   *
+   * @export
+   * @param {Object} configuration- The configuration for the DB
+   * @param {string} configuration.env - Environment i.e 'production'
+   * @returns
+   */
+  const get = async function ({ env = 'prod' } = {}) {
+    if (!DB) {
+      DB = await _create({ env });
     }
+    return DB;
+  };
+
+  return Object.freeze({
+    get
   });
-};
+})();
 
-export async function get({ env }) {
-  if (!DB) {
-    DB = await _create({ env });
-  }
-  return DB;
-}
+export default Database;

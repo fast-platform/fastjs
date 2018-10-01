@@ -91,7 +91,7 @@ let Configuration = (() => {
   }
 
   async function set ({ Vue, appConf, forceOnline }) {
-    if (appConf.offlineStart === 'true' && !forceOnline) {
+    if (String(appConf.offlineStart) === 'true' && !forceOnline) {
       return setOfflineConfig({ Vue, appConf });
     }
     return setOnlineConfig({ Vue, appConf });

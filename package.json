@@ -11,8 +11,8 @@
     "build": "rm -rf lib/*;webpack --env dev && webpack --env build",
     "rebuild": "rm -rf node_modules;npm install;npm run build",
     "dev": "webpack --progress --colors --watch --env dev",
-    "test": "mocha --require babel-core/register -r jsdom-global/register --exit --colors ./test/**/*.spec.js",
-    "test:watch": "mocha --require babel-core/register --require babel-polyfill --compilers js:babel-register --colors -w ./test/*.spec.js"
+    "test": "mocha-webpack --colors --recursive --exit -w --timeout 10000 --webpack-config test/config/webpack.config.test.js --require mock-local-storage --require test/config/setup.js --exit test/**/*.spec.js",
+    "test:watch": "mocha-webpack --webpack-config webpack.config.test.js --watch --glob '*.spect.js' --recursive test"
   },
   "repository": {
     "type": "git",
@@ -31,6 +31,7 @@
   },
   "homepage": "https://github.com/UN-FAO/fastjs.git#readme",
   "devDependencies": {
+    "axios-mock-adapter": "^1.15.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.3",
@@ -40,17 +41,23 @@
     "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-stage-2": "^6.24.1",
+    "buffer": "^5.2.1",
     "chai": "^4.1.2",
+    "custom-event": "^1.0.1",
     "eslint": "^4.19.1",
     "eslint-loader": "^2.0.0",
+    "isomorphic-fetch": "^2.2.1",
     "jsdom": "11.11.0",
     "jsdom-global": "3.0.2",
     "lodash-webpack-plugin": "^0.11.5",
     "mocha": "^5.2.0",
-    "mocha-webpack": "^1.1.0",
+    "mocha-webpack": "^2.0.0-beta.0",
+    "mock-local-storage": "^1.0.5",
+    "node-fetch": "^2.2.0",
     "webpack": "^4.20.2",
     "webpack-bundle-analyzer": "^2.13.1",
     "webpack-cli": "^3.1.1",
+    "webpack-node-externals": "^1.7.2",
     "yargs": "^11.0.0"
   },
   "dependencies": {

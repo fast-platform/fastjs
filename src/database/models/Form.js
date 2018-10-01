@@ -5,11 +5,6 @@ import remoteModel from './baseModel/remote';
 import Connection from 'Wrappers/Connection';
 let Form = (args) => {
   var baseModel = args.baseModel;
-  /**
-   * [getOwnName description]
-   * @return {[type]} [description]
-   */
-  /* eslint-disable no-unused-vars */
 
   function getOwnName () {
     return 'Form';

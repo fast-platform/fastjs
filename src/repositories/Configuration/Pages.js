@@ -58,7 +58,7 @@ let PAGES = (() => {
   }
 
   async function set ({ appConf, forceOnline }) {
-    if (appConf.offlineStart === 'true' && !forceOnline) {
+    if (String(appConf.offlineStart) === 'true' && !forceOnline) {
       return setOfflinePages({ appConf });
     }
     return setOnlinePages();

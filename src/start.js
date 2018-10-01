@@ -8,6 +8,13 @@ import Roles from './repositories/Auth/Role';
 
 /* eslint-disable no-unused-vars */
 let FAST = (() => {
+  /**
+   *
+   *
+   * @param {Object} conf
+   * @param {Object} conf.appConf - Configuration of the App
+   * @returns
+   */
   async function sync ({ appConf }) {
     let forceOnline = true;
     // Pull the configuration
@@ -40,7 +47,7 @@ let FAST = (() => {
       i18n: appConf.i18n
     });
 
-    SyncInterval.set(3000);
+    // SyncInterval.set(3000);
 
     // Pull the configuration
     let config = await Configuration.set({ Vue, appConf });

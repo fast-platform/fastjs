@@ -11,11 +11,12 @@ import Promise from 'bluebird';
 
 let Auth = (() => {
   /**
-   * [localAuthenticate description]
-   * @param  {[type]} credentials [description]
-   * @return {[type]}             [description]
+   *
+   *
+   * @param {any} credentials
+   * @returns
    */
-  async function localAuthenticate (credentials) {
+  const localAuthenticate = async function (credentials) {
     const { username, password } = credentials;
     let config = await Configuration.getLocal();
 
@@ -41,14 +42,16 @@ let Auth = (() => {
     }
     // If is valid, return the user
     return userFound;
-  }
+  };
   /**
-   * [remoteAuthenticate description]
-   * @param  {[type]} credentials [description]
-   * @param  {[type]} baseUrl     [description]
-   * @return {[type]}             [description]
+   *
+   *
+   * @param {any} credentials
+   * @param {any} baseUrl
+   * @param {any} role
+   * @returns
    */
-  function remoteAuthenticate (credentials, baseUrl, role) {
+  const remoteAuthenticate = function (credentials, baseUrl, role) {
     return UserRepository.login({ credentials: credentials, role: role }).then((response) => {
       // Store locally the user for future offline login
       let user = response.data;
@@ -56,27 +59,34 @@ let Auth = (() => {
       UserRepository.updateUser(user);
       return response;
     });
-  }
+  };
 
   /**
-   * [authenticate description]
-   * @param  {[type]} credentials [description]
-   * @return {Promise}             [description]
+   *
+   * Authenticates the User with the given credentials
+   * @param {any} credentials
+   * @param {any} baseUrl
+   * @param {any} role
+   * @returns
    */
-  async function authenticate (credentials, baseUrl, role) {
+  const authenticate = async function (credentials, baseUrl, role) {
     let isOnline = await Connection.isOnline();
 
     if (isOnline) {
       return remoteAuthenticate(credentials, baseUrl, role);
     }
     return localAuthenticate(credentials, baseUrl);
-  }
+  };
   /**
-   * [attempt description]
-   * @param  {[type]}   credentials [description]
-   * @return {Promise}   callback    [description]
+   *
+   *
+   * @param {any} credentials
+   * @param {any} baseUrl
+   * @param {any} role
+   * @returns
    */
-  function attempt (credentials, baseUrl, role) {
+
+  const attempt = function (credentials, baseUrl, role) {
     role = role || 'user';
 
     return new Promise((resolve, reject) => {
@@ -116,12 +126,14 @@ let Auth = (() => {
           reject(error);
         });
     });
-  }
+  };
   /**
-   * Retrieves the current auth user
-   * @return {boolean} [description]
+   *
+   *
+   * @returns
    */
-  function user () {
+
+  const user = function () {
     try {
       let user = JSON.parse(localStorage.getItem('authUser'));
 
@@ -130,9 +142,14 @@ let Auth = (() => {
       localStorage.removeItem('authUser');
       return false;
     }
-  }
+  };
+  /**
+   *
+   *
+   * @returns
+   */
 
-  function email () {
+  const email = function () {
     let email = '';
 
     if (Auth.user() && Auth.user().data && Auth.user().data.email) {
@@ -141,9 +158,15 @@ let Auth = (() => {
       email = Auth.user().email;
     }
     return email;
-  }
+  };
+  /**
+   *
+   *
+   * @param {any} roleName
+   * @returns
+   */
 
-  function hasRole (roleName) {
+  const hasRole = function (roleName) {
     let user = JSON.parse(localStorage.getItem('authUser'));
 
     user = user === null ? false : user;
@@ -153,18 +176,30 @@ let Auth = (() => {
     });
 
     return typeof result !== 'undefined';
-  }
+  };
+  /**
+   *
+   *
+   * @param {any} roles
+   * @returns
+   */
 
-  function hasRoleIn (roles) {
+  const hasRoleIn = function (roles) {
     if (!roles || _isEmpty(roles)) {
       return true;
     }
     return roles.some((role) => {
       return hasRole(role) || role === 'Authenticated';
     });
-  }
+  };
+  /**
+   *
+   *
+   * @param {any} rolesIds
+   * @returns
+   */
 
-  async function hasRoleIdIn (rolesIds) {
+  const hasRoleIdIn = async function (rolesIds) {
     if (!rolesIds || _isEmpty(rolesIds)) {
       return true;
     }
@@ -182,26 +217,28 @@ let Auth = (() => {
     return roles.some((role) => {
       return hasRole(role) || role === 'Authenticated';
     });
-  }
+  };
   /**
    * Checks if the current user is
    * Authenticated
    * @return {boolean}
    */
-  function check () {
+
+  const check = function () {
     let user = JSON.parse(localStorage.getItem('authUser'));
 
     return !!user && !!user.x_jwt_token;
-  }
-
+  };
   /**
-   * Logs the Authenticated User Out
+   * Logs out autheticated user
+   *
    */
-  async function logOut () {
+
+  const logOut = async function () {
     await localStorage.removeItem('authUser');
     await localStorage.removeItem('formioToken');
     await localStorage.removeItem('formioUser');
-  }
+  };
 
   return Object.freeze({
     user,

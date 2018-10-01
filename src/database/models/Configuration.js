@@ -6,7 +6,6 @@ let Configuration = (args) => {
    * [getOwnName description]
    * @return {[type]} [description]
    */
-  /* eslint-disable no-unused-vars */
 
   function getOwnName () {
     return 'Configuration';

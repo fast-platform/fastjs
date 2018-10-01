@@ -1,9 +1,17 @@
 class SyncHelper {
   /**
-   * Removes all the null values from an Object
-   * or from an array
-   * @param  {Object, Array} object [description]
-   * @return {Object, Array}        [description]
+   * Recursively removes all NULL values
+   * from an Object or an Array
+   * @static
+   * @param {Array|Object} object Array, Object to clean
+   * @returns {Array|Object} returns the cleaned value
+   * @memberof SyncHelper
+   * @example
+   *
+   * const object = { 'a': 'b', c: null, d: {'a':'b', c:null} }
+   *
+   * deleteNulls(object)
+   * // => {'a': 'b', d: {'a':'b'}}
    */
   static deleteNulls (object) {
     let obj = object;
@@ -16,4 +24,5 @@ class SyncHelper {
     return obj;
   }
 }
+
 export default SyncHelper;

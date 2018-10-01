@@ -47,9 +47,6 @@ let StoreForm = class {
     let config = await CONFIGURATION.getLocal();
 
     submission.data.hashedPassword = md5(submission.data.password, config.MD5_KEY);
-    console.log('----------------------');
-    console.log('===>submission', submission);
-    console.log('----------------------');
 
     let user = await User.storeLocally({
       data: submission.data,
