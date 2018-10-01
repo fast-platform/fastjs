@@ -47,7 +47,7 @@ let FAST = (() => {
       i18n: appConf.i18n
     });
 
-    // SyncInterval.set(3000);
+    SyncInterval.set(3000);
 
     // Pull the configuration
     let config = await Configuration.set({ Vue, appConf });
