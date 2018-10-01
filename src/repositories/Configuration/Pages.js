@@ -15,6 +15,7 @@ let PAGES = (() => {
 
     let localDate = getLocalPagesDate(localPages);
     let config = await Configuration.getLocal();
+
     let offlinePages = _get(appConf.offlineFiles.Pages, '[0].data', undefined);
 
     if (config.fastUpdated >= localDate) {

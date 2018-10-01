@@ -16,7 +16,7 @@ let Configuration = (() => {
   async function getLocal () {
     let configuration = await CONFIGURATION.local().find();
 
-    return _get(configuration, '[0]', undefined);
+    return _get(configuration, '0', undefined);
   }
 
   async function getRemote (appConf) {
@@ -55,6 +55,7 @@ let Configuration = (() => {
       if (localConfig) {
         await CONFIGURATION.local().clear();
       }
+
       let insertedConfig = await CONFIGURATION.local().insert(offlineConfig);
 
       assingGlobalVariable(Vue, insertedConfig);
