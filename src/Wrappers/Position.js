@@ -7,7 +7,7 @@ const Position = class {
   static getConfig () {
     return {
       maximumAge: 3000,
-      timeout: 5000,
+      timeout: 15000,
       enableHighAccuracy: true
     };
   }
