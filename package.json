@@ -8,7 +8,7 @@
     "test": "test"
   },
   "scripts": {
-    "build": "rm -rf lib/*;webpack --env dev && webpack --env build",
+    "build": "rm -rf lib/*;webpack --env build",
     "rebuild": "rm -rf node_modules;npm install;npm run build",
     "dev": "webpack --progress --colors --watch --env dev",
     "test": "mocha-webpack --colors --recursive --exit -w --timeout 10000 --webpack-config test/config/webpack.config.test.js --require mock-local-storage --require test/config/setup.js --exit test/**/*.spec.js",
