@@ -1,6 +1,6 @@
 import Connection from 'Wrappers/Connection';
 import CONFIGURATION from 'database/models/Configuration';
-import _get from 'lodash/get';
+import Utilities from 'utilities';
 import moment from 'moment';
 
 let Configuration = (() => {
@@ -16,7 +16,7 @@ let Configuration = (() => {
   async function getLocal () {
     let configuration = await CONFIGURATION.local().find();
 
-    return _get(configuration, '0', undefined);
+    return Utilities.get(configuration, '0', undefined);
   }
 
   async function getRemote (appConf) {
@@ -33,11 +33,11 @@ let Configuration = (() => {
         console.log('error', error);
       }
     }
-    return _get(remoteConfig, '[0].data', undefined);
+    return Utilities.get(remoteConfig, '[0].data', undefined);
   }
 
   function getConfigDate (localConfig) {
-    return _get(localConfig, 'fastUpdated', 0);
+    return Utilities.get(localConfig, 'fastUpdated', 0);
   }
 
   async function setOfflineConfig ({ Vue, appConf }) {

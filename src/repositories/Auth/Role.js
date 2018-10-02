@@ -1,19 +1,19 @@
 import Connection from 'Wrappers/Connection';
 import Roles from 'database/models/Role';
-import _get from 'lodash/get';
+import Utilities from 'utilities';
 import to from 'await-to-js';
 import axios from 'axios';
 import moment from 'moment';
 
 let Role = (() => {
   function getRolesDate (localRoles) {
-    return _get(localRoles, 'fastUpdated', 0);
+    return Utilities.get(localRoles, 'fastUpdated', 0);
   }
 
   async function getLocal () {
     let roles = await Roles.local().find();
 
-    return _get(roles, '[0]', undefined);
+    return Utilities.get(roles, '[0]', undefined);
   }
 
   async function setOnlineRoles ({ url }) {
@@ -22,7 +22,7 @@ let Role = (() => {
 
     let localRoles = await Roles.local().find();
 
-    localRoles = _get(localRoles, '[0]', undefined);
+    localRoles = Utilities.get(localRoles, '[0]', undefined);
     let isOnline = await Connection.isOnline();
 
     if (isOnline) {
@@ -33,7 +33,7 @@ let Role = (() => {
       }
     }
 
-    remoteRoles = _get(remoteRoles, 'data.roles', undefined);
+    remoteRoles = Utilities.get(remoteRoles, 'data.roles', undefined);
 
     if (remoteRoles) {
       if (localRoles) {

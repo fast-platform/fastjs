@@ -2,11 +2,10 @@ import _map from 'lodash/map';
 import _filter from 'lodash/filter';
 import _orderBy from 'lodash/orderBy';
 import _uniqBy from 'lodash/uniqBy';
-import _get from 'lodash/get';
 import Auth from 'repositories/Auth/Auth';
 import moment from 'moment';
 import baseModel from './baseModelFactory';
-import _cloneDeep from 'lodash/cloneDeep';
+import Utilities from 'utilities';
 import Form from 'database/models/Form';
 import FormioUtils from 'formiojs/utils';
 
@@ -100,7 +99,7 @@ let Submission = (args) => {
     });
 
     // Need to clone the object as it is Dynamic LokiJs
-    submissions = _cloneDeep(submissions);
+    submissions = Utilities.cloneDeep(submissions);
 
     submissions = submissions.map((o) => {
       if (o._id && o._id.indexOf('_local') >= 0) {
@@ -238,7 +237,7 @@ let Submission = (args) => {
     });
 
     currentSubmission = currentSubmission[0];
-    let groupId = _get(currentSubmission, 'data.data.parallelSurvey', undefined);
+    let groupId = Utilities.get(currentSubmission, 'data.data.parallelSurvey', undefined);
 
     groupId = groupId && groupId !== '[object Object]' ? JSON.parse(groupId).groupId : undefined;
 
@@ -249,7 +248,7 @@ let Submission = (args) => {
     });
 
     let a = submissions.filter((submission) => {
-      let parallelSurveyID = _get(submission, 'data.data.parallelSurvey', undefined);
+      let parallelSurveyID = Utilities.get(submission, 'data.data.parallelSurvey', undefined);
 
       parallelSurveyID =
         parallelSurveyID && parallelSurveyID !== '[object Object]' ? JSON.parse(parallelSurveyID).groupId : undefined;
@@ -265,7 +264,8 @@ let Submission = (args) => {
 
   function getParallelSurvey (submission) {
     let parallelsurveyInfo =
-      _get(submission, 'data.data.parallelSurvey', undefined) || _get(submission, 'data.parallelSurvey', undefined);
+      Utilities.get(submission, 'data.data.parallelSurvey', undefined) ||
+      Utilities.get(submission, 'data.parallelSurvey', undefined);
 
     parallelsurveyInfo =
       parallelsurveyInfo && parallelsurveyInfo !== '[object Object]' ? JSON.parse(parallelsurveyInfo) : undefined;

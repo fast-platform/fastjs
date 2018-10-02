@@ -90,6 +90,7 @@ class FormLabels {
       } else {
         newObject[label.text].location.push(label);
       }
+      // If the label does not exist
     } else {
       if (label.location && Array.isArray(label.location)) {
         newObject[label.text] = {

@@ -1,5 +1,5 @@
 import Database from '../../Database';
-import _cloneDeep from 'lodash/cloneDeep';
+import Utilities from 'utilities';
 import uuidv4 from 'uuid/v4';
 
 const localModel = (() => {
@@ -71,7 +71,7 @@ const localModel = (() => {
    * @return {[type]}         [description]
    */
   async function insert ({ modelName, element }) {
-    element = _cloneDeep(element);
+    element = Utilities.cloneDeep(element);
 
     const model = await getModel({ model: modelName });
 

@@ -4,11 +4,11 @@ import _isEmpty from 'lodash/isEmpty';
 import Translation from 'database/models/Translation';
 import Configuration from 'repositories/Configuration/Configuration';
 import moment from 'moment';
-import _get from 'lodash/get';
+import Utilities from 'utilities';
 
 const Localization = class {
   static getLocalizationDate (localTranslations) {
-    return _get(localTranslations, '[0].fastUpdated', 0);
+    return Utilities.get(localTranslations, '[0].fastUpdated', 0);
   }
   static async setOfflineLocales ({ appConf }) {
     let localTranslations = await Translation.local().find();

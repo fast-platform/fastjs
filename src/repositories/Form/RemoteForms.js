@@ -2,18 +2,18 @@ import Form from 'database/models/Form';
 import _isEmpty from 'lodash/isEmpty';
 import Event from 'Wrappers/Event';
 import Configuration from 'repositories/Configuration/Configuration';
-import _get from 'lodash/get';
+import Utilities from 'utilities';
 import moment from 'moment';
 let RemoteForms = (() => {
   function getLocalFormsDate (localForms) {
-    return _get(localForms, '[0].fastUpdated', 0);
+    return Utilities.get(localForms, '[0].fastUpdated', 0);
   }
   async function setOfflineForms ({ appConf }) {
     let localForms = await Form.local().find();
 
     let localDate = getLocalFormsDate(localForms);
     let config = await Configuration.getLocal();
-    let offlineForms = _get(appConf.offlineFiles, 'Forms', undefined);
+    let offlineForms = Utilities.get(appConf.offlineFiles, 'Forms', undefined);
 
     if (config.fastUpdated >= localDate) {
       if (localForms) {
