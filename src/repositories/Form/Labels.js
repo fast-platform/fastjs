@@ -11,8 +11,8 @@ class FormLabels {
    * @param {*} formNameFilter
    * @param {*} languageFilter
    */
-  static async get (formNameFilter, languageFilter) {
-    return this.handle(formNameFilter, languageFilter);
+  static async get () {
+    return this.handle();
   }
   /**
    *
@@ -182,7 +182,7 @@ class FormLabels {
                 label: {
                   text: component[position],
                   type: position,
-                  component: component,
+                  component: component.key,
                   form: form.path,
                   picture: null
                 }
@@ -199,7 +199,7 @@ class FormLabels {
                   label: {
                     text: value.label,
                     type: 'value',
-                    component: component,
+                    component: component.key,
                     form: form.path,
                     picture: null
                   }
@@ -215,7 +215,7 @@ class FormLabels {
               label: {
                 text: component.content,
                 type: 'htmlElement',
-                component: component,
+                component: component.key,
                 form: form.path,
                 picture: null
               }
@@ -232,7 +232,7 @@ class FormLabels {
                     label: {
                       text: value.label,
                       type: 'selectValue',
-                      component: component,
+                      component: component.key,
                       form: form.path,
                       picture: null
                     }
@@ -252,7 +252,7 @@ class FormLabels {
                   label: {
                     text: q.label,
                     type: 'surveyLabel',
-                    component: component,
+                    component: component.key,
                     form: form.path,
                     picture: null
                   }
@@ -260,13 +260,12 @@ class FormLabels {
               });
               // Check every text of the answers
               component.values.forEach((v) => {
-                componentLabels.push(v.label);
                 componentLabels = this.createOrAdd({
                   labels: componentLabels,
                   label: {
                     text: v.label,
                     type: 'surveyValues',
-                    component: component,
+                    component: component.key,
                     form: form.path,
                     picture: null
                   }
