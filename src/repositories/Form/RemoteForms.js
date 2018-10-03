@@ -28,29 +28,17 @@ let RemoteForms = (() => {
 
   async function setOnlineForms () {
     let remoteForms = await Form.remote().find();
-    // For every new or updated entry
     let unixDate = moment().unix();
 
-    remoteForms.forEach(async function (form) {
-      // Find the local Form
-      let localRes = await Form.local().findOne({
-        'data._id': form._id
-      });
-
-      // If the local form exists
-      if (!Utilities.isEmpty(localRes)) {
-        // Replace it with the new Form
-        localRes.data = form;
-        await Form.local().update(localRes);
-      } else {
-        // If it doesn't, create a new one
+    if (remoteForms && !Utilities.isEmpty(remoteForms)) {
+      await Form.local().clear();
+      remoteForms.forEach(async function (form) {
         await Form.local().insert({
           data: form,
           fastUpdated: unixDate
         });
-      }
-    });
-
+      });
+    }
     Event.emit({
       name: 'FAST:FORMS:UPDATED',
       data: remoteForms.length,

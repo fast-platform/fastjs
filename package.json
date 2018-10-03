@@ -1,6 +1,6 @@
 {
   "name": "fast-fastjs",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Formio interface for online and offline use",
   "main": "lib/fast-fastjs.min.js",
   "directories": {
