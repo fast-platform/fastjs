@@ -1,5 +1,5 @@
 import Sync from './Sync';
-import _debounce from 'lodash/debounce';
+import Utilities from 'utilities';
 
 let SyncInterval = (() => {
   async function set (milliseconds) {
@@ -23,7 +23,7 @@ let SyncInterval = (() => {
       };
     };
 
-    var _debouncedSync = _debounce(Sync.now, 2000);
+    var _debouncedSync = Utilities.debounce(Sync.now, 2000);
 
     rInterval(_debouncedSync, milliseconds);
   }

@@ -1,4 +1,3 @@
-import _filter from 'lodash/filter';
 import User from 'database/models/User';
 import Auth from 'repositories/Auth/Auth';
 import Submission from 'database/models/Submission';
@@ -55,7 +54,7 @@ let Sync = class {
       'data.sync': false
     });
 
-    return _filter(filter, function (o) {
+    return filter.filter((o) => {
       return o.data.sync === false;
     });
   }
@@ -74,7 +73,7 @@ let Sync = class {
   static async syncUsers () {
     let users = await Sync.getUsersToSync();
 
-    users = _filter(users, function (o) {
+    users = users.filter((o) => {
       return o.data.sync === false && !o.data.queuedForSync && !o.data.syncError;
     });
 

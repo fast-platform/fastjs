@@ -1,7 +1,3 @@
-import _map from 'lodash/map';
-import _filter from 'lodash/filter';
-import _orderBy from 'lodash/orderBy';
-import _uniqBy from 'lodash/uniqBy';
 import Auth from 'repositories/Auth/Auth';
 import moment from 'moment';
 import baseModel from './baseModelFactory';
@@ -48,10 +44,14 @@ let Submission = (args) => {
     });
     // updated incomplete submission
 
-    filter = _filter(filter, function (o) {
+    filter = filter.filter((o) => {
       return o.data.sync === false || o.data.draft === false;
     });
-    filter = _orderBy(filter, ['data.created'], ['asc']);
+    filter = filter.sort((a, b) => {
+      a = new Date(a.data.created);
+      b = new Date(b.data.created);
+      return a > b ? -1 : a < b ? 1 : 0;
+    });
     return filter;
   }
 
@@ -68,7 +68,7 @@ let Submission = (args) => {
     });
 
     // updated incomplete submission
-    unsynced = _filter(unsynced, function (o) {
+    unsynced = unsynced.filter((o) => {
       return (
         o.data.sync === false &&
         o.data.draft === false &&
@@ -77,9 +77,11 @@ let Submission = (args) => {
         !o.data.syncError
       );
     });
-
-    unsynced = _orderBy(unsynced, ['data.created'], ['asc']);
-
+    unsynced = unsynced.sort((a, b) => {
+      a = new Date(a.data.created);
+      b = new Date(b.data.created);
+      return a > b ? -1 : a < b ? 1 : 0;
+    });
     return unsynced;
   }
 
@@ -223,7 +225,12 @@ let Submission = (args) => {
       return sub;
     });
 
-    submissions = _orderBy(submissions, ['updated'], ['desc']);
+    submissions = submissions.sort((a, b) => {
+      a = new Date(a.updated);
+      b = new Date(b.updated);
+      return a > b ? -1 : a < b ? 1 : 0;
+    });
+
     let paginated = { results: submissions, pagination: paginationInfo };
 
     return paginated;
@@ -237,7 +244,7 @@ let Submission = (args) => {
     });
 
     currentSubmission = currentSubmission[0];
-    let groupId = Utilities.get(currentSubmission, 'data.data.parallelSurvey', undefined);
+    let groupId = Utilities.get(() => currentSubmission.data.data.parallelSurvey);
 
     groupId = groupId && groupId !== '[object Object]' ? JSON.parse(groupId).groupId : undefined;
 
@@ -248,15 +255,17 @@ let Submission = (args) => {
     });
 
     let a = submissions.filter((submission) => {
-      let parallelSurveyID = Utilities.get(submission, 'data.data.parallelSurvey', undefined);
+      let parallelSurveyID = Utilities.get(() => submission.data.data.parallelSurvey);
 
       parallelSurveyID =
         parallelSurveyID && parallelSurveyID !== '[object Object]' ? JSON.parse(parallelSurveyID).groupId : undefined;
       return parallelSurveyID && parallelSurveyID === groupId;
     });
 
-    a = _map(a, 'data.data.parallelSurvey');
-    a = _map(a, (survey) => {
+    a = a.map((e) => {
+      e.data.data.parallelSurvey;
+    });
+    a = a.map((survey) => {
       return JSON.parse(survey);
     });
     return a;
@@ -264,8 +273,8 @@ let Submission = (args) => {
 
   function getParallelSurvey (submission) {
     let parallelsurveyInfo =
-      Utilities.get(submission, 'data.data.parallelSurvey', undefined) ||
-      Utilities.get(submission, 'data.parallelSurvey', undefined);
+      Utilities.get(() => submission.data.data.paraparallelSurvey) ||
+      Utilities.get(() => submission.data.parallelSurvey);
 
     parallelsurveyInfo =
       parallelsurveyInfo && parallelsurveyInfo !== '[object Object]' ? JSON.parse(parallelsurveyInfo) : undefined;
@@ -299,7 +308,7 @@ let Submission = (args) => {
       return typeof group !== 'undefined';
     });
 
-    return _uniqBy(groups, 'groupId');
+    return Utilities.uniqBy(groups, 'groupId');
   }
 
   async function getGroup (id) {

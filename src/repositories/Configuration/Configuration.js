@@ -16,7 +16,7 @@ let Configuration = (() => {
   async function getLocal () {
     let configuration = await CONFIGURATION.local().find();
 
-    return Utilities.get(configuration, '0', undefined);
+    return Utilities.get(() => configuration[0]);
   }
 
   async function getRemote (appConf) {
@@ -33,11 +33,11 @@ let Configuration = (() => {
         console.log('error', error);
       }
     }
-    return Utilities.get(remoteConfig, '[0].data', undefined);
+    return Utilities.get(() => remoteConfig[0].data);
   }
 
   function getConfigDate (localConfig) {
-    return Utilities.get(localConfig, 'fastUpdated', 0);
+    return Utilities.get(() => localConfig.fastUpdated, 0);
   }
 
   async function setOfflineConfig ({ Vue, appConf }) {

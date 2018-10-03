@@ -1,7 +1,7 @@
 /* global describe, it, before */
 import 'babel-polyfill';
 import chai from 'chai';
-import Event from '../../src/Wrappers/Event';
+import Event from '../src/Wrappers/Event';
 
 chai.expect();
 

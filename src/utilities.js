@@ -1,4 +1,3 @@
-import _get from 'lodash/get';
 /* eslint-disable no-unused-vars */
 let Utilities = (() => {
   /**
@@ -10,7 +9,6 @@ let Utilities = (() => {
   const cloneDeep = (object) => {
     return JSON.parse(JSON.stringify(object));
   };
-
   /**
    * Given an Object and its path, if exisits it will
    * return the value of it, if not the default
@@ -18,22 +16,64 @@ let Utilities = (() => {
    * @param {String} path
    * @param {*} def
    */
-  const get = (object, path, def) => {
-    /*
-      (() => (typeof path === 'string' ? path.replace(/\[(\d+)]/g, '.$1') : path.join('.')))()
-    .split('.')
-    .filter(Boolean)
-    .every((step) => (object = object[step]) !== undefined) ?
-    object :
-    def;
+  const get = (fn, def) => {
+    try {
+      return fn();
+    } catch (e) {
+      return def;
+    }
+  };
 
-    */
-    return _get(object, path, def);
+  const uniqBy = (arr, predicate) => {
+    const cb = typeof predicate === 'function' ? predicate : (o) => o[predicate];
+
+    return [
+      ...arr
+        .reduce((map, item) => {
+          const key = cb(item);
+
+          map.has(key) || map.set(key, item);
+
+          return map;
+        }, new Map())
+        .values()
+    ];
+  };
+
+  const orderBy = () => {};
+
+  const isEmpty = (value) => {
+    if (!value) {
+      return true;
+    }
+    if (Array.isArray(value) || typeof value === 'string') {
+      return !value.length;
+    }
+    for (let key in value) {
+      if (hasOwnProperty.call(value, key)) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const debounce = (fn, time) => {
+    let timeout;
+
+    return function () {
+      const functionCall = () => fn.apply(this, arguments);
+
+      clearTimeout(timeout);
+      timeout = setTimeout(functionCall, time);
+    };
   };
 
   return Object.freeze({
     cloneDeep,
-    get
+    get,
+    orderBy,
+    isEmpty,
+    debounce
   });
 })();
 

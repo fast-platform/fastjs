@@ -50,7 +50,7 @@ let ParallelSurvey = (() => {
   }
 
   function getGroupId (submission) {
-    let groupId = Utilities.get(Submission.local().getParallelSurvey(submission), 'groupId', undefined);
+    let groupId = Utilities.get(() => Submission.local().getParallelSurvey(submission).groupId);
 
     return groupId;
   }

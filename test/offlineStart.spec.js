@@ -1,8 +1,8 @@
 /* global describe, it, before */
 import 'babel-polyfill';
 import chai from 'chai';
-import FAST from '../../src/start.js';
-import TRANSLATIONS from '../resources/Localizations/appTranslations';
+import FAST from '../src/start.js';
+import TRANSLATIONS from './resources/Localizations/appTranslations';
 
 chai.expect();
 
@@ -20,12 +20,12 @@ let appConf = {
   i18n: TRANSLATIONS,
   offlineStart: OFFLINE_START,
   offlineFiles: {
-    Configuration: require('../resources/offline/Configuration.json'),
-    Roles: require('../resources/offline/Roles.json'),
-    lastUpdated: require('../resources/offline/lastUpdate.json'),
-    Translations: require('../resources/offline/Translations.json'),
-    Pages: require('../resources/offline/Pages.json'),
-    Forms: require('../resources/offline/Forms.json')
+    Configuration: require('./resources/offline/Configuration.json'),
+    Roles: require('./resources/offline/Roles.json'),
+    lastUpdated: require('./resources/offline/lastUpdate.json'),
+    Translations: require('./resources/offline/Translations.json'),
+    Pages: require('./resources/offline/Pages.json'),
+    Forms: require('./resources/offline/Forms.json')
   }
 };
 
@@ -89,6 +89,6 @@ describe('Given FAST start', () => {
       }
     };
 
-    expect(fast.translations.data).to.deep.equal(translations);
+    expect(fast.translations).to.deep.equal(translations);
   });
 });

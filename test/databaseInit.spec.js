@@ -1,7 +1,7 @@
 /* global describe, it, before */
 import 'babel-polyfill';
 import chai from 'chai';
-import Database from '../../src/database/Database.js';
+import Database from '../src/database/Database.js';
 import Loki from 'lokijs';
 
 chai.expect();

@@ -1,6 +1,5 @@
 import Connection from 'Wrappers/Connection';
 import Pages from 'database/models/Pages';
-import _isEmpty from 'lodash/isEmpty';
 import Utilities from 'utilities';
 import to from 'await-to-js';
 import Configuration from 'repositories/Configuration/Configuration';
@@ -8,7 +7,7 @@ import moment from 'moment';
 
 let PAGES = (() => {
   function getLocalPagesDate (localPages) {
-    return Utilities.get(localPages, '[0].fastUpdated', 0);
+    return Utilities.get(() => localPages[0].fastUpdated, 0);
   }
   async function setOfflinePages ({ appConf }) {
     let localPages = await Pages.local().find();
@@ -16,7 +15,7 @@ let PAGES = (() => {
     let localDate = getLocalPagesDate(localPages);
     let config = await Configuration.getLocal();
 
-    let offlinePages = Utilities.get(appConf.offlineFiles.Pages, '[0].data', undefined);
+    let offlinePages = Utilities.get(() => appConf.offlineFiles.Pages[0].data);
 
     if (config.fastUpdated >= localDate) {
       if (localPages) {
@@ -27,14 +26,14 @@ let PAGES = (() => {
       return newPages;
     }
 
-    return Utilities.get(localPages, '[0].data', undefined);
+    return Utilities.get(() => localPages[0].data);
   }
 
   async function setOnlinePages () {
     let localPages, remotePages, error;
 
     localPages = await Pages.local().find();
-    localPages = Utilities.get(localPages, '[0]', undefined);
+    localPages = Utilities.get(() => localPages[0]);
     let isOnline = await Connection.isOnline();
 
     if (isOnline) {
@@ -43,10 +42,10 @@ let PAGES = (() => {
         throw new Error(error);
       }
     }
-    remotePages = Utilities.get(remotePages, '[0].data', undefined);
+    remotePages = Utilities.get(() => remotePages[0].data);
     let newPages = localPages;
 
-    if (remotePages && !_isEmpty(remotePages)) {
+    if (remotePages && !Utilities.isEmpty(remotePages)) {
       if (localPages) {
         await Pages.local().clear();
       }
@@ -68,7 +67,7 @@ let PAGES = (() => {
   async function getLocal (submission) {
     let pages = await Pages.local().find();
 
-    return Utilities.get(pages, '[0]', {});
+    return Utilities.get(() => pages[0], {});
   }
 
   return Object.freeze({

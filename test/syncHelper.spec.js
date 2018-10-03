@@ -1,7 +1,7 @@
 /* global describe, it, before */
 import 'babel-polyfill';
 import chai from 'chai';
-import SyncHelper from '../../src/database/helpers/SyncHelper.js';
+import SyncHelper from '../src/database/helpers/SyncHelper.js';
 
 const expect = chai.expect;
 let Sync;

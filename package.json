@@ -1,6 +1,6 @@
 {
   "name": "fast-fastjs",
-  "version": "0.2.12",
+  "version": "0.3.0",
   "description": "Formio interface for online and offline use",
   "main": "lib/fast-fastjs.js",
   "directories": {
@@ -58,6 +58,7 @@
     "webpack-bundle-analyzer": "^2.13.1",
     "webpack-cli": "^3.1.1",
     "webpack-node-externals": "^1.7.2",
+    "xmlhttprequest": "^1.8.0",
     "yargs": "^11.0.0"
   },
   "dependencies": {
@@ -65,7 +66,6 @@
     "axios": "^0.18.0",
     "bluebird": "^3.5.2",
     "formiojs": "^3.5.6",
-    "lodash": "^4.17.10",
     "lokijs": "^1.5.5",
     "md5": "^2.2.1",
     "moment": "^2.22.2",

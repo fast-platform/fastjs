@@ -1,6 +1,4 @@
 import FormioUtils from 'formiojs/utils';
-import _forEach from 'lodash/forEach';
-// import _isEmpty from 'lodash/isEmpty';
 import Translation from 'database/models/Translation';
 import config from 'config';
 import Form from 'database/models/Form';
@@ -193,7 +191,7 @@ class FormLabels {
 
           // Check for components that have values with labels (i.e: radio)
           if (component.values) {
-            _forEach(component.values, (value) => {
+            component.values.forEach((value) => {
               if (value.label && value.label !== '') {
                 componentLabels = this.createOrAdd({
                   labels: componentLabels,
@@ -226,7 +224,7 @@ class FormLabels {
           // Check specificaly for select elements
           if (component.type === 'select') {
             if (component.data && component.data.values) {
-              _forEach(component.data.values, (value) => {
+              component.data.values.forEach((value) => {
                 if (value.label && value.label !== '') {
                   componentLabels = this.createOrAdd({
                     labels: componentLabels,

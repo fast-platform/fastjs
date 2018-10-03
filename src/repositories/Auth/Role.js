@@ -7,13 +7,13 @@ import moment from 'moment';
 
 let Role = (() => {
   function getRolesDate (localRoles) {
-    return Utilities.get(localRoles, 'fastUpdated', 0);
+    return Utilities.get(() => localRoles.fastUpdated, 0);
   }
 
   async function getLocal () {
     let roles = await Roles.local().find();
 
-    return Utilities.get(roles, '[0]', undefined);
+    return Utilities.get(() => roles[0]);
   }
 
   async function setOnlineRoles ({ url }) {
@@ -22,7 +22,7 @@ let Role = (() => {
 
     let localRoles = await Roles.local().find();
 
-    localRoles = Utilities.get(localRoles, '[0]', undefined);
+    localRoles = Utilities.get(() => localRoles[0]);
     let isOnline = await Connection.isOnline();
 
     if (isOnline) {
@@ -33,7 +33,7 @@ let Role = (() => {
       }
     }
 
-    remoteRoles = Utilities.get(remoteRoles, 'data.roles', undefined);
+    remoteRoles = Utilities.get(() => remoteRoles.data.roles);
 
     if (remoteRoles) {
       if (localRoles) {

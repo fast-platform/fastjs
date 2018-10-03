@@ -1,8 +1,5 @@
-import _forEach from 'lodash/forEach';
-import _orderBy from 'lodash/orderBy';
-import _find from 'lodash/find';
 import baseModel from './baseModelFactory';
-
+import Utilities from 'utilities';
 let Translation = (args) => {
   var baseModel = args.baseModel;
 
@@ -18,11 +15,11 @@ let Translation = (args) => {
 
     let localTranslations = await Translation.local().findOne();
 
-    localTranslations = localTranslations && localTranslations.data ? localTranslations.data : {};
+    localTranslations = Utilities.get(() => localTranslations.data, {});
 
-    _forEach(localTranslations, (lenguage, index) => {
-      if (index !== 'type') {
-        i18n[index] = lenguage;
+    Object.keys(localTranslations).forEach((languageCode) => {
+      if (languageCode !== 'type') {
+        i18n[languageCode] = localTranslations[languageCode];
       }
     });
     return i18n;
@@ -40,23 +37,26 @@ let Translation = (args) => {
     let isoLanguages = Translation.getIsoLanguages();
     let languages = [];
 
-    _forEach(translations[0].data, (language, code) => {
-      let iso = _find(isoLanguages, {
-        code: code
+    translations = Utilities.get(() => translations[0].data, []);
+
+    Object.keys(translations).forEach((languageCode) => {
+      let iso = isoLanguages.find((l) => {
+        return l.code === languageCode;
       });
 
       if (iso) {
         languages.push(iso);
       }
     });
-    languages = _orderBy(languages, ['label'], ['asc']);
+
+    languages = languages.sort((a, b) => {
+      a = a.label;
+      b = b.label;
+      return a > b ? 1 : a < b ? -1 : 0;
+    });
     return languages;
   }
 
-  async function getTranslationStatus () {
-    // let languages = supportedLanguages();
-
-  }
   /**
    *
    */
@@ -71,8 +71,7 @@ let Translation = (args) => {
       getFormPath,
       getFormTranslations,
       supportedLanguages,
-      getIsoLanguages,
-      getTranslationStatus
+      getIsoLanguages
     })
   );
 };

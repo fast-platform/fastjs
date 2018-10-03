@@ -1,5 +1,4 @@
 import moment from 'moment';
-import _orderBy from 'lodash/orderBy';
 import baseModel from './baseModelFactory';
 import remoteModel from './baseModel/remote';
 import Connection from 'Wrappers/Connection';
@@ -124,7 +123,12 @@ let Form = (args) => {
     result = result.filter((o) => {
       return o.data.tags.indexOf('visible') > -1;
     });
-    result = _orderBy(result, 'data.title', 'asc');
+    result = result.sort((a, b) => {
+      a = a.data.title;
+      b = b.data.title;
+      return a > b ? 1 : a < b ? -1 : 0;
+    });
+
     result = result.map((f) => {
       return {
         title: f.data.title,

@@ -1,5 +1,5 @@
 import moment from 'moment';
-import 'moment/min/locales';
+// import 'moment/min/locales';
 
 let Moment = class {
   static setLocales () {

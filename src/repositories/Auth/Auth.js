@@ -5,9 +5,8 @@ import UserRepository from 'repositories/User/User';
 import Connection from 'Wrappers/Connection';
 import Role from 'database/models/Role';
 import RoleRepo from 'repositories/Auth/Role';
-import _find from 'lodash/find';
-import _isEmpty from 'lodash/isEmpty';
 import Promise from 'bluebird';
+import Utilities from 'utilities';
 
 let Auth = (() => {
   /**
@@ -171,8 +170,8 @@ let Auth = (() => {
 
     user = user === null ? false : user;
 
-    let result = _find(user.rolesNames, {
-      title: roleName
+    let result = user.rolesNames.find((r) => {
+      return r.title === roleName;
     });
 
     return typeof result !== 'undefined';
@@ -185,7 +184,7 @@ let Auth = (() => {
    */
 
   const hasRoleIn = function (roles) {
-    if (!roles || _isEmpty(roles)) {
+    if (!roles || Utilities.isEmpty(roles)) {
       return true;
     }
     return roles.some((role) => {
@@ -200,7 +199,7 @@ let Auth = (() => {
    */
 
   const hasRoleIdIn = async function (rolesIds) {
-    if (!rolesIds || _isEmpty(rolesIds)) {
+    if (!rolesIds || Utilities.isEmpty(rolesIds)) {
       return true;
     }
     let appRoles = await RoleRepo.getLocal();

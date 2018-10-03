@@ -1,7 +1,7 @@
 import config from 'config';
 import USER from 'database/models/User';
 import SyncHelper from 'database/helpers/SyncHelper';
-import _isEmpty from 'lodash/isEmpty';
+import Utilities from 'utilities';
 import axios from 'axios';
 
 let User = (() => {
@@ -11,7 +11,7 @@ let User = (() => {
     });
 
     formIoUser = SyncHelper.deleteNulls(formIoUser);
-    let isUserAlreadyStored = !!user && !_isEmpty(user);
+    let isUserAlreadyStored = !!user && !Utilities.isEmpty(user);
 
     //  check if user is already present in local storage
     if (isUserAlreadyStored) {

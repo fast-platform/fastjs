@@ -1,6 +1,3 @@
-import _forEach from 'lodash/forEach';
-import _map from 'lodash/map';
-import _isEmpty from 'lodash/isEmpty';
 import Translation from 'database/models/Translation';
 import Configuration from 'repositories/Configuration/Configuration';
 import moment from 'moment';
@@ -8,7 +5,7 @@ import Utilities from 'utilities';
 
 const Localization = class {
   static getLocalizationDate (localTranslations) {
-    return Utilities.get(localTranslations, '[0].fastUpdated', 0);
+    return Utilities.get(() => localTranslations[0].fastUpdated, 0);
   }
   static async setOfflineLocales ({ appConf }) {
     let localTranslations = await Translation.local().find();
@@ -73,7 +70,7 @@ const Localization = class {
       fastUpdated: moment().unix()
     });
 
-    return appTranslations;
+    return appTranslations.data;
   }
   /**
    * [setTranslations description]
@@ -85,8 +82,8 @@ const Localization = class {
 
     processedTranslations.label = {};
     // Foreach of the locale lenguages, set the translations
-    _forEach(lenguages, (language) => {
-      _forEach(translationArray, (translation, index) => {
+    lenguages.forEach((language) => {
+      translationArray.forEach((translation, index) => {
         if (translation.data && translation.data[language.code]) {
           if (!processedTranslations[language.code]) {
             processedTranslations[language.code] = {};
@@ -98,14 +95,6 @@ const Localization = class {
           processedTranslations['label'][translation.data.label] = translation.data.label;
         }
       });
-    });
-
-    _map(processedTranslations, (language, index) => {
-      if (!_isEmpty(language.translations)) {
-        processedTranslations[language.code] = language.translations;
-      } else {
-        delete processedTranslations[language.code];
-      }
     });
 
     return processedTranslations;

@@ -1,19 +1,18 @@
 import Form from 'database/models/Form';
-import _isEmpty from 'lodash/isEmpty';
 import Event from 'Wrappers/Event';
 import Configuration from 'repositories/Configuration/Configuration';
 import Utilities from 'utilities';
 import moment from 'moment';
 let RemoteForms = (() => {
   function getLocalFormsDate (localForms) {
-    return Utilities.get(localForms, '[0].fastUpdated', 0);
+    return Utilities.get(() => localForms[0].fastUpdated, 0);
   }
   async function setOfflineForms ({ appConf }) {
     let localForms = await Form.local().find();
 
     let localDate = getLocalFormsDate(localForms);
     let config = await Configuration.getLocal();
-    let offlineForms = Utilities.get(appConf.offlineFiles, 'Forms', undefined);
+    let offlineForms = Utilities.get(() => appConf.offlineFiles.Forms);
 
     if (config.fastUpdated >= localDate) {
       if (localForms) {
@@ -39,7 +38,7 @@ let RemoteForms = (() => {
       });
 
       // If the local form exists
-      if (!_isEmpty(localRes)) {
+      if (!Utilities.isEmpty(localRes)) {
         // Replace it with the new Form
         localRes.data = form;
         await Form.local().update(localRes);
