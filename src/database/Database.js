@@ -34,15 +34,15 @@ let Database = (() => {
         autoloadCallback: databaseInitialize
       };
 
-      if (env && env === 'testing') {
-        db = new Loki('FAST', dbConfig);
-      } else {
+      try {
         idbAdapter = new LokiIndexedAdapter('FAST');
         pa = new Loki.LokiPartitioningAdapter(idbAdapter, {
           paging: true
         });
 
         db = new Loki('FAST', { ...dbConfig, adapter: pa });
+      } catch (error) {
+        db = new Loki('FAST', dbConfig);
       }
 
       function databaseInitialize () {

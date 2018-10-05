@@ -11,7 +11,7 @@
     "build": "rm -rf lib/*;webpack --env build;npm run test",
     "rebuild": "rm -rf node_modules;npm install;npm run build",
     "dev": "webpack --progress --colors --watch --env dev",
-    "test": "mocha-webpack --colors --recursive -w --timeout 10000 --webpack-config test/config/webpack.config.test.js --require mock-local-storage --require test/config/setup.js --exit test/**/*.spec.js --exit ",
+    "test": "mocha-webpack --colors --recursive -w --timeout 10000 --webpack-config test/config/webpack.config.test.js --require mock-local-storage --require test/config/setup.js --exit test/fluent.spec.js --exit ",
     "test:watch": "mocha-webpack --webpack-config webpack.config.test.js --watch --glob '*.spect.js' --recursive test"
   },
   "repository": {
@@ -62,6 +62,9 @@
     "yargs": "^11.0.0"
   },
   "dependencies": {
+    "@stamp/compose": "^1.0.2",
+    "@stamp/it": "^1.1.0",
+    "@stamp/privatize": "^1.0.3",
     "await-to-js": "^2.0.1",
     "axios": "^0.18.0",
     "bluebird": "^3.5.2",
@@ -69,6 +72,7 @@
     "lokijs": "^1.5.5",
     "md5": "^2.2.1",
     "moment": "^2.22.2",
+    "stampit": "^4.2.0",
     "uuid": "^3.2.1"
   }
 }

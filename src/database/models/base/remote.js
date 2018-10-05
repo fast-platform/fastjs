@@ -2,7 +2,7 @@ import Formio from 'formiojs/Formio';
 import config from 'config';
 import to from 'await-to-js';
 
-const remoteModel = (() => {
+const remoteModel = ((path) => {
   function filterToString (filter) {
     if (!filter) {
       return;
@@ -76,15 +76,16 @@ const remoteModel = (() => {
     return { select: selectString };
   }
   /* eslint-disable no-unused-vars */
-  async function getFormioInstance ({ formPath, submissionID = undefined }) {
+  async function getFormioInstance ({ submissionID = undefined }) {
     let formUrl;
     let AuthUser = JSON.parse(localStorage.getItem('authUser'));
 
     if (AuthUser && AuthUser.x_jwt_token) {
       Formio.setToken(AuthUser.x_jwt_token);
     }
+
     // Get the base URL
-    switch (formPath) {
+    switch (path) {
       case 'custom':
         formUrl = await config.get().baseURL;
         break;
@@ -94,7 +95,7 @@ const remoteModel = (() => {
         break;
       default:
         formUrl = await config.get().baseURL;
-        formUrl = formUrl + '/' + formPath;
+        formUrl = formUrl + '/' + path;
         break;
     }
 
@@ -103,21 +104,28 @@ const remoteModel = (() => {
     formUrl = submissionID ? formUrl + '/submission/' + submissionID : formUrl;
     return new Formio(formUrl);
   }
+
+  let all = async function () {
+    let remoteData, error;
+    let formio = await getFormioInstance({ path });
+
+    [error, remoteData] = await to(formio.loadForms());
+    if (error) {
+      console.log(error);
+      throw new Error('Cannot get data');
+    }
+
+    return remoteData;
+  };
   /**
    * [find description]
    * @param  {[type]} filter [description]
    * @return {[type]}        [description]
    */
-  async function find ({
-    formPath,
-    filter = undefined,
-    limit = 30,
-    select = undefined,
-    populate = undefined,
-    pagination
-  }) {
+
+  async function find ({ filter = undefined, limit = 30, select = undefined, populate = undefined, pagination }) {
     let remoteSubmissions, error;
-    let formio = await getFormioInstance({ formPath: formPath });
+    let formio = await getFormioInstance({ path: path });
 
     let queryParams = {
       limit: limit
@@ -147,7 +155,7 @@ const remoteModel = (() => {
     if (error) {
       let path;
 
-      switch (formPath) {
+      switch (path) {
         case 'custom':
           path = await config.get().baseURL;
           break;
@@ -156,7 +164,7 @@ const remoteModel = (() => {
           break;
         default:
           path = await config.get().baseURL;
-          path = path + '/' + formPath;
+          path = path + '/' + path;
           break;
       }
       let e = 'The API call to "' + path + '" could not be completed, server responded with ' + JSON.stringify(error);
@@ -171,19 +179,19 @@ const remoteModel = (() => {
    * @param  {[type]} filter [description]
    * @return {[type]}        [description]
    */
-  async function findOne ({ formPath, filter }) {}
+  async function findOne ({ filter }) {}
   /**
    * [remove description]
    * @param  {[type]} document [description]
    * @return {[type]}          [description]
    */
-  async function remove ({ id, formPath }) {
-    let formio = await getFormioInstance({ formPath: formPath, submissionID: id });
+  async function remove ({ id }) {
+    let formio = await getFormioInstance({ path: path, submissionID: id });
     let a = await formio.deleteSubmission();
   }
 
-  async function softDelete ({ id, formPath }) {
-    let formio = await getFormioInstance({ formPath: formPath, submissionID: id });
+  async function softDelete ({ id }) {
+    let formio = await getFormioInstance({ path: path, submissionID: id });
     let original = await formio.loadSubmission();
 
     original.data.enabled = false;
@@ -200,8 +208,8 @@ const remoteModel = (() => {
    * @param  {[type]} element [description]
    * @return {[type]}         [description]
    */
-  async function insert ({ formPath, element }) {
-    let formio = await getFormioInstance({ formPath: formPath });
+  async function insert ({ element }) {
+    let formio = await getFormioInstance({ path: path });
 
     Formio.deregisterPlugin('offline');
     let sub = await formio.saveSubmission(element);
@@ -213,8 +221,8 @@ const remoteModel = (() => {
    * @param  {[type]} document [description]
    * @return {[type]}          [description]
    */
-  async function update ({ formPath, document }) {
-    let formio = await getFormioInstance({ formPath: formPath });
+  async function update ({ document }) {
+    let formio = await getFormioInstance({ path: path });
 
     Formio.deregisterPlugin('offline');
     let sub = await formio.saveSubmission(document);
@@ -222,9 +230,9 @@ const remoteModel = (() => {
     return sub;
   }
 
-  async function updateOrCreate ({ formPath, document }) {}
+  async function updateOrCreate ({ document }) {}
 
-  async function findAndRemove ({ formPath, filter }) {}
+  async function findAndRemove ({ filter }) {}
 
   return Object.freeze({
     find,
@@ -235,7 +243,8 @@ const remoteModel = (() => {
     updateOrCreate,
     findAndRemove,
     getFormioInstance,
-    softDelete
+    softDelete,
+    all
   });
 })();
 

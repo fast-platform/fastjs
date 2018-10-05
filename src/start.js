@@ -10,9 +10,11 @@ import Roles from './repositories/Auth/Role';
 let FAST = (() => {
   /**
    *
+   * Triggers a full Online update of all Configuration,
+   * Forms, Pages and Roles of the application.
    *
    * @param {Object} conf
-   * @param {Object} conf.appConf - Configuration of the App
+   * @param {Object} conf.appConf Configuration of the App
    * @returns
    */
   async function sync ({ appConf }) {
@@ -38,6 +40,12 @@ let FAST = (() => {
     };
   }
 
+  /**
+   *
+   * @param {*} conf
+   * @param {*} conf.appConf Configuration of the App
+   * @param {*} conf.Vue Vue instance
+   */
   async function start ({ Vue, appConf }) {
     let pages, err;
 

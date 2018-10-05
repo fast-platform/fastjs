@@ -1,29 +1,9 @@
-import baseModel from 'database/models/baseModelFactory';
-let Role = (args) => {
-  var baseModel = args.baseModel;
-  /**
-   * [getOwnName description]
-   * @return {[type]} [description]
-   */
-  /* eslint-disable no-unused-vars */
+import Model from './base/Model';
+import Fluent from '../Fluent';
 
-  function getOwnName () {
-    return 'Role';
+export default Fluent.extend(Model, {
+  properties: {
+    name: 'Role',
+    path: undefined
   }
-
-  function getFormPath () {
-    return undefined;
-  }
-
-  return Object.freeze(
-    Object.assign({}, baseModel, {
-      getOwnName,
-      getFormPath
-    })
-  );
-};
-
-Role = Role({
-  baseModel: baseModel()
-});
-export default Role;
+})();
