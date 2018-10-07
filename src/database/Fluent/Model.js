@@ -18,8 +18,10 @@ export default Fluent.compose({
      * [remote description]
      * @return {[type]} [description]
      */
-    remote ({ token, pullForm }) {
-      this.remoteConnection.token = token;
+    remote ({ token = undefined, pullForm = undefined } = {}) {
+      if (token) {
+        this.remoteConnection.token = token;
+      }
       if (pullForm) {
         this.remoteConnection.pullForm = pullForm;
       }

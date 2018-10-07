@@ -4,11 +4,11 @@ import chai from 'chai';
 import to from 'await-to-js';
 import Model from '../src/database/Fluent/Model';
 import Fluent from '../src/database/Fluent/Fluent';
+import DB from '../src/database/models/DB';
 
 chai.expect();
 const expect = chai.expect;
 let testModel;
-let testModel2;
 
 describe('Given a FLUENT Remote Instance', () => {
   before(() => {
@@ -17,17 +17,6 @@ describe('Given a FLUENT Remote Instance', () => {
         name: 'myTestModel',
         remoteConnection: {
           baseUrl: 'https://vnikkswzjatywzi.form.io/',
-          path: 'mytestmodel',
-          token: undefined
-        }
-      }
-    }).compose(Fluent.privatize)();
-
-    testModel2 = Fluent.extend(Model, {
-      properties: {
-        name: 'https://vnikkswzjatywzi.form.io/',
-        remoteConnection: {
-          baseUrl: 'https://myBaseUrl.com/',
           path: 'mytestmodel',
           token: undefined
         }
@@ -43,48 +32,170 @@ describe('Given a FLUENT Remote Instance', () => {
     expect(testModel.getModelName()).to.be.equal('myTestModel');
   });
 
-  /*
   it('Should insert Data', async () => {
-    let data = await testModel.local().insert({
-      test: true,
-      order: 1,
-      nestedTest: { a: [6, 5, 4], b: { c: true, d: [2, 1, 0] }, c: 4 },
-      created: '2018-12-03'
+    let inserted = await testModel.remote().insert({
+      name: 'Ignacio',
+      age: 29
     });
 
-    await testModel.local().insert({
-      test: false,
-      order: 2,
-      nestedTest: { a: [3, 2, 1], b: { c: true, d: [1, 1, 0] }, c: 3 },
-      created: '2017-12-03'
-    });
-    await testModel.local().insert({
-      test: false,
-      order: 3,
-      nestedTest: { a: [0, -1, -2], b: { c: true, d: [0, 1, 0] }, c: 2 },
-      created: '2016-12-03'
+    let inserted2 = await testModel.remote().insert({
+      name: 'Andres',
+      age: 15
     });
 
-    let data2 = await testModel2.local().insert({
-      test: true,
-      nestedTest: { a: [5, 4, 3], b: { c: true, d: [2, 1, 0] }, c: 1 }
-    });
-
-    expect(data.nestedTest.a[0]).to.be.equal(6);
-    expect(data2.nestedTest.a[0]).to.be.equal(5);
+    expect(inserted._id).to.be.a('string');
+    expect(inserted2._id).to.be.a('string');
   });
-*/
-  it('Should get remote data', async () => {
-    let data;
-    let error;
 
-    [error, data] = await to(
+  it('Should get remote data', async () => {
+    let [error, data] = await to(testModel.remote().all());
+
+    if (error) {
+      console.log(error);
+      throw new Error('Cannot get remote Model');
+    }
+
+    expect(data[0].data.name).to.be.equal('Andres');
+  });
+
+  it('DB should get data for any local Model', async () => {
+    let [error, data] = await to(
+      DB.table({
+        remoteConnection: {
+          baseUrl: 'https://vnikkswzjatywzi.form.io/',
+          path: 'mytestmodel',
+          token: undefined
+        }
+      })
+        .remote()
+        .all()
+    );
+
+    if (error) {
+      console.log(error);
+      throw new Error('Cannot get remote Model');
+    }
+
+    expect(data[0].data.name).to.be.equal('Andres');
+  });
+
+  it('select() should filter and name specific columns', async () => {
+    let [error, data] = await to(
       testModel
-        .remote({ token: 'myToken' })
-        .where(['data.age', '>', 10])
-        .andWhere(['data.age', '<', 40])
-        .select('_id', 'data.name as Name', 'created as customCreated')
-        .orderBy('customCreated', 'desc', 'date')
+        .remote()
+        .select('data.name as Name')
+        .get()
+    );
+
+    if (error) {
+      console.log(error);
+      throw new Error('Cannot get remote Model');
+    }
+
+    expect(data[0].Name).to.be.equal('Andres');
+  });
+
+  it('pluck() should return a single array', async () => {
+    let [error, data] = await to(testModel.remote().pluck('data.name'));
+
+    if (error) {
+      console.log(error);
+      throw new Error('Cannot get remote Model');
+    }
+
+    expect(data[0]).to.be.equal('Andres');
+  });
+
+  it('orderBy() should order results desc', async () => {
+    let [error, data] = await to(
+      testModel
+        .remote()
+        .select('data.name as Name')
+        .orderBy('Name', 'desc')
+        .get()
+    );
+
+    if (error) {
+      console.log(error);
+      throw new Error('Cannot get remote Model');
+    }
+
+    expect(data[0].Name).to.be.equal('Ignacio');
+  });
+
+  it('orderBy() should order results asc', async () => {
+    let [error, data] = await to(
+      testModel
+        .remote()
+        .select('data.name as Name')
+        .orderBy('Name', 'asc')
+        .get()
+    );
+
+    if (error) {
+      console.log(error);
+      throw new Error('Cannot get remote Model');
+    }
+
+    expect(data[0].Name).to.be.equal('Andres');
+  });
+
+  it('orderBy() should order by Dates with Select()', async () => {
+    let [error, data] = await to(
+      testModel
+        .remote()
+        .select('data.name as Name', 'created as created')
+        .orderBy('created', 'asc', 'date')
+        .get()
+    );
+
+    if (error) {
+      console.log(error);
+      throw new Error('Cannot get remote Model');
+    }
+    expect(data[0].Name).to.be.equal('Ignacio');
+  });
+
+  it('orderBy() should order by Dates without Select()', async () => {
+    let [error, data] = await to(
+      testModel
+        .remote()
+        .orderBy('created', 'asc')
+        .get()
+    );
+
+    if (error) {
+      console.log(error);
+      throw new Error('Cannot get remote Model');
+    }
+
+    expect(data[0].data.name).to.be.equal('Ignacio');
+  });
+
+  it('limit() should limit the amount of results', async () => {
+    let [error, data] = await to(
+      testModel
+        .remote()
+        .select('data.name as Name', 'created as created')
+        .orderBy('created', 'asc', 'date')
+        .limit(1)
+        .get()
+    );
+
+    if (error) {
+      console.log(error);
+      throw new Error('Cannot get remote Model');
+    }
+    expect(data.length).to.be.equal(1);
+  });
+
+  it('offset() should start at the given position', async () => {
+    let [error, data] = await to(
+      testModel
+        .remote()
+        .select('data.name as Name', 'created as created')
+        .orderBy('created', 'desc', 'date')
+        .limit(1)
         .offset(1)
         .get()
     );
@@ -94,131 +205,63 @@ describe('Given a FLUENT Remote Instance', () => {
       throw new Error('Cannot get remote Model');
     }
 
-    console.log(data);
-
-    expect(data[0].nestedTest.a[0]).to.be.equal(6);
-  });
-
-  /*
-
-  it('DB should get data for any local Model', async () => {
-    let data = await DB.table('myTestModel')
-      .local()
-      .all();
-
-    expect(data[0].nestedTest.a[0]).to.be.equal(6);
-
-    data = await DB.table('myTestModel2')
-      .local()
-      .all();
-    expect(data[0].nestedTest.a[0]).to.be.equal(5);
-  });
-
-  it('select() should filter and name specific columns', async () => {
-    let data = await testModel
-      .local()
-      .select('nestedTest.b.d[2] as myCustomName', 'fake.a as myA', [
-        'fake.b[1] as anotherB',
-        'fake.b.2.0.d as myvalue'
-      ])
-      .get();
-
-    expect(data[0]['myCustomName']).to.be.equal(0);
-  });
-
-  it('pluck() should return a single array', async () => {
-    let data = await testModel.local().pluck('test');
-
-    expect(data[0]).to.be.equal(true);
-  });
-
-  it('orderBy() should order results desc', async () => {
-    let forms = await testModel
-      .local()
-      .select('test', 'nestedTest.b.d[0] as custom', 'order')
-      .orderBy('custom', 'desc')
-      .get();
-
-    expect(forms[0].order).to.be.equal(1);
-  });
-
-  it('orderBy() should order results asc', async () => {
-    let forms = await testModel
-      .local()
-      .select('test', 'nestedTest.b.d[0] as custom', 'order')
-      .orderBy('custom', 'asc')
-      .get();
-
-    expect(forms[0].order).to.be.equal(3);
-  });
-
-  it('orderBy() should order by Dates with Select()', async () => {
-    let forms = await testModel
-      .local()
-      .select('created', 'order')
-      .orderBy('created', 'asc', 'date')
-      .get();
-
-    expect(forms[0].order).to.be.equal(3);
-  });
-
-  it('orderBy() should order by Dates without Select()', async () => {
-    let forms = await testModel
-      .local()
-      .orderBy('created', 'asc', 'date')
-      .get();
-
-    expect(forms[0].order).to.be.equal(3);
-  });
-
-  it('limit() should limit the amount of results', async () => {
-    let forms = await testModel
-      .local()
-      .select('created', 'order')
-      .orderBy('created', 'asc', 'date')
-      .limit(2)
-      .get();
-
-    expect(forms.length).to.be.equal(2);
-  });
-
-  it('offset() should start at the given position', async () => {
-    let forms = await testModel
-      .local()
-      .select('created', 'order')
-      .offset(1)
-      .limit(1)
-      .get();
-
-    expect(forms[0].order).to.be.equal(2);
+    expect(data[0].Name).to.be.equal('Ignacio');
   });
 
   it('where() should filter the data', async () => {
-    let forms = await testModel
-      .local()
-      .where(['nestedTest.c', '>=', 3])
-      .get();
+    let [error, data] = await to(
+      testModel
+        .remote()
+        .where('data.name', '=', 'Andres')
+        .select('data.name as Name', 'created as created')
+        .get()
+    );
 
-    expect(forms.length).to.be.equal(2);
+    if (error) {
+      console.log(error);
+      throw new Error('Cannot get remote Model');
+    }
+
+    expect(data[0].Name).to.be.equal('Andres');
   });
 
   it('first() should take the first result from data', async () => {
-    let form = await testModel
-      .local()
-      .where(['nestedTest.c', '>=', 3])
-      .orderBy('order', 'desc')
-      .first();
+    let [error, data] = await to(
+      testModel
+        .remote()
+        .where('data.name', '=', 'Ignacio')
+        .select('data.name as Name', 'created as created')
+        .first()
+    );
 
-    expect(form.order).to.be.equal(2);
+    if (error) {
+      console.log(error);
+      throw new Error('Cannot get remote Model');
+    }
+
+    expect(data.Name).to.be.equal('Ignacio');
   });
 
   it('clear() should remove all records from the Model', async () => {
-    await testModel.local().clear();
-    await testModel2.local().clear();
+    let [error, data] = await to(testModel.remote().clear({ sure: true }));
 
-    let forms = await testModel.local().all();
+    if (error) {
+      console.log(error);
+      throw new Error('Cannot get remote Model');
+    }
 
-    expect(forms.length).to.be.equal(0);
+    [error, data] = await to(
+      testModel
+        .remote()
+        .select('_id')
+        .get()
+    );
+
+    if (error) {
+      console.log(error);
+      throw new Error('Cannot get remote Model');
+    }
+
+    expect(data.length).to.be.equal(0);
   });
-  */
 });

@@ -74,6 +74,7 @@ export default stampit({
      * @param {*} args
      */
     where (...args) {
+      this.whereArray = [];
       args = Array.isArray(args[0]) ? args : [args];
       args.forEach((arg) => {
         if (arg.length !== 3) {
@@ -92,7 +93,18 @@ export default stampit({
      * @param {*} args
      */
     andWhere (...args) {
-      return this.where(...args);
+      args = Array.isArray(args[0]) ? args : [args];
+      args.forEach((arg) => {
+        if (arg.length !== 3) {
+          throw new Error(
+            'There where clouse is not properly formatted, expecting: ["attribute", "operator","value"] but got "' +
+              JSON.stringify(arg) +
+              '" '
+          );
+        }
+        this.whereArray.push(arg);
+      });
+      return this;
     },
     /**
      *
@@ -129,7 +141,13 @@ export default stampit({
     async pluck (attributePath) {
       let data = await this.get();
 
-      data = data.map((e) => e[attributePath]);
+      data = data.map((e) => {
+        let extracted = Utilities.getFromPath(e, attributePath, undefined);
+
+        if (typeof extracted.value !== 'undefined') {
+          return extracted.value;
+        }
+      });
       return data;
     },
     orderBy (...args) {

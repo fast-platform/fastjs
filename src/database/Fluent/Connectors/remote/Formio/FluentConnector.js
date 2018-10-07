@@ -8,6 +8,60 @@ export default compose(
   Interface,
   {
     methods: {
+      async get () {
+        let error;
+        let result;
+
+        [error, result] = await to(this.httpGET());
+
+        if (error) {
+          console.log(error);
+          throw new Error('Error while getting submissions');
+        }
+
+        result = this.jsApplySelect(result.data);
+        result = this.jsApplyOrderBy(result);
+        return result;
+      },
+      async all () {
+        return this.get();
+      },
+      async insert (data) {
+        data = { data: data };
+
+        let [error, result] = await to(this.httpPOST(data));
+
+        if (error) {
+          console.log(error);
+          throw new Error('Cannot insert data');
+        }
+        return result.data;
+      },
+      async clear ({ sure } = {}) {
+        if (!sure || sure !== true) {
+          throw new Error(
+            'Clear() method will delete everything!, you must set the "sure" parameter "clear({sure:true})" to continue'
+          );
+        }
+        let promises = [];
+        let headers = this.getHeaders();
+        let [error, data] = await to(this.select('_id').pluck('_id'));
+
+        if (error) {
+          console.log(error);
+          throw new Error('Cannot get remote Model');
+        }
+
+        let url = this.getUrl().slice(0, -1);
+
+        data.forEach((_id) => {
+          let fullUrl = url + '/' + _id;
+
+          promises.push(axios.delete(fullUrl, { headers }));
+        });
+
+        return axios.all(promises);
+      },
       getUrl () {
         let baseUrl =
           this.remoteConnection && this.remoteConnection.baseUrl ? this.remoteConnection.baseUrl : undefined;
@@ -37,9 +91,10 @@ export default compose(
 
         return headers;
       },
-      httpCall () {
+      httpGET () {
         let url = this.getUrl();
         let headers = this.getHeaders();
+
         let filters = this.getFilters();
         let limit = this.getLimit();
         let skip = this.getSkip();
@@ -65,29 +120,19 @@ export default compose(
           spacer = url.substr(url.length - 1) === '&' ? '' : '&';
           url = url + spacer + select;
         }
-
         return axios.get(url, { headers });
+      },
+      httpPOST (data) {
+        let url = this.getUrl();
+        let headers = this.getHeaders();
+
+        return axios.post(url, data, { headers });
       },
       getTokenType (token) {
         if (token.length > 32) {
           return 'x-jwt-token';
         }
         return 'x-token';
-      },
-      async get () {
-        let error;
-        let result;
-
-        [error, result] = await to(this.httpCall());
-
-        if (error) {
-          console.log(error);
-          throw new Error('Error while getting submissions');
-        }
-
-        result = this.jsApplySelect(result.data);
-        result = this.jsApplyOrderBy(result);
-        return result;
       },
       getFilters () {
         let filter = this.whereArray;
@@ -187,79 +232,6 @@ export default compose(
 
 /**
   const remoteModel = ((path) => {
-    function filterToString (filter) {
-      if (!filter) {
-        return;
-      }
-      // Condition {element: '_id', query: 'in', value: ''}
-      let filterQuery = {};
-
-      filter = filter.filter((e) => {
-        return !e.type || e.type !== 'local';
-      });
-
-      filter.forEach((condition) => {
-        let valueString = '';
-
-        switch (condition.query) {
-          case '=':
-            filterQuery[condition.element] = condition.value;
-            break;
-          case '!=':
-            filterQuery[condition.element + '__ne'] = condition.value;
-            break;
-          case '>':
-            filterQuery[condition.element + '__gt'] = condition.value;
-            break;
-          case '>=':
-            filterQuery[condition.element + '__gte'] = condition.value;
-            break;
-          case '<':
-            filterQuery[condition.element + '__lt'] = condition.value;
-            break;
-          case '<=':
-            filterQuery[condition.element + '__lte'] = condition.value;
-            break;
-          case 'in':
-            valueString = '';
-            condition.value.forEach((value, index, array) => {
-              valueString = index === array.length - 1 ? valueString + value : valueString + value + ',';
-            });
-            filterQuery[condition.element + '__in'] = valueString;
-            break;
-          case 'nin':
-            valueString = '';
-            condition.value.forEach((value, index, array) => {
-              valueString = index === array.length - 1 ? valueString + value : valueString + value + ',';
-            });
-            filterQuery[condition.element + '__nin'] = valueString;
-            break;
-          case 'exists':
-            filterQuery[condition.element + '__exists'] = true;
-            break;
-          case '!exists':
-            filterQuery[condition.element + '__exists'] = false;
-            break;
-          case 'regex':
-            filterQuery[condition.element + '__regex'] = condition.value;
-            break;
-        }
-      });
-      return filterQuery;
-    }
-
-    function selectToString (select) {
-      if (!select) {
-        return;
-      }
-      let selectString = select.reduce((reducer, column) => {
-        reducer = reducer + ',' + column;
-        return reducer;
-      }, '_id,owner,modified');
-
-      return { select: selectString };
-    }
-
     let all = async function () {
       let remoteData, error;
       let formio = await getFormioInstance({ path });
