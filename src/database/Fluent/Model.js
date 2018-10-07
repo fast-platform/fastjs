@@ -2,9 +2,13 @@ import Fluent from './Fluent';
 
 export default Fluent.compose({
   properties: {
-    getFrom: 'remote-local',
     name: 'baseModel',
-    path: undefined
+    remoteConnection: {
+      baseUrl: 'https://myBaseUrl.com/',
+      path: '/myRemote/model',
+      token: undefined,
+      pullForm: false
+    }
   },
   methods: {
     getModelName () {
@@ -14,8 +18,12 @@ export default Fluent.compose({
      * [remote description]
      * @return {[type]} [description]
      */
-    remote () {
-      return Fluent.getRemoteConnector({ path: this.path });
+    remote ({ token, pullForm }) {
+      this.remoteConnection.token = token;
+      if (pullForm) {
+        this.remoteConnection.pullForm = pullForm;
+      }
+      return Fluent.getRemoteConnector({ remoteConnection: this.remoteConnection });
     },
     /**
      * [local description]
@@ -27,7 +35,8 @@ export default Fluent.compose({
     /**
      *
      */
-    merged () {
+    merged ({ token }) {
+      this.remoteConnection.token = token;
       return Fluent.getMergedConnector({ name: this.name, path: this.path });
     }
   }

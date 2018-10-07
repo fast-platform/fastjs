@@ -4,6 +4,6 @@ import Fluent from '../Fluent/Fluent';
 export default Fluent.extend(Model, {
   properties: {
     name: 'Role',
-    path: undefined
+    remoteConnection: undefined
   }
 })();

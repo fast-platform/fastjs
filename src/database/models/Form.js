@@ -6,7 +6,11 @@ import Fluent from '../Fluent/Fluent';
 export default Fluent.extend(Model, {
   properties: {
     name: 'Form',
-    path: 'custom'
+    remoteConnection: {
+      baseUrl: 'https://myBaseUrl.com/',
+      path: 'custom',
+      token: undefined
+    }
   },
   methods: {
     filterToString (filter) {

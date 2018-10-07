@@ -4,6 +4,10 @@ import Fluent from '../Fluent/Fluent';
 export default Fluent.extend(Model, {
   properties: {
     name: 'Pages',
-    path: 'fast-app-pages'
+    remoteConnection: {
+      baseUrl: 'https://myBaseUrl.com/',
+      path: 'fast-app-pages',
+      token: undefined
+    }
   }
 })();

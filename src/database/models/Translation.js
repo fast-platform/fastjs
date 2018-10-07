@@ -5,7 +5,11 @@ import Fluent from '../Fluent/Fluent';
 export default Fluent.extend(Model, {
   properties: {
     name: 'Translation',
-    path: 'translations'
+    remoteConnection: {
+      baseUrl: 'https://myBaseUrl.com/',
+      path: 'translations',
+      token: undefined
+    }
   },
   methods: {
     async getFormTranslations () {

@@ -1,31 +1,37 @@
 /* global describe, it, before */
 import 'babel-polyfill';
 import chai from 'chai';
+import to from 'await-to-js';
 import Model from '../src/database/Fluent/Model';
 import Fluent from '../src/database/Fluent/Fluent';
 
-import DB from '../src/database/models/DB';
 chai.expect();
 const expect = chai.expect;
 let testModel;
 let testModel2;
 
-describe('Given a FLUENT Local Model', () => {
+describe('Given a FLUENT Remote Instance', () => {
   before(() => {
     testModel = Fluent.extend(Model, {
       properties: {
         name: 'myTestModel',
-        path: 'myRemoteTest'
-      },
-      methods: {}
+        remoteConnection: {
+          baseUrl: 'https://vnikkswzjatywzi.form.io/',
+          path: 'mytestmodel',
+          token: undefined
+        }
+      }
     }).compose(Fluent.privatize)();
 
     testModel2 = Fluent.extend(Model, {
       properties: {
-        name: 'myTestModel2',
-        path: 'myRemoteTest2'
-      },
-      methods: {}
+        name: 'https://vnikkswzjatywzi.form.io/',
+        remoteConnection: {
+          baseUrl: 'https://myBaseUrl.com/',
+          path: 'mytestmodel',
+          token: undefined
+        }
+      }
     }).compose(Fluent.privatize)();
   });
 
@@ -37,6 +43,7 @@ describe('Given a FLUENT Local Model', () => {
     expect(testModel.getModelName()).to.be.equal('myTestModel');
   });
 
+  /*
   it('Should insert Data', async () => {
     let data = await testModel.local().insert({
       test: true,
@@ -66,12 +73,33 @@ describe('Given a FLUENT Local Model', () => {
     expect(data.nestedTest.a[0]).to.be.equal(6);
     expect(data2.nestedTest.a[0]).to.be.equal(5);
   });
+*/
+  it('Should get remote data', async () => {
+    let data;
+    let error;
 
-  it('Should get local data', async () => {
-    let data = await testModel.local().all();
+    [error, data] = await to(
+      testModel
+        .remote({ token: 'myToken' })
+        .where(['data.age', '>', 10])
+        .andWhere(['data.age', '<', 40])
+        .select('_id', 'data.name as Name', 'created as customCreated')
+        .orderBy('customCreated', 'desc', 'date')
+        .offset(1)
+        .get()
+    );
+
+    if (error) {
+      console.log(error);
+      throw new Error('Cannot get remote Model');
+    }
+
+    console.log(data);
 
     expect(data[0].nestedTest.a[0]).to.be.equal(6);
   });
+
+  /*
 
   it('DB should get data for any local Model', async () => {
     let data = await DB.table('myTestModel')
@@ -192,4 +220,5 @@ describe('Given a FLUENT Local Model', () => {
 
     expect(forms.length).to.be.equal(0);
   });
+  */
 });

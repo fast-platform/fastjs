@@ -21,134 +21,10 @@ export default compose(
           .limit(this.limitNumber)
           .data();
 
-        data = this.applySelect(data);
-        data = this.applyOrderBy(data);
+        data = this.jsApplySelect(data);
+        data = this.jsApplyOrderBy(data);
 
         return data;
-      },
-      /**
-       *
-       * @param {*} attributePath
-       */
-      async pluck (attributePath) {
-        let data = await this.get();
-
-        data = data.map((e) => e[attributePath]);
-        return data;
-      },
-      /**
-       *
-       * @param {*} args
-       */
-      orderBy (...args) {
-        this.orderByArray = args;
-        return this;
-      },
-      /**
-       *
-       * @param {*} data
-       */
-      applyOrderBy (data) {
-        let _data = [...data];
-
-        if (this.orderByArray.length === 0) {
-          return _data;
-        }
-        let field = this.orderByArray[0];
-
-        if (this.selectArray.length > 0 && (field.includes('.') || field.includes('['))) {
-          throw new Error(
-            'Cannot orderBy nested attribute "' + field + '" when using Select. You must rename the attribute'
-          );
-        }
-
-        let order = this.orderByArray[1];
-        let type = this.orderByArray[2];
-
-        if (!type) {
-          type = 'string';
-        }
-
-        _data = _data.sort((a, b) => {
-          let A = Utilities.getFromPath(a, field, undefined).value;
-          let B = Utilities.getFromPath(b, field, undefined).value;
-
-          if (typeof A === 'undefined' || typeof B === 'undefined') {
-            throw new Error('Cannot order by property "' + field + '" not all values have this property');
-          }
-          // For default order and numbers
-          if (type.includes('string') || type.includes('number')) {
-            if (order === 'asc') {
-              return A > B ? 1 : A < B ? -1 : 0;
-            }
-            return A > B ? -1 : A < B ? 1 : 0;
-          } else if (type.includes('date')) {
-            if (order === 'asc') {
-              return new Date(A) - new Date(B);
-            }
-            return new Date(B) - new Date(A);
-          }
-        });
-        return _data;
-      },
-      /**
-       *
-       * @param {*} limit
-       */
-      limit (limit) {
-        this.limitNumber = limit;
-        return this;
-      },
-      /**
-       *
-       * @param {*} offset
-       */
-      offset (offset) {
-        this.offsetNumber = offset;
-        return this;
-      },
-      /**
-       *
-       * @param {*} args
-       */
-      where (...args) {
-        args = Array.isArray(args[0]) ? args : [args];
-        args.forEach((arg) => {
-          if (arg.length !== 3) {
-            throw new Error(
-              'There where clouse is not properly formatted, expecting: ["attribute", "operator","value"] but got "' +
-                JSON.stringify(arg) +
-                '" '
-            );
-          }
-          this.whereArray.push(arg);
-        });
-        return this;
-      },
-      /**
-       *
-       * @param {*} args
-       */
-      andWhere (...args) {
-        return this.where(...args);
-      },
-      /**
-       *
-       * @param {*} args
-       */
-      orWhere (...args) {
-        args = Array.isArray(args[0]) ? args : [args];
-        args.forEach((arg) => {
-          if (arg.length !== 3) {
-            throw new Error(
-              'There orWhere clouse is not properly formatted, expecting: ["attribute", "operator","value"] but got "' +
-                JSON.stringify(arg) +
-                '" '
-            );
-          }
-          this.orWhereArray.push(arg);
-        });
-        return this;
       },
       /**
        *
@@ -246,92 +122,12 @@ export default compose(
         return DB.getCollection(this.name);
       },
       /**
-       * Maps the given Data to show only those fields
-       * explicitly detailed on the Select function
-       * @param {Array} data Data from the Local DB
-       * @returns {Array} Formatted data with the selected columns
-       */
-      applySelect (data) {
-        let _data = [...data];
-
-        if (this.selectArray.length > 0) {
-          _data = _data.map((element) => {
-            let newElement = {};
-
-            this.selectArray.forEach((attribute) => {
-              let extract = Utilities.getFromPath(element, attribute, undefined);
-
-              let value = Utilities.get(() => extract.value, undefined);
-
-              if (typeof value !== 'undefined') {
-                newElement[extract.label] = extract.value;
-              }
-            });
-            return newElement;
-          });
-        }
-
-        return _data;
-      },
-      /**
        *
        */
       async all () {
         const model = await this.getModel();
 
         return model.find();
-      },
-      /**
-       *
-       * @param {*} columns
-       */
-      select (...columns) {
-        columns = this.prepareInput(columns);
-
-        this.selectArray = this.selectArray.concat(columns).filter((elem, pos, arr) => {
-          return arr.indexOf(elem) === pos;
-        });
-
-        return this;
-      },
-      /**
-       *
-       * @param {*} param0
-       */
-      async find ({
-        filter = undefined,
-        limit = 30,
-        select = undefined,
-        pagination = undefined,
-        form = undefined
-      } = {}) {
-        const model = await this.getModel();
-
-        if (filter && Array.isArray(filter)) {
-          let owner = filter.find((e) => {
-            return e.element === 'owner' && e.type === 'local';
-          });
-
-          if (owner) {
-            filter = { 'data.user_email': owner.value };
-          }
-
-          if (form) {
-            filter = { ...filter, 'data.formio.formId': form };
-          }
-        }
-
-        return model.find(filter);
-      },
-      /**
-       * [findOne description]
-       * @param  {[type]} filter [description]
-       * @return {[type]}        [description]
-       */
-      async first () {
-        let data = await this.get();
-
-        return Utilities.get(() => data[0], []);
       },
       /**
        * [remove description]

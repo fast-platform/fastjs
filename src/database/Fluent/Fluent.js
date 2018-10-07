@@ -38,10 +38,10 @@ const Fluent = stampit({
 
       return this.connectors.local[con](modelName);
     },
-    getRemoteConnector (pathName) {
+    getRemoteConnector (remoteConnection) {
       let con = process.env.FLUENT_REMOTE_CONNECTOR || this.defaultRemote;
 
-      return this.connectors.remote[con](pathName);
+      return this.connectors.remote[con](remoteConnection);
     },
     getMergedConnector (nameAndPath) {
       // let con = process.env.FLUENT_MERGED_CONNECTOR || this.defaultMerged;

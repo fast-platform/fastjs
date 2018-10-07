@@ -9,7 +9,7 @@ import Fluent from '../Fluent/Fluent';
 export default Fluent.extend(Model, {
   properties: {
     name: 'Submission',
-    path: undefined
+    remoteConnection: undefined
   },
   methods: {
     async get (id) {

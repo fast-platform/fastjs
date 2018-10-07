@@ -1,12 +1,13 @@
 import stampit from '@stamp/it';
+import Utilities from 'utilities';
 
 export default stampit({
-  init ({ name, path }) {
-    if (!name && !path) {
+  init ({ name, remoteConnection }) {
+    if (!name && !remoteConnection) {
       throw new Error('Model must have a name or path');
     }
     this.name = name || this.name;
-    this.path = path || this.path;
+    this.remoteConnection = remoteConnection || this.remoteConnection;
   },
   properties: {
     whereArray: [],
@@ -27,26 +28,156 @@ export default stampit({
     all () {
       throw new Error('all() method not implemented');
     },
-    select () {
-      throw new Error('select() method not implemented');
+    select (...columns) {
+      columns = this.prepareInput(columns);
+
+      this.selectArray = this.selectArray.concat(columns).filter((elem, pos, arr) => {
+        return arr.indexOf(elem) === pos;
+      });
+
+      return this;
     },
-    where () {
-      throw new Error('where() method not implemented');
+    /**
+     * Maps the given Data to show only those fields
+     * explicitly detailed on the Select function
+     * @param {Array} data Data from the Local DB
+     * @returns {Array} Formatted data with the selected columns
+     */
+    jsApplySelect (data) {
+      let _data = [...data];
+
+      if (this.selectArray.length > 0) {
+        _data = _data.map((element) => {
+          let newElement = {};
+
+          this.selectArray.forEach((attribute) => {
+            let extract = Utilities.getFromPath(element, attribute, undefined);
+
+            let value = Utilities.get(() => extract.value, undefined);
+
+            if (typeof value !== 'undefined') {
+              newElement[extract.label] = extract.value;
+            }
+          });
+          return newElement;
+        });
+      }
+
+      return _data;
     },
-    andWhere () {
-      throw new Error('andWhere() method not implemented');
+    offset (offset) {
+      this.offsetNumber = offset;
+      return this;
     },
-    orWhere () {
-      throw new Error('orWhere() method not implemented');
+    /**
+     *
+     * @param {*} args
+     */
+    where (...args) {
+      args = Array.isArray(args[0]) ? args : [args];
+      args.forEach((arg) => {
+        if (arg.length !== 3) {
+          throw new Error(
+            'There where clouse is not properly formatted, expecting: ["attribute", "operator","value"] but got "' +
+              JSON.stringify(arg) +
+              '" '
+          );
+        }
+        this.whereArray.push(arg);
+      });
+      return this;
     },
-    limit () {
-      throw new Error('limit() method not implemented');
+    /**
+     *
+     * @param {*} args
+     */
+    andWhere (...args) {
+      return this.where(...args);
     },
-    offset () {
-      throw new Error('offset() method not implemented');
+    /**
+     *
+     * @param {*} args
+     */
+    orWhere (...args) {
+      args = Array.isArray(args[0]) ? args : [args];
+      args.forEach((arg) => {
+        if (arg.length !== 3) {
+          throw new Error(
+            'There orWhere clouse is not properly formatted, expecting: ["attribute", "operator","value"] but got "' +
+              JSON.stringify(arg) +
+              '" '
+          );
+        }
+        this.orWhereArray.push(arg);
+      });
+      return this;
     },
-    pluck (attributePath) {
-      throw new Error('pluck() method not implemented');
+    /**
+     * [findOne description]
+     * @param  {[type]} filter [description]
+     * @return {[type]}        [description]
+     */
+    async first () {
+      let data = await this.get();
+
+      return Utilities.get(() => data[0], []);
+    },
+    limit (limit) {
+      this.limitNumber = limit;
+      return this;
+    },
+    async pluck (attributePath) {
+      let data = await this.get();
+
+      data = data.map((e) => e[attributePath]);
+      return data;
+    },
+    orderBy (...args) {
+      this.orderByArray = args;
+      return this;
+    },
+    jsApplyOrderBy (data) {
+      let _data = [...data];
+
+      if (this.orderByArray.length === 0) {
+        return _data;
+      }
+      let field = this.orderByArray[0];
+
+      if (this.selectArray.length > 0 && (field.includes('.') || field.includes('['))) {
+        throw new Error(
+          'Cannot orderBy nested attribute "' + field + '" when using Select. You must rename the attribute'
+        );
+      }
+
+      let order = this.orderByArray[1];
+      let type = this.orderByArray[2];
+
+      if (!type) {
+        type = 'string';
+      }
+
+      _data = _data.sort((a, b) => {
+        let A = Utilities.getFromPath(a, field, undefined).value;
+        let B = Utilities.getFromPath(b, field, undefined).value;
+
+        if (typeof A === 'undefined' || typeof B === 'undefined') {
+          throw new Error('Cannot order by property "' + field + '" not all values have this property');
+        }
+        // For default order and numbers
+        if (type.includes('string') || type.includes('number')) {
+          if (order === 'asc') {
+            return A > B ? 1 : A < B ? -1 : 0;
+          }
+          return A > B ? -1 : A < B ? 1 : 0;
+        } else if (type.includes('date')) {
+          if (order === 'asc') {
+            return new Date(A) - new Date(B);
+          }
+          return new Date(B) - new Date(A);
+        }
+      });
+      return _data;
     },
     prepareInput (input) {
       let cols = [];

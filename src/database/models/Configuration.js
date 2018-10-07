@@ -7,7 +7,7 @@ import moment from 'moment';
 export default Fluent.extend(Model, {
   properties: {
     name: 'Configuration',
-    path: undefined
+    remoteConnection: undefined
   },
   methods: {
     /**

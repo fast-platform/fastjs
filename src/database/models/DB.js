@@ -4,12 +4,12 @@ import Fluent from '../Fluent/Fluent';
 export default Fluent.extend(Model, {
   properties: {
     name: undefined,
-    path: undefined
+    remoteConnection: undefined
   },
   methods: {
-    table (name) {
+    table ({ name, remoteConnection }) {
       this.name = name;
-      this.path = name;
+      this.remoteConnection = remoteConnection;
       return this;
     }
   }

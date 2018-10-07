@@ -4,6 +4,10 @@ import Fluent from '../Fluent/Fluent';
 export default Fluent.extend(Model, {
   properties: {
     name: 'User',
-    path: 'user'
+    remoteConnection: {
+      baseUrl: 'https://myBaseUrl.com/',
+      path: 'user',
+      token: undefined
+    }
   }
 })();
