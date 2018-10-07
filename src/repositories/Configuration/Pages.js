@@ -2,7 +2,7 @@ import Connection from 'Wrappers/Connection';
 import Pages from 'database/models/Pages';
 import Utilities from 'utilities';
 import to from 'await-to-js';
-import Configuration from 'repositories/Configuration/Configuration';
+import Configuration from '../../database/models/Configuration';
 import moment from 'moment';
 
 let PAGES = (() => {

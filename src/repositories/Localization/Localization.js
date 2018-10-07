@@ -1,5 +1,5 @@
 import Translation from 'database/models/Translation';
-import Configuration from 'repositories/Configuration/Configuration';
+import Configuration from '../../database/models/Configuration';
 import moment from 'moment';
 import Utilities from 'utilities';
 

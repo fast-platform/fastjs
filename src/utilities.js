@@ -23,7 +23,44 @@ let Utilities = (() => {
       return def;
     }
   };
+  /**
+   *
+   * @param {*} obj
+   * @param {*} path
+   * @param {*} def
+   */
+  const getFromPath = (obj, path, def) => {
+    let _path = path;
 
+    if (path.includes(' as ')) {
+      path = path.split(' as ');
+      _path = path[0];
+    }
+
+    let assignedName = get(() => {
+      return Array.isArray(path) && path[1].trim();
+    }, undefined);
+
+    let fullPath = _path
+      .replace(/\[/g, '.')
+      .replace(/]/g, '')
+      .split('.')
+      .filter(Boolean)
+      .map((e) => e.trim());
+
+    function everyFunc (step) {
+      return !(step && (obj = obj[step]) === undefined);
+    }
+
+    let result = fullPath.every(everyFunc) ? obj : def;
+
+    return { label: assignedName || _path, value: result };
+  };
+  /**
+   *
+   * @param {*} arr
+   * @param {*} predicate
+   */
   const uniqBy = (arr, predicate) => {
     const cb = typeof predicate === 'function' ? predicate : (o) => o[predicate];
 
@@ -39,9 +76,14 @@ let Utilities = (() => {
         .values()
     ];
   };
-
+  /**
+   *
+   */
   const orderBy = () => {};
-
+  /**
+   *
+   * @param {*} value
+   */
   const isEmpty = (value) => {
     if (!value) {
       return true;
@@ -56,7 +98,11 @@ let Utilities = (() => {
     }
     return true;
   };
-
+  /**
+   *
+   * @param {*} fn
+   * @param {*} time
+   */
   const debounce = (fn, time) => {
     let timeout;
 
@@ -73,7 +119,8 @@ let Utilities = (() => {
     get,
     orderBy,
     isEmpty,
-    debounce
+    debounce,
+    getFromPath
   });
 })();
 

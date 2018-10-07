@@ -1,8 +1,4 @@
-import Local from './local';
-import Remote from './remote';
-import Merged from './merged';
-import Connection from 'Wrappers/Connection';
-import Fluent from '../../Fluent';
+import Fluent from './Fluent';
 
 export default Fluent.compose({
   properties: {
@@ -19,20 +15,20 @@ export default Fluent.compose({
      * @return {[type]} [description]
      */
     remote () {
-      return Remote({ path: this.path });
+      return Fluent.getRemoteConnector({ path: this.path });
     },
     /**
      * [local description]
      * @return {[type]} [description]
      */
     local () {
-      return Local({ name: this.name });
+      return Fluent.getLocalConnector({ name: this.name });
     },
     /**
      *
      */
     merged () {
-      return Merged({ name: this.name, path: this.path });
+      return Fluent.getMergedConnector({ name: this.name, path: this.path });
     }
   }
 }).compose(Fluent.privatize);

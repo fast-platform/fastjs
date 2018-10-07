@@ -1,6 +1,6 @@
 import Form from 'database/models/Form';
 import Event from 'Wrappers/Event';
-import Configuration from 'repositories/Configuration/Configuration';
+import Configuration from '../../database/models/Configuration';
 import Utilities from 'utilities';
 import moment from 'moment';
 let RemoteForms = (() => {

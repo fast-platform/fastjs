@@ -1,4 +1,4 @@
-import Configuration from './repositories/Configuration/Configuration';
+import Configuration from './database/models/Configuration';
 import Form from './repositories/Form/RemoteForms';
 import Localization from './repositories/Localization/Localization';
 import Pages from './repositories/Configuration/Pages';

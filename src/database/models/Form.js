@@ -1,8 +1,7 @@
 import moment from 'moment';
-import Model from './base/Model';
-import remoteModel from './base/remote';
 import Connection from 'Wrappers/Connection';
-import Fluent from '../Fluent';
+import Model from '../Fluent/Model';
+import Fluent from '../Fluent/Fluent';
 
 export default Fluent.extend(Model, {
   properties: {
@@ -67,7 +66,7 @@ export default Fluent.extend(Model, {
       return filterQuery;
     },
     async rFind ({ filter = undefined, limit = 200, select, pagination, form } = {}) {
-      let formio = await remoteModel.getFormioInstance({ path: 'custom' });
+      let formio = await Fluent.getRemoteConnector({ path: 'custom' }).getFormioInstance({ path: 'custom' });
       let queryParams = {};
 
       if (limit) {

@@ -1,5 +1,5 @@
 import md5 from 'md5';
-import CONFIGURATION from 'repositories/Configuration/Configuration';
+import CONFIGURATION from '../../database/models/Configuration';
 
 let Hash = class {
   static async string (string) {

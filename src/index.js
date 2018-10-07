@@ -9,7 +9,7 @@ import PagesRepo from 'repositories/Configuration/Pages';
 import Submission from 'database/models/Submission';
 import SubmissionRepo from 'repositories/Submission/SubmissionRepository';
 import ParallelSurvey from 'repositories/Submission/ParallelSurvey';
-import Configuration from 'repositories/Configuration/Configuration';
+import Configuration from './database/models/Configuration';
 import Translation from 'database/models/Translation';
 import Import from 'repositories/Submission/Import';
 import Localization from 'repositories/Localization/Localization';

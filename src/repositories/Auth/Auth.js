@@ -1,4 +1,4 @@
-import Configuration from 'repositories/Configuration/Configuration';
+import Configuration from '../../database/models/Configuration';
 import md5 from 'md5';
 import User from 'database/models/User';
 import UserRepository from 'repositories/User/User';

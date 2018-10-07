@@ -1,10 +1,8 @@
 import Promise from 'bluebird';
 import Loki from 'lokijs';
 import LokiIndexedAdapter from 'lokijs/src/loki-indexed-adapter';
-
+var DB = null;
 let Database = (() => {
-  var DB = null;
-
   /*
   |--------------------------------------------------------------------------
   | LockiDB Config
@@ -46,9 +44,20 @@ let Database = (() => {
       }
 
       function databaseInitialize () {
-        const baseModels = ['Submission', 'Form', 'Translation', 'User', 'Role', 'Configuration', 'Pages'];
+        const baseModels =
+          window && window._FLUENT_ && window._FLUENT_.models ?
+            window._FLUENT_.models :
+            global && global._FLUENT_ && global._FLUENT_.models ?
+              global._FLUENT_.models :
+              undefined;
 
-        baseModels.forEach((model) => {
+        if (!baseModels) {
+          throw new Error(
+            'Cannot Start FLUENT, no models registered or you dont have access to the "window" or "global" variable'
+          );
+        }
+
+        Object.keys(baseModels).forEach((model) => {
           const dbModel = db.getCollection(model);
 
           if (!dbModel) {

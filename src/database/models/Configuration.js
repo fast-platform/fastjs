@@ -1,5 +1,5 @@
-import Model from './base/Model';
-import Fluent from '../Fluent';
+import Model from '../Fluent/Model';
+import Fluent from '../Fluent/Fluent';
 import Utilities from 'utilities';
 import Connection from 'Wrappers/Connection';
 import moment from 'moment';

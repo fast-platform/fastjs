@@ -1,5 +1,5 @@
-import Model from './base/Model';
-import Fluent from '../Fluent';
+import Model from '../Fluent/Model';
+import Fluent from '../Fluent/Fluent';
 
 export default Fluent.extend(Model, {
   properties: {

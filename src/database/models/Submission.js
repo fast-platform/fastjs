@@ -3,8 +3,8 @@ import moment from 'moment';
 import Utilities from 'utilities';
 import Form from 'database/models/Form';
 import FormioUtils from 'formiojs/utils';
-import Model from './base/Model';
-import Fluent from '../Fluent';
+import Model from '../Fluent/Model';
+import Fluent from '../Fluent/Fluent';
 
 export default Fluent.extend(Model, {
   properties: {
