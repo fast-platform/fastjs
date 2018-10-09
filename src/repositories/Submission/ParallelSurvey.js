@@ -1,8 +1,6 @@
 import uuidv4 from 'uuid/v4';
 import Utilities from 'utilities';
-import Formio from 'formiojs/Formio';
-import Submission from 'database/models/Submission';
-import OFFLINE_PLUGIN from 'offlinePlugin/offlinePlugin';
+import Submission from 'models/Submission';
 import Promise from 'bluebird';
 
 let ParallelSurvey = (() => {
@@ -117,7 +115,7 @@ let ParallelSurvey = (() => {
     }
     return prepareNewGroupObject({ submission, vm, info });
   }
-
+  /*
   async function storeNewSurvey ({ survey, vm }) {
     let formio = new Formio(vm.$FAST_CONFIG.APP_URL + '/' + vm.$route.params.idForm);
     // De register if there was a previous registration
@@ -137,11 +135,11 @@ let ParallelSurvey = (() => {
 
     return created;
   }
-
+*/
   return Object.freeze({
     createWizard,
-    createNewSurvey,
-    storeNewSurvey
+    createNewSurvey
+    // storeNewSurvey
   });
 })();
 

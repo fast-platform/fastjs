@@ -1,6 +1,4 @@
-import Form from 'database/models/Form';
-// import Auth from 'repositories/Auth/Auth';
-// import Submission from 'database/models/Submission';
+import Form from 'models/Form';
 
 const GetRequest = class {
   /**

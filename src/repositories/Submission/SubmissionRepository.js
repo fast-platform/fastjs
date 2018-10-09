@@ -1,11 +1,11 @@
 import moment from 'moment';
 import Auth from 'repositories/Auth/Auth';
-import SyncHelper from 'database/helpers/SyncHelper';
-import SubmissionModel from 'database/models/Submission';
+import Utilities from 'utilities';
+import SubmissionModel from 'models/Submission';
 
 let Submission = (() => {
   function formatSubmission (submission, formio) {
-    submission = SyncHelper.deleteNulls(submission);
+    submission = Utilities.deleteNulls(submission);
 
     submission = {
       ...submission,

@@ -1,29 +1,27 @@
-import Configuration from './database/models/Configuration';
-import Form from './repositories/Form/RemoteForms';
-import Localization from './repositories/Localization/Localization';
-import Pages from './repositories/Configuration/Pages';
+import Configuration from './models/Configuration';
+import Form from './models/Form';
+import Translation from './models/Translation';
+import Pages from './models/Pages';
 import SyncInterval from './repositories/Database/SyncInterval';
-import fastConfig from './config';
 import Roles from './repositories/Auth/Role';
 
 /* eslint-disable no-unused-vars */
 let FAST = (() => {
   /**
    *
-   * Triggers a full Online update of all Configuration,
-   * Forms, Pages and Roles of the application.
-   *
-   * @param {Object} conf
-   * @param {Object} conf.appConf Configuration of the App
-   * @returns
+   * @param {*} conf
+   * @param {*} conf.appConf Configuration of the App
+   * @param {*} conf.Vue Vue instance
    */
-  async function sync ({ appConf }) {
-    let forceOnline = true;
+  async function start ({ appConf, forceOnline }) {
+    let pages, err;
+
+    if (!forceOnline) {
+      SyncInterval.set(3000);
+    }
+
     // Pull the configuration
     let config = await Configuration.set({ appConf, forceOnline });
-
-    // Change the Base URL for all the other calls
-    fastConfig.setBaseUrl(config.APP_URL);
 
     await Roles.set({ url: config.APP_URL, appConf, forceOnline });
 
@@ -31,45 +29,7 @@ let FAST = (() => {
 
     await Form.set({ appConf, forceOnline });
 
-    let appTranslations = await Localization.set({ appConf, forceOnline });
-
-    return {
-      translations: appTranslations,
-      defaultLenguage: localStorage.getItem('defaultLenguage') || 'en',
-      config: config
-    };
-  }
-
-  /**
-   *
-   * @param {*} conf
-   * @param {*} conf.appConf Configuration of the App
-   * @param {*} conf.Vue Vue instance
-   */
-  async function start ({ Vue, appConf }) {
-    let pages, err;
-
-    fastConfig.set({
-      baseURL: appConf.appConfigUrl,
-      submissionId: appConf.appConfigId,
-      i18n: appConf.i18n
-    });
-
-    SyncInterval.set(3000);
-
-    // Pull the configuration
-    let config = await Configuration.set({ Vue, appConf });
-
-    // Change the Base URL for all the other calls
-    fastConfig.setBaseUrl(config.APP_URL);
-
-    await Roles.set({ url: config.APP_URL, appConf });
-
-    await Pages.set({ appConf });
-
-    await Form.set({ appConf });
-
-    let appTranslations = await Localization.set({ appConf });
+    let appTranslations = await Translation.set({ appConf, forceOnline });
 
     /*
     let currentConf = await Configuration.getLocal();
@@ -105,6 +65,18 @@ let FAST = (() => {
       translations: appTranslations,
       defaultLanguage: localStorage.getItem('defaultLenguage') || 'en'
     };
+  }
+  /**
+   *
+   * Triggers a full Online update of all Configuration,
+   * Forms, Pages and Roles of the application.
+   *
+   * @param {Object} conf
+   * @param {Object} conf.appConf Configuration of the App
+   * @returns
+   */
+  async function sync ({ appConf }) {
+    return start({ appConf, forceOnline: true });
   }
 
   return Object.freeze({

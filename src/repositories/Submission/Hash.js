@@ -1,9 +1,9 @@
 import md5 from 'md5';
-import CONFIGURATION from '../../database/models/Configuration';
+import Configuration from '../../models/Configuration';
 
 let Hash = class {
   static async string (string) {
-    let config = await CONFIGURATION.getLocal();
+    let config = await Configuration.local().first();
     let hashed = '';
 
     hashed = md5(string, config.MD5_KEY);

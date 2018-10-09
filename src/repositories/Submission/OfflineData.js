@@ -1,6 +1,7 @@
+/*
 import Connection from 'Wrappers/Connection';
-import Submission from 'database/models/Submission';
-import User from 'database/models/User';
+import Submission from 'models/Submission';
+import User from 'models/User';
 import FormioJS from 'formiojs/Formio';
 import Event from 'Wrappers/Event';
 import Scheduler from 'repositories/Database/Scheduler';
@@ -55,11 +56,6 @@ let OfflineData = (() => {
           }
         } catch (e) {
           console.log('The submission cannot be synced ', e);
-          /*
-          Raven.send(new Error('Submission cannot be synced'), {
-            error: e
-          });
-          */
           if (e === 'TypeError: Could not connect to API server (Failed to fetch)') {
             console.log('Error connecting to the API server');
           }
@@ -108,3 +104,4 @@ let OfflineData = (() => {
 })();
 
 export default OfflineData;
+*/

@@ -1,6 +1,6 @@
-import User from 'database/models/User';
+import User from 'models/User';
 import Auth from 'repositories/Auth/Auth';
-import Submission from 'database/models/Submission';
+import Submission from 'models/Submission';
 import OfflineData from 'repositories/Submission/OfflineData';
 import Scheduler from 'repositories/Database/Scheduler';
 import Event from 'Wrappers/Event';
@@ -50,9 +50,9 @@ let Sync = class {
    *
    */
   static async getUsersToSync () {
-    let filter = await User.local().find({
-      'data.sync': false
-    });
+    let filter = await User.local()
+      .where('data.sync', '=', false)
+      .get();
 
     return filter.filter((o) => {
       return o.data.sync === false;

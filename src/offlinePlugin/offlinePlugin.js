@@ -1,5 +1,4 @@
-import Formio from 'formiojs/Formio';
-import Translation from 'database/models/Translation';
+import Translation from 'models/Translation';
 import GetRequest from './repositories/getRequest';
 import PostRequest from './repositories/postRequest';
 
@@ -8,12 +7,9 @@ const OFFLINE_PLUGIN = class {
     let plugin = {
       priority: 0,
       request: async (args) => {
-        Formio.clearCache();
-
         if (args.method === 'GET') {
           return GetRequest.handle(args);
         }
-
         // If we are trying to save a submission
         if (args.method === 'POST' || args.method === 'PUT') {
           let submission = await PostRequest.handle({ args, hashField, formio });

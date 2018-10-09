@@ -1,5 +1,5 @@
 import Connection from 'Wrappers/Connection';
-import Roles from 'database/models/Role';
+import Roles from 'models/Role';
 import Utilities from 'utilities';
 import to from 'await-to-js';
 import axios from 'axios';
@@ -11,7 +11,7 @@ let Role = (() => {
   }
 
   async function getLocal () {
-    let roles = await Roles.local().find();
+    let roles = await Roles.local().get();
 
     return Utilities.get(() => roles[0]);
   }
@@ -20,7 +20,7 @@ let Role = (() => {
     let error;
     let remoteRoles;
 
-    let localRoles = await Roles.local().find();
+    let localRoles = await Roles.local().get();
 
     localRoles = Utilities.get(() => localRoles[0]);
     let isOnline = await Connection.isOnline();

@@ -1,6 +1,6 @@
 import md5 from 'md5';
-import CONFIGURATION from '../../database/models/Configuration';
-import User from 'repositories/User/User';
+import CONFIGURATION from '../../models/Configuration';
+import User from 'models/User';
 import Submission from 'repositories/Submission/SubmissionRepository';
 import Event from 'Wrappers/Event';
 

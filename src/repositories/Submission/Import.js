@@ -1,5 +1,5 @@
-import Formio from 'formiojs/Formio';
-import offlinePlugin from 'offlinePlugin/offlinePlugin';
+// import Formio from 'formiojs/Formio';
+// import offlinePlugin from 'offlinePlugin/offlinePlugin';
 import Submission from 'repositories/Submission/SubmissionRepository';
 import Event from 'Wrappers/Event';
 import Promise from 'bluebird';
@@ -92,6 +92,7 @@ let Import = class {
    *
    * @param {*} vm
    */
+  /*
   static getFormIOInstance (vm) {
     Formio.deregisterPlugin('offline');
     Formio.registerPlugin(offlinePlugin.getPlugin(vm.form.data.path, undefined, false), 'offline');
@@ -101,6 +102,7 @@ let Import = class {
 
     return formio;
   }
+*/
   /**
    *
    * @param {*} vm
