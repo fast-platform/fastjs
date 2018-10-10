@@ -1,10 +1,8 @@
 import Configuration from '../../models/Configuration';
 import md5 from 'md5';
 import User from 'models/User';
-import UserRepository from '../../models/User';
 import Connection from 'Wrappers/Connection';
 import Role from 'models/Role';
-import RoleRepo from 'repositories/Auth/Role';
 import Promise from 'bluebird';
 import Utilities from 'utilities';
 
@@ -16,25 +14,23 @@ let Auth = (() => {
    * @returns
    */
   const localAuthenticate = async function (credentials) {
-    const { username, password } = credentials;
-    let config = await Configuration.getLocal();
+    const { email, password } = credentials;
+    let config = await Configuration.local().first();
 
     // Hash password
     const hashedPassword = md5(password, config.MD5_KEY);
 
     // Get the user
-    let dbUser = await User.local().find({
-      'data.data.email': username
-    });
+    let dbUser = await User.local()
+      .where('data.email', '=', email)
+      .get();
     let userFound = dbUser && dbUser[0] ? dbUser[0] : undefined;
 
-    console.log('user', userFound);
     if (!userFound) {
       throw new Error();
     }
-
     // Compare hashed passwords
-    const isValidUser = userFound.data.data.hashedPassword === hashedPassword;
+    const isValidUser = userFound.data.hashedPassword === hashedPassword;
 
     if (!isValidUser) {
       throw new Error();
@@ -50,14 +46,12 @@ let Auth = (() => {
    * @param {any} role
    * @returns
    */
-  const remoteAuthenticate = function (credentials, baseUrl, role) {
-    return UserRepository.login({ credentials: credentials, role: role }).then((response) => {
-      // Store locally the user for future offline login
-      let user = response.data;
+  const remoteAuthenticate = async (credentials, baseUrl, role) => {
+    let response = await User.login({ credentials: credentials, role: role });
+    let user = response.data;
 
-      UserRepository.updateUser(user);
-      return response;
-    });
+    await User.updateUser(user);
+    return response;
   };
 
   /**
@@ -103,9 +97,8 @@ let Auth = (() => {
           localStorage.setItem('authUser', JSON.stringify(user));
           localStorage.setItem('formioToken', headers['x-jwt-token']);
           // user.isAdmin = true
-          let roles = await Role.local().find();
+          let roles = await Role.local().first();
 
-          roles = roles[0];
           user.rolesNames = [];
           Object.keys(roles).forEach((key) => {
             if (key !== '$loki' && key !== '_id' && key !== 'meta') {
@@ -202,7 +195,7 @@ let Auth = (() => {
     if (!rolesIds || Utilities.isEmpty(rolesIds)) {
       return true;
     }
-    let appRoles = await RoleRepo.getLocal();
+    let appRoles = await Role.local().first();
 
     let roles = rolesIds.reduce((reducer, roleId) => {
       Object.keys(appRoles).forEach(function (role) {

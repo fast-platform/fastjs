@@ -8,6 +8,9 @@ export default compose(
   Interface,
   {
     methods: {
+      getToken () {
+        return localStorage.getItem('formioToken');
+      },
       async get () {
         let error;
         let result;
@@ -28,9 +31,23 @@ export default compose(
         return this.get();
       },
       async insert (data) {
-        data = { data: data };
-
         let [error, result] = await to(this.httpPOST(data));
+
+        if (error) {
+          console.log(error);
+          throw new Error('Cannot insert data');
+        }
+        return result.data;
+      },
+      async update (data) {
+        if (!data._id) {
+          throw new Error('Formio connector error. Cannot update a Model without _id key');
+        }
+        if (data._id.includes('_local')) {
+          throw new Error('Formio connector error. Cannot update a local document');
+        }
+
+        let [error, result] = await to(this.httpPUT(data));
 
         if (error) {
           console.log(error);
@@ -45,7 +62,7 @@ export default compose(
           );
         }
         let promises = [];
-        let headers = this.getHeaders();
+
         let [error, data] = await to(this.select('_id').pluck('_id'));
 
         if (error) {
@@ -53,15 +70,21 @@ export default compose(
           throw new Error('Cannot get remote Model');
         }
 
-        let url = this.getUrl();
-
         data.forEach((_id) => {
-          let fullUrl = url + '/' + _id;
-
-          promises.push(axios.delete(fullUrl, { headers }));
+          promises.push(this.httpDelete(_id));
         });
 
         return axios.all(promises);
+      },
+      async remove (_id) {
+        let [error, removed] = await to(this.httpDelete(_id));
+
+        if (error) {
+          console.log(error);
+          throw new Error(`FormioConnector: Could not delete ${_id}`);
+        }
+
+        return removed;
       },
       async find (_id) {
         if (typeof _id !== 'string') {
@@ -142,6 +165,21 @@ export default compose(
           throw new Error(`Cannot make request post to ${url}. You are not online`);
         }
         return axios.post(url, data, { headers });
+      },
+      httpPUT (data) {
+        let url = `${this.getUrl()}/${data._id}`;
+        let headers = this.getHeaders();
+
+        if (!Connection.isOnline()) {
+          throw new Error(`Cannot make request post to ${url}. You are not online`);
+        }
+        return axios.put(url, data, { headers });
+      },
+      httpDelete (_id) {
+        let headers = this.getHeaders();
+        let url = `${this.getUrl()}/${_id}`;
+
+        return axios.delete(url, { headers });
       },
       getTokenType (token) {
         if (token.length > 32) {

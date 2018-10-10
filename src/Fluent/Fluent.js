@@ -83,6 +83,11 @@ const Fluent = stampit({
         window._FLUENT_.models[name] = true;
         global._FLUENT_.models[name] = true;
       }
+    },
+    getRemoteToken (provider) {
+      let con = process.env.FLUENT_REMOTE_CONNECTOR || this.defaultRemote;
+
+      return this.connectors.remote[con]({ name: 'token' }).getToken();
     }
   }
 })();

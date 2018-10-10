@@ -6,16 +6,16 @@ import Moment from './repositories/Date/moment';
 import Form from 'models/Form';
 import Pages from 'models/Pages';
 import Submission from 'models/Submission';
-import SubmissionRepo from 'repositories/Submission/SubmissionRepository';
 import ParallelSurvey from 'repositories/Submission/ParallelSurvey';
 import Configuration from './models/Configuration';
 import Translation from 'models/Translation';
 import Import from 'repositories/Submission/Import';
 import User from 'models/User';
 import OfflinePlugin from 'offlinePlugin/offlinePlugin';
-import Role from 'repositories/Auth/Role';
+import Role from 'models/Role';
 import Hash from 'repositories/Submission/Hash';
 import Sync from 'repositories/Database/Sync';
+import Utilities from 'utilities';
 
 export {
   Moment,
@@ -26,7 +26,6 @@ export {
   Form,
   Pages,
   Submission,
-  SubmissionRepo,
   ParallelSurvey,
   Configuration,
   Translation,
@@ -35,5 +34,6 @@ export {
   OfflinePlugin,
   Role,
   Hash,
-  Sync
+  Sync,
+  Utilities
 };

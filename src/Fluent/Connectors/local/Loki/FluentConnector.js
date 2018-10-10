@@ -134,10 +134,17 @@ export default compose(
        * @param  {[type]} document [description]
        * @return {[type]}          [description]
        */
-      async remove ({ document }) {
+      async remove (_id) {
+        if (!_id) {
+          throw new Error('No id assign to remove().You must give and _id to delete');
+        }
+
+        if (!_id.includes('_local')) {
+          throw new Error('You can`t delete non local submissions');
+        }
         const model = await this.getModel();
 
-        return model.remove(document);
+        return model.findAndRemove({ _id: _id });
       },
       /**
        * [insert description]
@@ -158,10 +165,17 @@ export default compose(
        * @param  {[type]} document [description]
        * @return {[type]}          [description]
        */
-      async update ({ document }) {
+      async update (document) {
+        if (!document._id) {
+          throw new Error('Loki connector error. Cannot update a Model without _id key');
+        }
         const model = await this.getModel();
 
-        return model.update(document);
+        document.modified = Math.round(+new Date() / 1000);
+        let local = await model.findOne({ _id: document._id });
+        let mod = { ...local, ...document };
+
+        return model.update(mod);
       },
       /**
        *

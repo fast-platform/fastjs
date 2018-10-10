@@ -1,15 +1,41 @@
-/*
 import Connection from 'Wrappers/Connection';
 import Submission from 'models/Submission';
-import User from 'models/User';
-import FormioJS from 'formiojs/Formio';
 import Event from 'Wrappers/Event';
 import Scheduler from 'repositories/Database/Scheduler';
+import Form from 'models/Form';
+import to from 'await-to-js';
 
 let OfflineData = (() => {
+  const sendSubmission = async (offlineSubmission) => {
+    let remoteEndPoint = Form.getModel({ path: offlineSubmission.path }).remote();
+
+    offlineSubmission.queuedForSync = true;
+    // Set the submission as queuedForSync
+    await Submission.local().update(offlineSubmission);
+
+    let [error, insertedData] = await to(remoteEndPoint.insert(offlineSubmission));
+
+    if (error) {
+      console.log(error);
+      offlineSubmission.queuedForSync = false;
+      offlineSubmission.syncError = error;
+      Submission.local().update(offlineSubmission);
+      throw new Error('Error while Syncing data');
+    }
+    if (!insertedData._id) {
+      throw Error('The remote endpoint did not save the submission properly (no _id back)');
+    }
+
+    let [e] = await to(Submission.local().remove(offlineSubmission._id));
+
+    if (e) {
+      throw new Error('Sync error:Could not remove local submission after sync');
+    }
+    return true;
+  };
+
   async function send (data) {
     let offlineSubmissions = data;
-    let offlinePlugin = FormioJS.getPlugin('offline');
     let isOnline = await Connection.isOnline();
 
     let PromiseEach = async function (arr, fn) {
@@ -18,83 +44,24 @@ let OfflineData = (() => {
 
     if (isOnline) {
       await Scheduler.startSync();
-      PromiseEach(offlineSubmissions, async function (offlineSubmission) {
-        let formio = new FormioJS(offlineSubmission.data.formio.formUrl);
-        let postData = {
-          data: offlineSubmission.data.data
-        };
 
-        offlineSubmission.data.queuedForSync = true;
-        let model = Submission.local();
-
-        if (offlineSubmission.data.formio.formId === 'userregister') {
-          model = User.local();
-        }
-        // Set the submission as queuedForSync
-        await model.update(offlineSubmission);
-
-        // If it has an ID and the Id its not local (doesnt contain "_local")
-        if (offlineSubmission.data._id && offlineSubmission.data._id.indexOf('_local') === -1) {
-          postData._id = offlineSubmission.data._id;
-        }
-        FormioJS.deregisterPlugin('offline');
-
-        try {
-          let FormIOinsertedData = await formio.saveSubmission(postData);
-
-          if (!FormIOinsertedData._id) {
-            throw Error('Submission cannot be synced');
-          }
-          FormIOinsertedData.formio = formio;
-
-          // Update the local submission
-          offlineSubmission.data = FormIOinsertedData;
-          await model.update(offlineSubmission);
-
-          if (offlinePlugin) {
-            FormioJS.registerPlugin(offlinePlugin, 'offline');
-          }
-        } catch (e) {
-          console.log('The submission cannot be synced ', e);
-          if (e === 'TypeError: Could not connect to API server (Failed to fetch)') {
-            console.log('Error connecting to the API server');
-          }
-          offlineSubmission.data.queuedForSync = false;
-          offlineSubmission.data.syncError = e;
-
-          if (offlineSubmission.data.formio.formId === 'userregister') {
-            model.remove(offlineSubmission);
-            let errorEvent = new CustomEvent('FAST:USER:REGISTRATION:ERROR', {
-              detail: {
-                data: {
-                  submission: offlineSubmission.data.data,
-                  error: e
-                },
-                text: 'Validation Error'
-              }
-            });
-
-            document.dispatchEvent(errorEvent);
-          } else {
-            await model.update(offlineSubmission);
-          }
-          if (offlinePlugin) {
-            FormioJS.registerPlugin(offlinePlugin, 'offline');
-          }
-        }
-      })
-        .then((result) => {
-          Scheduler.stopSync();
-          Event.emit({
-            name: 'FAST:SUBMISSION:SYNCED',
-            data: {},
-            text: 'The submissions have been synced'
-          });
+      let [error] = await to(
+        PromiseEach(offlineSubmissions, async (offlineSubmission) => {
+          await sendSubmission(offlineSubmission);
         })
-        .catch((e) => {
-          console.log(e);
-          Scheduler.stopSync();
-        });
+      );
+
+      Scheduler.stopSync();
+      if (error) {
+        console.log(error);
+      }
+
+      console.log('Submissions Synced');
+      Event.emit({
+        name: 'FAST:SUBMISSION:SYNCED',
+        data: {},
+        text: 'The submissions have been synced'
+      });
     }
   }
 
@@ -104,4 +71,3 @@ let OfflineData = (() => {
 })();
 
 export default OfflineData;
-*/

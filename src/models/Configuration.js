@@ -10,7 +10,7 @@ export default Fluent.extend(Model, {
       baseUrl: process.env.FAST_CONFIG_URL || 'https://ydvahgxgqliaeuf.form.io/',
       path: 'configuration',
       id: '5b50a6571c8da0f446286093',
-      token: undefined
+      token: null
     }
   },
   methods: {
@@ -57,7 +57,7 @@ export default Fluent.extend(Model, {
     async setOnline ({ appConf }) {
       let localConfig = await this.local().first();
 
-      let remoteConfig = await this.remote().first();
+      let remoteConfig = await this.remote({ token: false }).first();
 
       if (!localConfig && !remoteConfig) {
         throw new Error('Application is not connected to internet, or the configuration file cannot be pulled');

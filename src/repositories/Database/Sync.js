@@ -3,7 +3,6 @@ import Auth from 'repositories/Auth/Auth';
 import Submission from 'models/Submission';
 import OfflineData from 'repositories/Submission/OfflineData';
 import Scheduler from 'repositories/Database/Scheduler';
-import Event from 'Wrappers/Event';
 
 let Sync = class {
   /**
@@ -15,15 +14,6 @@ let Sync = class {
 
     if (Auth.check()) {
       await Sync.syncSubmission(vm);
-    }
-  }
-  static async check () {
-    let unsyncSubmissions = await Submission.local().getUnsync();
-
-    if (unsyncSubmissions.length > 0) {
-      Event.emit({ name: 'FAST:SUBMISSION:UNSYNCED', data: true, text: 'There are unsynced Submissions' });
-    } else {
-      Event.emit({ name: 'FAST:SUBMISSION:UNSYNCED', data: false, text: 'There are no unsynced Submissions' });
     }
   }
   /**
@@ -38,7 +28,7 @@ let Sync = class {
       return;
     }
 
-    let unsyncSubmissions = await Submission.local().getUnsync();
+    let unsyncSubmissions = await Submission.getUnsync();
 
     let isSyncing = await Scheduler.isSyncing();
 
@@ -50,13 +40,11 @@ let Sync = class {
    *
    */
   static async getUsersToSync () {
-    let filter = await User.local()
-      .where('data.sync', '=', false)
+    return await User.local()
+      .where('sync', '=', false)
+      .andWhere('queuedForSync', '=', false)
+      .andWhere('syncError', '=', false)
       .get();
-
-    return filter.filter((o) => {
-      return o.data.sync === false;
-    });
   }
   /**
    *
@@ -73,14 +61,10 @@ let Sync = class {
   static async syncUsers () {
     let users = await Sync.getUsersToSync();
 
-    users = users.filter((o) => {
-      return o.data.sync === false && !o.data.queuedForSync && !o.data.syncError;
-    });
-
     let isSyncing = await Scheduler.isSyncing();
 
     if (Array.isArray(users) && users.length > 0 && !isSyncing) {
-      OfflineData.send(users);
+      OfflineData.syncUsers(users);
     }
   }
 };

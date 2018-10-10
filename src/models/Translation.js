@@ -32,7 +32,7 @@ export default Fluent.extend(Model, {
      *
      */
     async supportedLanguages () {
-      let translations = await this.local().find();
+      let translations = await this.local().get();
 
       if (translations.length === 0) {
         return [];
@@ -165,6 +165,30 @@ export default Fluent.extend(Model, {
       });
 
       return result;
+    },
+
+    async setTranslations (translations) {
+      let trans = await this.remote()
+        .where('data.label', '=', translations.label)
+        .first();
+
+      let id = trans._id;
+
+      let result = await this.remote().update({
+        _id: id,
+        data: translations
+      });
+
+      return result;
+    },
+
+    async createTranslation (label) {
+      return this.remote().insert({
+        data: {
+          en: label,
+          label: label
+        }
+      });
     }
   }
 })();

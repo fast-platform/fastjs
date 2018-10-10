@@ -33,9 +33,9 @@ const GetRequest = class {
    * @param {*} args
    */
   static async handleLocalForm (args) {
-    let form = await Form.local().get(args.formio.formId);
-
-    return form;
+    return await Form.local()
+      .where('data.path', '=', args.formio.formId)
+      .first();
   }
   /**
    *

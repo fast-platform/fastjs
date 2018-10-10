@@ -15,10 +15,9 @@ export default Fluent.extend(Model, {
     }
   },
   methods: {
-    getModel ({ path, name }) {
+    getModel ({ path }) {
       return Fluent.extend(Model, {
         properties: {
-          name: 'name',
           remoteConnection: {
             baseUrl: process.env.FLUENT_FORMIO_BASEURL || 'https://myFluentBaseUrl.com/',
             path: path
@@ -31,7 +30,7 @@ export default Fluent.extend(Model, {
      * @param {*} action
      */
     async cardFormattedForms (action) {
-      let result = await this.local().find();
+      let result = await this.local().get();
 
       result = result.filter((o) => {
         return o.data.tags.indexOf('visible') > -1;
@@ -66,10 +65,10 @@ export default Fluent.extend(Model, {
     /**
      *
      */
-    async labels () {
+    async FormLabels () {
       let forms = await this.local().get();
 
-      return Labels(forms);
+      return Labels.get(forms);
     },
     /**
      *
@@ -130,6 +129,21 @@ export default Fluent.extend(Model, {
         return this.setOffline({ appConf });
       }
       return this.setOnline();
+    },
+    async getFastTableTemplates ({ path }) {
+      let fullForm = await this.local()
+        .where('data.path', '=', path)
+        .get();
+
+      let templates = [];
+
+      Utilities.eachComponent(fullForm.components, (c) => {
+        if (c.properties && c.properties.FAST_TABLE_TEMPLATE) {
+          templates.push({ key: c.key, template: c.properties.FAST_TABLE_TEMPLATE });
+        }
+      });
+
+      return templates;
     }
   }
 })();

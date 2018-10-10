@@ -3,7 +3,7 @@ import Form from './models/Form';
 import Translation from './models/Translation';
 import Pages from './models/Pages';
 import SyncInterval from './repositories/Database/SyncInterval';
-import Roles from './repositories/Auth/Role';
+import Roles from './models/Role';
 
 /* eslint-disable no-unused-vars */
 let FAST = (() => {

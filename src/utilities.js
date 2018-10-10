@@ -192,6 +192,10 @@ let Utilities = (() => {
     });
   };
 
+  const unixDate = () => {
+    return Math.round(+new Date() / 1000);
+  };
+
   return Object.freeze({
     cloneDeep,
     get,
@@ -199,7 +203,8 @@ let Utilities = (() => {
     isEmpty,
     debounce,
     getFromPath,
-    deleteNulls
+    deleteNulls,
+    eachComponent
   });
 })();
 

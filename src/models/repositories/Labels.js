@@ -1,6 +1,7 @@
 import Utilities from 'utilities';
 import Translation from 'models/Translation';
 import Pages from 'models/Pages';
+import Configuration from 'models/Configuration';
 
 class FormLabels {
   /**
@@ -19,7 +20,7 @@ class FormLabels {
   static async handle (forms) {
     let labels = await this.fetchAllLabels(forms);
 
-    let translations = (await Translation.local().find())[0].data;
+    let translations = (await Translation.local().first()).data;
 
     // Merge labels and translations
     Object.keys(translations).forEach(function (languageCode) {
@@ -52,7 +53,12 @@ class FormLabels {
 
     let formLabels = this.getFormLabels(forms);
 
-    let translations = (await Translation.local().find())[0].data;
+    let translations = await Configuration.local().first();
+
+    console.log('----------------------');
+    console.log('translations===>', translations);
+    console.log('----------------------');
+
     let appLabels = await this.getAppLabels(translations);
 
     allLabels = this.mergeLabels(formLabels, appLabels);
