@@ -65,10 +65,10 @@ export default Fluent.extend(Model, {
     /**
      *
      */
-    async FormLabels () {
+    async FormLabels (selection, i18n) {
       let forms = await this.local().get();
 
-      return Labels.get(forms);
+      return Labels.get(forms, i18n);
     },
     /**
      *

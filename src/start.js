@@ -8,10 +8,12 @@ import Roles from './models/Role';
 /* eslint-disable no-unused-vars */
 let FAST = (() => {
   /**
+   * Loads all configuration for the FAST app
+   * This is the main start function and mandatory
+   * to execute if you will use it!
    *
    * @param {*} conf
    * @param {*} conf.appConf Configuration of the App
-   * @param {*} conf.Vue Vue instance
    */
   async function start ({ appConf, forceOnline }) {
     let pages, err;
@@ -20,10 +22,9 @@ let FAST = (() => {
       SyncInterval.set(3000);
     }
 
-    // Pull the configuration
     let config = await Configuration.set({ appConf, forceOnline });
 
-    await Roles.set({ url: config.APP_URL, appConf, forceOnline });
+    await Roles.set({ appConf, forceOnline });
 
     await Pages.set({ appConf, forceOnline });
 

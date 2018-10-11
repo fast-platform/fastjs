@@ -71,7 +71,7 @@ export default Fluent.extend(Model, {
         await this.local().clear({ sure: true });
       }
 
-      return this.local().insert({ ...remoteConfig, fastUpdated: moment().unix() });
+      return this.local().insert({ ...remoteConfig.data, fastUpdated: moment().unix() });
     },
     /**
      *

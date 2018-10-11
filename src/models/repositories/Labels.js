@@ -1,7 +1,6 @@
 import Utilities from 'utilities';
 import Translation from 'models/Translation';
 import Pages from 'models/Pages';
-import Configuration from 'models/Configuration';
 
 class FormLabels {
   /**
@@ -9,16 +8,16 @@ class FormLabels {
    * @param {*} formNameFilter
    * @param {*} languageFilter
    */
-  static async get (forms) {
-    return this.handle(forms);
+  static async get (forms, i18n) {
+    return this.handle(forms, i18n);
   }
   /**
    *
    * @param {*} formNameFilter
    * @param {*} languageFilter
    */
-  static async handle (forms) {
-    let labels = await this.fetchAllLabels(forms);
+  static async handle (forms, i18n) {
+    let labels = await this.fetchAllLabels(forms, i18n);
 
     let translations = (await Translation.local().first()).data;
 
@@ -44,7 +43,7 @@ class FormLabels {
    *  types of labels inputs that the
    *  application has
    */
-  static async fetchAllLabels (forms) {
+  static async fetchAllLabels (forms, i18n) {
     let allLabels = {};
 
     forms = forms.map((form) => {
@@ -53,17 +52,11 @@ class FormLabels {
 
     let formLabels = this.getFormLabels(forms);
 
-    let translations = await Configuration.local().first();
-
-    console.log('----------------------');
-    console.log('translations===>', translations);
-    console.log('----------------------');
-
-    let appLabels = await this.getAppLabels(translations);
+    let appLabels = await this.getAppLabels(i18n);
 
     allLabels = this.mergeLabels(formLabels, appLabels);
 
-    let pagesLabels = await this.getPagesLabels(await Pages.getLocal());
+    let pagesLabels = await this.getPagesLabels(await Pages.local().first());
 
     allLabels = this.mergeLabels(allLabels, pagesLabels);
 
