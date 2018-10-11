@@ -67,10 +67,7 @@ export default Fluent.extend(Model, {
         url = url + '/user/login';
       }
       return axios.post(url, {
-        data: {
-          email: credentials.username,
-          password: credentials.password
-        }
+        data: credentials
       });
     }
   }

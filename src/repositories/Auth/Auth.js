@@ -14,7 +14,7 @@ let Auth = (() => {
    * @returns
    */
   const localAuthenticate = async function (credentials) {
-    const { email, password } = credentials;
+    const { username, password } = credentials;
     let config = await Configuration.local().first();
 
     // Hash password
@@ -22,7 +22,7 @@ let Auth = (() => {
 
     // Get the user
     let dbUser = await User.local()
-      .where('data.email', '=', email)
+      .where('data.username', '=', username)
       .get();
     let userFound = dbUser && dbUser[0] ? dbUser[0] : undefined;
 

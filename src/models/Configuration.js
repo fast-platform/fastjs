@@ -9,7 +9,7 @@ export default Fluent.extend(Model, {
     remoteConnection: {
       baseUrl: process.env.FAST_CONFIG_URL || 'https://ydvahgxgqliaeuf.form.io/',
       path: 'configuration',
-      id: '5b50a6571c8da0f446286093',
+      id: process.env.FAST_CONFIG_ID,
       token: null
     }
   },

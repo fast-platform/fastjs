@@ -16,8 +16,10 @@ import Role from 'models/Role';
 import Hash from 'repositories/Submission/Hash';
 import Sync from 'repositories/Database/Sync';
 import Utilities from 'utilities';
+import countryList from './resources/countries';
 
 export {
+  countryList,
   Moment,
   Event,
   FAST,
