@@ -3,8 +3,8 @@ import Privatize from '@stamp/privatize';
 import compose from '@stamp/compose';
 import loki from './Connectors/local/Loki/FluentConnector';
 import formio from './Connectors/remote/Formio/FluentConnector';
+import config from 'config';
 // import formioLoki from './Connectors/merged/Formio-Loki/FluentConnector';
-
 const Fluent = stampit({
   init () {
     this.registerInternalModels();
@@ -34,12 +34,12 @@ const Fluent = stampit({
       return compose(...args);
     },
     getLocalConnector (modelName) {
-      let con = process.env.FLUENT_LOCAL_CONNECTOR || this.defaulLocal;
+      let con = this.getConfigLocalConnector();
 
       return this.connectors.local[con](modelName);
     },
     getRemoteConnector (remoteConnection) {
-      let con = process.env.FLUENT_REMOTE_CONNECTOR || this.defaultRemote;
+      let con = this.getConfigRemoteConnector();
 
       return this.connectors.remote[con](remoteConnection);
     },
@@ -47,15 +47,65 @@ const Fluent = stampit({
       // let con = process.env.FLUENT_MERGED_CONNECTOR || this.defaultMerged;
       // return this.connectors.merged[con](nameAndPath);
     },
+    getFormioBaseUrl () {
+      const {FLUENT_FORMIO_BASEURL} = config.get();
+
+      return FLUENT_FORMIO_BASEURL;
+    },
+    getFastConfigUrl () {
+      const {FAST_CONFIG_URL} = config.get();
+
+      return FAST_CONFIG_URL;
+    },
+    getFastConfigId () {
+      const {FAST_CONFIG_ID} = config.get();
+
+      return FAST_CONFIG_ID;
+    },
+    getOfflineStart () {
+      const {OFFLINE_START} = config.get();
+
+      return OFFLINE_START;
+    },
+    getConfigRemoteConnector () {
+      if (window &&
+          window._FLUENT_ &&
+          window._FLUENT_.config &&
+          window._FLUENT_.config.FLUENT_REMOTE_CONNECTOR) {
+        return window._FLUENT_.config.FLUENT_REMOTE_CONNECTOR;
+      }
+      if (global &&
+          global._FLUENT_ &&
+          global._FLUENT_.config &&
+          global._FLUENT_.config.FLUENT_REMOTE_CONNECTOR) {
+        return global._FLUENT_.config.FLUENT_REMOTE_CONNECTOR;
+      }
+      return this.defaultRemote;
+    },
+    getConfigLocalConnector () {
+      if (window &&
+          window._FLUENT_ &&
+          window._FLUENT_.config &&
+          window._FLUENT_.config.FLUENT_LOCAL_CONNECTOR) {
+        return window._FLUENT_.config.FLUENT_LOCAL_CONNECTOR;
+      }
+      if (global &&
+          global._FLUENT_ &&
+          global._FLUENT_.config &&
+          global._FLUENT_.config.FLUENT_LOCAL_CONNECTOR) {
+        return global._FLUENT_.config.FLUENT_LOCAL_CONNECTOR;
+      }
+      return this.defaulLocal;
+    },
     registerInternalModels () {
       let models = ['Submission', 'Form', 'Translation', 'User', 'Role', 'Configuration', 'Pages', 'DB'];
 
-      if (window && !window._FLUENT_) {
-        window._FLUENT_ = { models: {} };
+      if (window) {
+        window._FLUENT_ = {...window._FLUENT_, ...{models: {}}};
       }
 
-      if (global && !global._FLUENT_) {
-        global._FLUENT_ = { models: {} };
+      if (global) {
+        global._FLUENT_ = {...global._FLUENT_, ...{models: {}}};
       }
 
       models.forEach((model) => {

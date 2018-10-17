@@ -8,7 +8,7 @@ export default Fluent.extend(Model, {
   properties: {
     name: 'Translation',
     remoteConnection: {
-      baseUrl: process.env.FLUENT_FORMIO_BASEURL || 'https://myFluentBaseUrl.com/',
+      baseUrl: Fluent.getFormioBaseUrl() || 'https://myFluentBaseUrl.com/',
       path: 'translations',
       token: undefined
     }

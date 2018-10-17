@@ -11,7 +11,7 @@ export default Fluent.extend(Model, {
   properties: {
     name: 'User',
     remoteConnection: {
-      baseUrl: process.env.FLUENT_FORMIO_BASEURL || 'https://myFluentBaseUrl.com/',
+      baseUrl: Fluent.getFormioBaseUrl() || 'https://myFluentBaseUrl.com/',
       path: 'user',
       token: undefined
     }

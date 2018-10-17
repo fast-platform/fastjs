@@ -68,10 +68,10 @@
     "await-to-js": "^2.0.1",
     "axios": "^0.18.0",
     "bluebird": "^3.5.2",
-    "dotenv-webpack": "^1.5.7",
     "lokijs": "^1.5.5",
     "md5": "^2.2.1",
     "moment": "^2.22.2",
+    "process-env": "^1.1.0",
     "stampit": "^4.2.0",
     "uuid": "^3.2.1"
   }

@@ -5,8 +5,7 @@ const env = require('yargs').argv.env; // use --env with webpack 2
 const pkg = require('./package.json');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const showBundle = false;
-const Dotenv = require('dotenv-webpack');
-let plugins = [new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/), new Dotenv()];
+let plugins = [new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)];
 
 if (showBundle) {
   plugins.push(new BundleAnalyzerPlugin());

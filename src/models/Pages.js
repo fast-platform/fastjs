@@ -9,7 +9,7 @@ export default Fluent.extend(Model, {
   properties: {
     name: 'Pages',
     remoteConnection: {
-      baseUrl: process.env.FLUENT_FORMIO_BASEURL || 'https://myFluentBaseUrl.com/',
+      baseUrl: Fluent.getFormioBaseUrl() || 'https://myFluentBaseUrl.com/',
       path: 'fast-app-pages',
       token: undefined
     }

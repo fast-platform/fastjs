@@ -7,9 +7,9 @@ export default Fluent.extend(Model, {
   properties: {
     name: 'Configuration',
     remoteConnection: {
-      baseUrl: process.env.FAST_CONFIG_URL || 'https://ydvahgxgqliaeuf.form.io/',
+      baseUrl: Fluent.getFastConfigUrl() || 'https://ydvahgxgqliaeuf.form.io/',
       path: 'configuration',
-      id: process.env.FAST_CONFIG_ID,
+      id: Fluent.getFastConfigId(),
       token: null
     }
   },
