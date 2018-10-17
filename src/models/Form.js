@@ -133,11 +133,11 @@ export default Fluent.extend(Model, {
     async getFastTableTemplates ({ path }) {
       let fullForm = await this.local()
         .where('data.path', '=', path)
-        .get();
+        .first();
 
       let templates = [];
 
-      Utilities.eachComponent(fullForm.components, (c) => {
+      Utilities.eachComponent(fullForm.data.components, (c) => {
         if (c.properties && c.properties.FAST_TABLE_TEMPLATE) {
           templates.push({ key: c.key, template: c.properties.FAST_TABLE_TEMPLATE });
         }

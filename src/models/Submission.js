@@ -134,29 +134,15 @@ export default Fluent.extend(Model, {
         // Custom templates using FAST_TABLE_TEMPLATE propertie
         templates.forEach((t) => {
           /* eslint-disable */
-          let newFx = Function('value', 'data', t.template);
+          let newFx = new Function('value', 'data', t.template);
           /* eslint-enable */
           try {
             s[t.key] = newFx(s[t.key], s);
           } catch (error) {
-            console.log('There is an error on one of your calculations', error);
+            console.log('There is an error in one of your calculations', error);
           }
         });
 
-        // We need to remove this from here and create
-        // A proper extension to allow tables to have custom visuali
-        // of complex data
-        if (s.dataCollected) {
-          if (s.dataCollected.scouting && s.dataCollected.traps) {
-            s.dataCollected = vm.$t('Scouting and traps');
-          } else if (s.dataCollected.scouting) {
-            s.dataCollected = vm.$t('Scouting');
-          } else if (s.dataCollected.traps) {
-            s.dataCollected = vm.$t('Traps');
-          } else {
-            s.dataCollected = '-';
-          }
-        }
         return { ...sub, ...s };
       });
 

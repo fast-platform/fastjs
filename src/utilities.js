@@ -204,7 +204,8 @@ let Utilities = (() => {
     debounce,
     getFromPath,
     deleteNulls,
-    eachComponent
+    eachComponent,
+    unixDate
   });
 })();
 
