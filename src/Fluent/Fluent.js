@@ -3,7 +3,8 @@ import Privatize from '@stamp/privatize';
 import compose from '@stamp/compose';
 import loki from './Connectors/local/Loki/FluentConnector';
 import formio from './Connectors/remote/Formio/FluentConnector';
-import config from 'config';
+
+var _FLUENT_FORMIO_BASEURL, _FAST_CONFIG_ID, _FAST_CONFIG_URL, _OFFLINE_START;
 // import formioLoki from './Connectors/merged/Formio-Loki/FluentConnector';
 const Fluent = stampit({
   init () {
@@ -46,26 +47,6 @@ const Fluent = stampit({
     getMergedConnector (nameAndPath) {
       // let con = process.env.FLUENT_MERGED_CONNECTOR || this.defaultMerged;
       // return this.connectors.merged[con](nameAndPath);
-    },
-    getFormioBaseUrl () {
-      const {FLUENT_FORMIO_BASEURL} = config.get();
-
-      return FLUENT_FORMIO_BASEURL;
-    },
-    getFastConfigUrl () {
-      const {FAST_CONFIG_URL} = config.get();
-
-      return FAST_CONFIG_URL;
-    },
-    getFastConfigId () {
-      const {FAST_CONFIG_ID} = config.get();
-
-      return FAST_CONFIG_ID;
-    },
-    getOfflineStart () {
-      const {OFFLINE_START} = config.get();
-
-      return OFFLINE_START;
     },
     getConfigRemoteConnector () {
       if (window &&
@@ -138,6 +119,24 @@ const Fluent = stampit({
       let con = process.env.FLUENT_REMOTE_CONNECTOR || this.defaultRemote;
 
       return this.connectors.remote[con]({ name: 'token' }).getToken();
+    },
+    setConfig ({
+      FLUENT_FORMIO_BASEURL = undefined,
+      FAST_CONFIG_ID = undefined,
+      FAST_CONFIG_URL = undefined,
+      OFFLINE_START = undefined }) {
+      _FLUENT_FORMIO_BASEURL = FLUENT_FORMIO_BASEURL;
+      _FAST_CONFIG_ID = FAST_CONFIG_ID;
+      _FAST_CONFIG_URL = FAST_CONFIG_URL;
+      _OFFLINE_START = OFFLINE_START;
+    },
+    getConfig () {
+      return {
+        FLUENT_FORMIO_BASEURL: _FLUENT_FORMIO_BASEURL,
+        FAST_CONFIG_ID: _FAST_CONFIG_ID,
+        FAST_CONFIG_URL: _FAST_CONFIG_URL,
+        OFFLINE_START: _OFFLINE_START
+      };
     }
   }
 })();

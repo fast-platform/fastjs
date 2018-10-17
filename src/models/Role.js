@@ -4,15 +4,14 @@ import Utilities from 'utilities';
 import Connection from 'Wrappers/Connection';
 import to from 'await-to-js';
 import moment from 'moment';
-import axios from 'axios';
 
 export default Fluent.extend(Model, {
   properties: {
     name: 'Role',
     remoteConnection: {
-      baseUrl: Fluent.getFormioBaseUrl() || 'https://myFluentBaseUrl.com/',
       path: 'access',
-      token: undefined
+      token: undefined,
+      pullForm: true
     }
   },
   methods: {
@@ -34,14 +33,14 @@ export default Fluent.extend(Model, {
       let isOnline = await Connection.isOnline();
 
       if (isOnline) {
-        [error, remoteRoles] = await to(axios.get(this.remoteConnection.baseUrl + '/access'));
+        [error, remoteRoles] = await to(this.remote().first());
 
         if (error) {
           throw new Error(error);
         }
       }
 
-      remoteRoles = Utilities.get(() => remoteRoles.data.roles);
+      remoteRoles = Utilities.get(() => remoteRoles.roles);
 
       if (remoteRoles) {
         if (localRoles) {

@@ -1,5 +1,6 @@
 import stampit from '@stamp/it';
 import Utilities from 'utilities';
+
 export default stampit({
   init (data) {
     if (!Array.isArray(data)) {

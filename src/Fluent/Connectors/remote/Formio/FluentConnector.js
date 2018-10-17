@@ -4,12 +4,33 @@ import axios from 'axios';
 import Interface from '../../../Interface';
 import compose from '@stamp/compose';
 import Connection from 'Wrappers/Connection';
+import Fluent from '../../../Fluent';
+
 export default compose(
   Interface,
   {
     methods: {
       getToken () {
         return localStorage.getItem('formioToken');
+      },
+      baseUrl () {
+        if (this.remoteConnection && this.remoteConnection.type && this.remoteConnection.type === 'config') {
+          const {FAST_CONFIG_URL} = Fluent.getConfig();
+
+          return FAST_CONFIG_URL;
+        }
+
+        const {FLUENT_FORMIO_BASEURL} = Fluent.getConfig();
+
+        return FLUENT_FORMIO_BASEURL;
+      },
+      id () {
+        if (this.remoteConnection && this.remoteConnection.type && this.remoteConnection.type === 'config') {
+          const {FAST_CONFIG_ID} = Fluent.getConfig();
+
+          return FAST_CONFIG_ID;
+        }
+        return this.remoteConnection.id;
       },
       async get () {
         let error;
@@ -103,11 +124,13 @@ export default compose(
       },
       getUrl () {
         let baseUrl =
-          this.remoteConnection && this.remoteConnection.baseUrl ? this.remoteConnection.baseUrl : undefined;
+          this && this.baseUrl() ? this.baseUrl() : undefined;
         let path = this.remoteConnection && this.remoteConnection.path ? this.remoteConnection.path : undefined;
 
         if (!this.remoteConnection.pullForm) {
-          path = !this.remoteConnection.id ? `${path}/submission` : `${path}/submission/${this.remoteConnection.id}`;
+          path = !this.id() ?
+            `${path}/submission` :
+            `${path}/submission/${this.id()}`;
         }
 
         if (!baseUrl || !path) {

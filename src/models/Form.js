@@ -9,7 +9,6 @@ export default Fluent.extend(Model, {
   properties: {
     name: 'Form',
     remoteConnection: {
-      baseUrl: Fluent.getFormioBaseUrl() || 'https://myFluentBaseUrl.com/',
       path: 'form',
       pullForm: true
     }
@@ -19,7 +18,6 @@ export default Fluent.extend(Model, {
       return Fluent.extend(Model, {
         properties: {
           remoteConnection: {
-            baseUrl: Fluent.getFormioBaseUrl() || 'https://myFluentBaseUrl.com/',
             path: path
           }
         }

@@ -4,7 +4,7 @@ import Translation from './models/Translation';
 import Pages from './models/Pages';
 import SyncInterval from './repositories/Database/SyncInterval';
 import Roles from './models/Role';
-import externalConf from 'config';
+import Fluent from './Fluent/Fluent';
 /* eslint-disable no-unused-vars */
 let FAST = (() => {
   /**
@@ -16,14 +16,13 @@ let FAST = (() => {
    * @param {*} conf.appConf Configuration of the App
    */
   async function start ({ appConf, forceOnline }) {
-    externalConf.set({
-      FLUENT_FORMIO_BASEURL: appConf.fluentFormioBaseUrl,
-      FAST_CONFIG_ID: appConf.appConfigId,
-      FAST_CONFIG_URL: appConf.appConfigUrl,
-      OFFLINE_START: appConf.offlineStart
-    });
-
     if (!forceOnline) {
+      Fluent.setConfig({
+        FLUENT_FORMIO_BASEURL: appConf.fluentFormioBaseUrl,
+        FAST_CONFIG_ID: appConf.appConfigId,
+        FAST_CONFIG_URL: appConf.appConfigUrl,
+        OFFLINE_START: appConf.offlineStart
+      });
       SyncInterval.set(3000);
     }
 

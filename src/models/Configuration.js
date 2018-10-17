@@ -2,15 +2,17 @@ import Model from '../Fluent/Model';
 import Fluent from '../Fluent/Fluent';
 import Utilities from 'utilities';
 import moment from 'moment';
+// TODO We still have to figure out how to solve the problem of
+// The CONFIG URL and FLUENT_URL changing on APP sync
+// Every page refresh will make the urls go back to their default
 
 export default Fluent.extend(Model, {
   properties: {
     name: 'Configuration',
     remoteConnection: {
-      baseUrl: Fluent.getFastConfigUrl() || 'https://ydvahgxgqliaeuf.form.io/',
       path: 'configuration',
-      id: Fluent.getFastConfigId(),
-      token: null
+      token: null,
+      type: 'config'
     }
   },
   methods: {
@@ -70,7 +72,6 @@ export default Fluent.extend(Model, {
       if (localConfig) {
         await this.local().clear({ sure: true });
       }
-
       return this.local().insert({ ...remoteConfig.data, fastUpdated: moment().unix() });
     },
     /**

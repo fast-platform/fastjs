@@ -4,11 +4,10 @@ export default Fluent.compose({
   properties: {
     name: 'baseModel',
     remoteConnection: {
-      baseUrl: 'https://myBaseUrl.com/',
       path: '/myRemote/model',
-      id: undefined,
       token: undefined,
-      pullForm: false
+      pullForm: false,
+      type: 'model'
     }
   },
   methods: {
