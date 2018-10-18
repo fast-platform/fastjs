@@ -301,12 +301,27 @@ class FormLabels {
    * @param {Array} appLabels
    */
   static async getPagesLabels (Pages) {
+    console.log('----------------------');
+    console.log('===>Pages', Pages);
+    console.log('----------------------');
+
     let pagesLabels = {};
 
     Pages.pages.forEach((page) => {
+      if (page.title && page.title !== '') {
+        pagesLabels = this.createOrAdd({
+          labels: pagesLabels,
+          label: {
+            text: page.title,
+            type: 'pageTitle',
+            picture: null,
+            page: page
+          }
+        });
+      }
       page.cards.forEach((card) => {
         if (card.title && card.title !== '') {
-          this.createOrAdd({
+          pagesLabels = this.createOrAdd({
             labels: pagesLabels,
             label: {
               text: card.title,
@@ -333,7 +348,7 @@ class FormLabels {
 
         card.actions.forEach((action) => {
           if (action.text && action.text !== '') {
-            this.createOrAdd({
+            pagesLabels = this.createOrAdd({
               labels: pagesLabels,
               label: {
                 text: action.text,
@@ -346,17 +361,6 @@ class FormLabels {
           }
         });
       });
-      if (page.title && page.title !== '') {
-        this.createOrAdd({
-          labels: pagesLabels,
-          label: {
-            text: page.title,
-            type: 'pageTitle',
-            picture: null,
-            page: page
-          }
-        });
-      }
     });
 
     return pagesLabels;
