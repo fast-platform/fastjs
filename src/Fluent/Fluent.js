@@ -1,24 +1,23 @@
 import stampit from '@stamp/it';
-import Privatize from '@stamp/privatize';
 import compose from '@stamp/compose';
 import loki from './Connectors/local/Loki/FluentConnector';
 import formio from './Connectors/remote/Formio/FluentConnector';
+import formioLoki from './Connectors/merged/Formio-Loki/FluentConnector';
 
 var _FLUENT_FORMIO_BASEURL, _FAST_CONFIG_ID, _FAST_CONFIG_URL, _OFFLINE_START;
-// import formioLoki from './Connectors/merged/Formio-Loki/FluentConnector';
+
 const Fluent = stampit({
   init () {
     this.registerInternalModels();
   },
   properties: {
-    privatize: Privatize,
     defaulLocal: 'loki',
     defaultRemote: 'formio',
     defaultMerged: 'formio-loki',
     connectors: {
       local: { loki: loki },
-      remote: { formio: formio }
-      // merged: { 'formio-loki': formioLoki }
+      remote: { formio: formio },
+      merged: { 'formio-loki': formioLoki }
     }
   },
   methods: {
@@ -44,52 +43,89 @@ const Fluent = stampit({
 
       return this.connectors.remote[con](remoteConnection);
     },
-    getMergedConnector (nameAndPath) {
-      // let con = process.env.FLUENT_MERGED_CONNECTOR || this.defaultMerged;
-      // return this.connectors.merged[con](nameAndPath);
+    getMergedConnector () {
+      let con = this.getConfigMergedConnector();
+
+      return this.connectors.merged[con];
     },
     getConfigRemoteConnector () {
-      if (window &&
-          window._FLUENT_ &&
-          window._FLUENT_.config &&
-          window._FLUENT_.config.FLUENT_REMOTE_CONNECTOR) {
+      if (
+        window &&
+        window._FLUENT_ &&
+        window._FLUENT_.config &&
+        window._FLUENT_.config.FLUENT_REMOTE_CONNECTOR
+      ) {
         return window._FLUENT_.config.FLUENT_REMOTE_CONNECTOR;
       }
-      if (global &&
-          global._FLUENT_ &&
-          global._FLUENT_.config &&
-          global._FLUENT_.config.FLUENT_REMOTE_CONNECTOR) {
+      if (
+        global &&
+        global._FLUENT_ &&
+        global._FLUENT_.config &&
+        global._FLUENT_.config.FLUENT_REMOTE_CONNECTOR
+      ) {
         return global._FLUENT_.config.FLUENT_REMOTE_CONNECTOR;
       }
       return this.defaultRemote;
     },
     getConfigLocalConnector () {
-      if (window &&
-          window._FLUENT_ &&
-          window._FLUENT_.config &&
-          window._FLUENT_.config.FLUENT_LOCAL_CONNECTOR) {
+      if (
+        window &&
+        window._FLUENT_ &&
+        window._FLUENT_.config &&
+        window._FLUENT_.config.FLUENT_LOCAL_CONNECTOR
+      ) {
         return window._FLUENT_.config.FLUENT_LOCAL_CONNECTOR;
       }
-      if (global &&
-          global._FLUENT_ &&
-          global._FLUENT_.config &&
-          global._FLUENT_.config.FLUENT_LOCAL_CONNECTOR) {
+      if (
+        global &&
+        global._FLUENT_ &&
+        global._FLUENT_.config &&
+        global._FLUENT_.config.FLUENT_LOCAL_CONNECTOR
+      ) {
         return global._FLUENT_.config.FLUENT_LOCAL_CONNECTOR;
       }
       return this.defaulLocal;
     },
+    getConfigMergedConnector () {
+      if (
+        window &&
+        window._FLUENT_ &&
+        window._FLUENT_.config &&
+        window._FLUENT_.config.FLUENT_MERGED_CONNECTOR
+      ) {
+        return window._FLUENT_.config.FLUENT_MERGED_CONNECTOR;
+      }
+      if (
+        global &&
+        global._FLUENT_ &&
+        global._FLUENT_.config &&
+        global._FLUENT_.config.FLUENT_MERGED_CONNECTOR
+      ) {
+        return global._FLUENT_.config.FLUENT_MERGED_CONNECTOR;
+      }
+      return this.defaultMerged;
+    },
     registerInternalModels () {
-      let models = ['Submission', 'Form', 'Translation', 'User', 'Role', 'Configuration', 'Pages', 'DB'];
+      let models = [
+        'Submission',
+        'Form',
+        'Translation',
+        'User',
+        'Role',
+        'Configuration',
+        'Pages',
+        'DB'
+      ];
 
       if (window) {
-        window._FLUENT_ = {...window._FLUENT_, ...{models: {}}};
+        window._FLUENT_ = { ...window._FLUENT_, ...{ models: {} } };
       }
 
       if (global) {
-        global._FLUENT_ = {...global._FLUENT_, ...{models: {}}};
+        global._FLUENT_ = { ...global._FLUENT_, ...{ models: {} } };
       }
 
-      models.forEach((model) => {
+      models.forEach(model => {
         window._FLUENT_.models[model] = true;
         global._FLUENT_.models[model] = true;
       });
@@ -107,7 +143,9 @@ const Fluent = stampit({
       }
 
       if (!(typeof name === 'string')) {
-        throw new Error('You must assign a name to your Model when using Fluent.compose');
+        throw new Error(
+          'You must assign a name to your Model when using Fluent.compose'
+        );
       }
 
       if (name !== 'baseModel') {
@@ -124,7 +162,8 @@ const Fluent = stampit({
       FLUENT_FORMIO_BASEURL = undefined,
       FAST_CONFIG_ID = undefined,
       FAST_CONFIG_URL = undefined,
-      OFFLINE_START = undefined }) {
+      OFFLINE_START = undefined
+    }) {
       _FLUENT_FORMIO_BASEURL = FLUENT_FORMIO_BASEURL;
       _FAST_CONFIG_ID = FAST_CONFIG_ID;
       _FAST_CONFIG_URL = FAST_CONFIG_URL;

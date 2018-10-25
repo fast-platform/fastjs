@@ -110,7 +110,7 @@ let Import = class {
   static async saveSubmission (submission, formio, vm) {
     // let processedSubmission = PreProcess.JsonSubmission(submission);
 
-    await Submission.add({ submission: submission, formio: formio });
+    await Submission('*').add({ submission: submission, formio: formio });
   }
 };
 

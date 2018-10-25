@@ -3,14 +3,21 @@ import moment from 'moment';
 import Utilities from 'utilities';
 import Form from 'models/Form';
 import Model from '../Fluent/Model';
-import Fluent from '../Fluent/Fluent';
+import Columns from './repositories/Columns';
 
-export default Fluent.extend(Model, {
+export default Model.compose({
   properties: {
     name: 'Submission',
     remoteConnection: undefined
   },
+  init ({ path }) {
+    this.path = path;
+    this.remoteConnection = { path };
+  },
   methods: {
+    async form () {
+      // return this.belongTo('Form', 'path', 'path');
+    },
     async get (id) {
       id = id.replace(/\s/g, '');
       let offline = await this.local().find({
@@ -34,7 +41,7 @@ export default Fluent.extend(Model, {
       });
       // updated incomplete submission
 
-      filter = filter.filter((o) => {
+      filter = filter.filter(o => {
         return o.data.sync === false || o.data.draft === false;
       });
       filter = filter.sort((a, b) => {
@@ -58,83 +65,59 @@ export default Fluent.extend(Model, {
         .andWhere('syncError', '=', false)
         .andWhere('user_email', '=', Auth.email())
         .orderBy('created', 'desc', 'date')
-        .get()).filter((d) => {
+        .get()).filter(d => {
         return !d.queuedForSync;
       });
 
       return unsynced;
     },
-    mergeFormioLoki ({ remote, local }) {
-      // We need to include a logic here to check Which submission to keep
-      // It could be the offline synced submission, the merge of the two
-      // Or just keep the online submission
-      let localOnline = local.reduce((reducer, s) => {
-        if (s.data && s.data._id && s.data._id.indexOf('_local') === -1) {
-          reducer.push(s.data._id);
-        }
-        return reducer;
-      }, []);
+    async showView (from) {
+      let cols = (await Columns.getTableView(this.path)).map(
+        o => `data.${o.path} as ${o.path}`
+      );
 
-      remote = remote.filter((s) => {
-        return !localOnline.includes(s._id);
-      });
+      cols = [
+        ...cols,
+        '_id',
+        'created',
+        'modified',
+        'syncError',
+        'draft',
+        'sync'
+      ];
 
-      return remote.concat(local);
-    },
-    localOwnSubmissions (path, columns, allData, limit) {
-      let query = this.local().where(['path', '=', path]);
+      let submissions = [];
 
-      if (!allData) {
-        query = query.andWhere('user_email', '=', Auth.email());
+      if (from === 'remote') {
+        submissions = await this.remote()
+          .select(cols)
+          .get();
+      } else {
+        submissions = await this.merged()
+          .select(cols)
+          .get();
       }
 
-      return query
-        .select(columns)
-        .limit(limit)
-        .get();
-    },
-    remoteOwnSubmissions (path, columns, allData, limit) {
-      let query = Form.getModel({ path }).remote();
+      let templates = await Form.getFastTableTemplates({ path: this.path });
 
-      if (!allData) {
-        query = query.where('owner', '=', Auth.user()._id);
-      }
-
-      return query
-        .select(columns)
-        .limit(limit)
-        .get();
-    },
-    async showView ({ path, columns, dataExport, vm, allData, limit }) {
-      columns = [...columns, '_id', 'created', 'modified', 'syncError', 'draft', 'sync'];
-      let local = [];
-
-      if (allData) {
-        local = await this.localOwnSubmissions(path, columns, allData, limit);
-      }
-      let remote = await this.remoteOwnSubmissions(path, columns, allData, limit);
-
-      let submissions = this.mergeFormioLoki({ local, remote });
-
-      // Need to clone the object as it is Dynamic LokiJs
-      submissions = Utilities.cloneDeep(submissions);
-
-      let templates = await Form.getFastTableTemplates({ path });
-
-      submissions = submissions.map((s) => {
+      submissions = submissions.map(s => {
         let sub = {
           _id: s._id,
           status: s.sync === false ? 'offline' : 'online',
           draft: s.draft,
-          HumanUpdated: Number.isInteger(s.modified) ? moment.unix(s.modified).fromNow() : moment(s.modified).fromNow(),
+          HumanUpdated: Number.isInteger(s.modified) ?
+            moment.unix(s.modified).fromNow() :
+            moment(s.modified).fromNow(),
           syncError: s.syncError ? s.syncError : false,
-          updated: Number.isInteger(s.modified) ? s.modified : moment(s.modified).unix()
+          updated: Number.isInteger(s.modified) ?
+            s.modified :
+            moment(s.modified).unix()
         };
 
         // Custom templates using FAST_TABLE_TEMPLATE propertie
-        templates.forEach((t) => {
+        templates.forEach(t => {
           /* eslint-disable */
-          let newFx = new Function('value', 'data', t.template);
+          let newFx = new Function("value", "data", t.template);
           /* eslint-enable */
           try {
             s[t.key] = newFx(s[t.key], s);
@@ -154,32 +137,41 @@ export default Fluent.extend(Model, {
 
       return submissions;
     },
-    async getParallelParticipants (path, _id) {
+    async getParallelParticipants (_id) {
       let currentSubmission = await this.local()
         .where('_id', '=', _id)
         .get();
 
       currentSubmission = currentSubmission[0];
-      let groupId = Utilities.get(() => currentSubmission.data.data.parallelSurvey);
+      let groupId = Utilities.get(
+        () => currentSubmission.data.data.parallelSurvey
+      );
 
-      groupId = groupId && groupId !== '[object Object]' ? JSON.parse(groupId).groupId : undefined;
+      groupId =
+        groupId && groupId !== '[object Object]' ?
+          JSON.parse(groupId).groupId :
+          undefined;
 
       let submissions = await this.local()
-        .where('path', '=', path)
+        .where('path', '=', this.path)
         .get();
 
-      let a = submissions.filter((submission) => {
-        let parallelSurveyID = Utilities.get(() => submission.data.data.parallelSurvey);
+      let a = submissions.filter(submission => {
+        let parallelSurveyID = Utilities.get(
+          () => submission.data.data.parallelSurvey
+        );
 
         parallelSurveyID =
-          parallelSurveyID && parallelSurveyID !== '[object Object]' ? JSON.parse(parallelSurveyID).groupId : undefined;
+          parallelSurveyID && parallelSurveyID !== '[object Object]' ?
+            JSON.parse(parallelSurveyID).groupId :
+            undefined;
         return parallelSurveyID && parallelSurveyID === groupId;
       });
 
-      a = a.map((e) => {
+      a = a.map(e => {
         e.data.data.parallelSurvey;
       });
-      a = a.map((survey) => {
+      a = a.map(survey => {
         return JSON.parse(survey);
       });
       return a;
@@ -190,7 +182,9 @@ export default Fluent.extend(Model, {
         Utilities.get(() => submission.data.parallelSurvey);
 
       parallelsurveyInfo =
-        parallelsurveyInfo && parallelsurveyInfo !== '[object Object]' ? JSON.parse(parallelsurveyInfo) : undefined;
+        parallelsurveyInfo && parallelsurveyInfo !== '[object Object]' ?
+          JSON.parse(parallelsurveyInfo) :
+          undefined;
 
       return parallelsurveyInfo;
     },
@@ -201,12 +195,12 @@ export default Fluent.extend(Model, {
       let submissions = await this.local().find();
 
       submissions = formId ?
-        submissions.filter((submission) => {
+        submissions.filter(submission => {
           return submission.data.formio.formId === formId;
         }) :
         submissions;
 
-      let groups = submissions.map((submission) => {
+      let groups = submissions.map(submission => {
         return this.local().getParallelSurvey(submission) ?
           {
             groupId: this.local().getParallelSurvey(submission).groupId,
@@ -215,7 +209,7 @@ export default Fluent.extend(Model, {
           undefined;
       });
 
-      groups = groups.filter((group) => {
+      groups = groups.filter(group => {
         return typeof group !== 'undefined';
       });
 
@@ -224,7 +218,7 @@ export default Fluent.extend(Model, {
     async getGroup (id) {
       let groups = await this.local().getGroups();
 
-      groups = groups.filter((group) => {
+      groups = groups.filter(group => {
         return group.groupId === id;
       });
       return groups[0];
@@ -244,8 +238,10 @@ export default Fluent.extend(Model, {
         groupName: group.groupName
       };
 
-      submission.data.data.parallelSurvey = this.local().setParallelSurvey(parallelSurvey);
+      submission.data.data.parallelSurvey = this.local().setParallelSurvey(
+        parallelSurvey
+      );
       await this.local().update(submission);
     }
   }
-})();
+});

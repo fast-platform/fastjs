@@ -1,7 +1,7 @@
-import Model from '../Fluent/Model';
 import Fluent from '../Fluent/Fluent';
 import Utilities from 'utilities';
 import moment from 'moment';
+import Model from '../Fluent/Model';
 // TODO We still have to figure out how to solve the problem of
 // The CONFIG URL and FLUENT_URL changing on APP sync
 // Every page refresh will make the urls go back to their default
@@ -62,7 +62,9 @@ export default Fluent.extend(Model, {
       let remoteConfig = await this.remote({ token: false }).first();
 
       if (!localConfig && !remoteConfig) {
-        throw new Error('Application is not connected to internet, or the configuration file cannot be pulled');
+        throw new Error(
+          'Application is not connected to internet, or the configuration file cannot be pulled'
+        );
       }
 
       if (!remoteConfig) {
@@ -72,7 +74,10 @@ export default Fluent.extend(Model, {
       if (localConfig) {
         await this.local().clear({ sure: true });
       }
-      return this.local().insert({ ...remoteConfig.data, fastUpdated: moment().unix() });
+      return this.local().insert({
+        ...remoteConfig.data,
+        fastUpdated: moment().unix()
+      });
     },
     /**
      *
@@ -84,4 +89,10 @@ export default Fluent.extend(Model, {
   }
 })
   .compose(Fluent.privatize)
-  .privatizeMethods('setOnlineConfig', 'setOfflineConfig', 'getConfigDate', 'assingGlobalVariable', 'getRemote')();
+  .privatizeMethods(
+    'setOnlineConfig',
+    'setOfflineConfig',
+    'getConfigDate',
+    'assingGlobalVariable',
+    'getRemote'
+  )();

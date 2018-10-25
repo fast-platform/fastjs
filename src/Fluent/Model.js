@@ -1,6 +1,8 @@
 import Fluent from './Fluent';
+import stampit from '@stamp/it';
+import Privatize from '@stamp/privatize';
 
-export default Fluent.compose({
+export default stampit({
   properties: {
     name: 'baseModel',
     remoteConnection: {
@@ -28,7 +30,9 @@ export default Fluent.compose({
       if (pullForm) {
         this.remoteConnection.pullForm = pullForm;
       }
-      return Fluent.getRemoteConnector({ remoteConnection: this.remoteConnection });
+      return Fluent.getRemoteConnector({
+        remoteConnection: this.remoteConnection
+      });
     },
     /**
      * [local description]
@@ -38,11 +42,14 @@ export default Fluent.compose({
       return Fluent.getLocalConnector({ name: this.name });
     },
     /**
-     *
+     * [local description]
+     * @return {[type]} [description]
      */
-    merged ({ token }) {
-      this.remoteConnection.token = token;
-      return Fluent.getMergedConnector({ name: this.name, path: this.path });
+    merged () {
+      const local = this.local();
+      const remote = this.remote();
+
+      return Fluent.getMergedConnector()({ local, remote, name: this.name });
     }
   }
-}).compose(Fluent.privatize);
+}).compose(Privatize);

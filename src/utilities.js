@@ -6,7 +6,7 @@ let Utilities = (() => {
    * functions
    * @param {Object} object
    */
-  const cloneDeep = (object) => {
+  const cloneDeep = object => {
     return JSON.parse(JSON.stringify(object));
   };
   /**
@@ -46,7 +46,7 @@ let Utilities = (() => {
       .replace(/]/g, '')
       .split('.')
       .filter(Boolean)
-      .map((e) => e.trim());
+      .map(e => e.trim());
 
     function everyFunc (step) {
       return !(step && (obj = obj[step]) === undefined);
@@ -62,7 +62,7 @@ let Utilities = (() => {
    * @param {*} predicate
    */
   const uniqBy = (arr, predicate) => {
-    const cb = typeof predicate === 'function' ? predicate : (o) => o[predicate];
+    const cb = typeof predicate === 'function' ? predicate : o => o[predicate];
 
     return [
       ...arr
@@ -84,7 +84,7 @@ let Utilities = (() => {
    *
    * @param {*} value
    */
-  const isEmpty = (value) => {
+  const isEmpty = value => {
     if (!value) {
       return true;
     }
@@ -121,7 +121,7 @@ let Utilities = (() => {
    * @param {Array|Object} object Array, Object to clean
    * @returns {Array|Object} returns the cleaned value
    */
-  const deleteNulls = (object) => {
+  const deleteNulls = object => {
     let obj = object;
     var isArray = obj instanceof Array;
 
@@ -135,15 +135,20 @@ let Utilities = (() => {
   const eachComponent = (components, fn, includeAll, path, parent) => {
     if (!components) return;
     path = path || '';
-    components.forEach((component) => {
+    components.forEach(component => {
       if (!component) {
         return;
       }
       const hasColumns = component.columns && Array.isArray(component.columns);
       const hasRows = component.rows && Array.isArray(component.rows);
-      const hasComps = component.components && Array.isArray(component.components);
+      const hasComps =
+        component.components && Array.isArray(component.components);
       let noRecurse = false;
-      const newPath = component.key ? (path ? `${path}.${component.key}` : component.key) : '';
+      const newPath = component.key ?
+        path ?
+          `${path}.${component.key}` :
+          component.key :
+        '';
 
       // Keep track of parent references.
       if (parent) {
@@ -155,15 +160,28 @@ let Utilities = (() => {
         delete component.parent.rows;
       }
 
-      if (includeAll || component.tree || (!hasColumns && !hasRows && !hasComps)) {
+      if (
+        includeAll ||
+        component.tree ||
+        (!hasColumns && !hasRows && !hasComps)
+      ) {
         noRecurse = fn(component, newPath);
       }
 
       const subPath = () => {
         if (
           component.key &&
-          !['panel', 'table', 'well', 'columns', 'fieldset', 'tabs', 'form'].includes(component.type) &&
-          (['datagrid', 'container', 'editgrid'].includes(component.type) || component.tree)
+          ![
+            'panel',
+            'table',
+            'well',
+            'columns',
+            'fieldset',
+            'tabs',
+            'form'
+          ].includes(component.type) &&
+          (['datagrid', 'container', 'editgrid'].includes(component.type) ||
+            component.tree)
         ) {
           return newPath;
         } else if (component.key && component.type === 'form') {
@@ -174,22 +192,71 @@ let Utilities = (() => {
 
       if (!noRecurse) {
         if (hasColumns) {
-          component.columns.forEach((column) =>
-            eachComponent(column.components, fn, includeAll, subPath(), parent ? component : null)
+          component.columns.forEach(column =>
+            eachComponent(
+              column.components,
+              fn,
+              includeAll,
+              subPath(),
+              parent ? component : null
+            )
           );
         } else if (hasRows) {
-          component.rows.forEach((row) => {
+          component.rows.forEach(row => {
             if (Array.isArray(row)) {
-              row.forEach((column) =>
-                eachComponent(column.components, fn, includeAll, subPath(), parent ? component : null)
+              row.forEach(column =>
+                eachComponent(
+                  column.components,
+                  fn,
+                  includeAll,
+                  subPath(),
+                  parent ? component : null
+                )
               );
             }
           });
         } else if (hasComps) {
-          eachComponent(component.components, fn, includeAll, subPath(), parent ? component : null);
+          eachComponent(
+            component.components,
+            fn,
+            includeAll,
+            subPath(),
+            parent ? component : null
+          );
         }
       }
     });
+  };
+
+  const matchComponent = (component, query) => {
+    if (typeof query === 'string') {
+      return component.key === query;
+    }
+    let matches = false;
+
+    Object.keys(query).forEach(path => {
+      matches = getFromPath(component, path).value === query[path];
+      if (!matches) {
+        return false;
+      }
+    });
+    return matches;
+  };
+
+  const findComponents = (components, query) => {
+    const results = [];
+
+    eachComponent(
+      components,
+      (component, path) => {
+        if (matchComponent(component, query)) {
+          component.path = path;
+          results.push(component);
+        }
+      },
+      true
+    );
+    return results;
   };
 
   const unixDate = () => {
@@ -205,6 +272,7 @@ let Utilities = (() => {
     getFromPath,
     deleteNulls,
     eachComponent,
+    findComponents,
     unixDate
   });
 })();

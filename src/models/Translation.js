@@ -1,10 +1,9 @@
 import Utilities from 'utilities';
 import Model from '../Fluent/Model';
-import Fluent from '../Fluent/Fluent';
 import Configuration from './Configuration';
 import moment from 'moment';
 
-export default Fluent.extend(Model, {
+export default Model.compose({
   properties: {
     name: 'Translation',
     remoteConnection: {
@@ -20,7 +19,7 @@ export default Fluent.extend(Model, {
 
       localTranslations = Utilities.get(() => localTranslations.data, {});
 
-      Object.keys(localTranslations).forEach((languageCode) => {
+      Object.keys(localTranslations).forEach(languageCode => {
         if (languageCode !== 'type') {
           i18n[languageCode] = localTranslations[languageCode];
         }
@@ -42,8 +41,8 @@ export default Fluent.extend(Model, {
 
       translations = Utilities.get(() => translations[0].data, []);
 
-      Object.keys(translations).forEach((languageCode) => {
-        let iso = isoLanguages.find((l) => {
+      Object.keys(translations).forEach(languageCode => {
+        let iso = isoLanguages.find(l => {
           return l.code === languageCode;
         });
 
@@ -148,13 +147,14 @@ export default Fluent.extend(Model, {
 
       result.label = {};
       // Foreach of the locale lenguages, set the translations
-      lenguages.forEach((language) => {
-        translations.forEach((translation, index) => {
+      lenguages.forEach(language => {
+        translations.forEach(translation => {
           if (translation.data && translation.data[language.code]) {
             if (!result[language.code]) {
               result[language.code] = {};
             }
-            result[language.code][translation.data.label] = translation.data[language.code];
+            result[language.code][translation.data.label] =
+              translation.data[language.code];
           }
 
           if (translation.data && translation.data.label) {
@@ -166,16 +166,18 @@ export default Fluent.extend(Model, {
       return result;
     },
 
-    async setTranslations (translations) {
+    async updateLabel (label, translation) {
       let trans = await this.remote()
-        .where('data.label', '=', translations.label)
+        .where('data.label', '=', label)
         .first();
 
       let id = trans._id;
 
+      const newTranslations = { ...trans.data, ...translation };
+
       let result = await this.remote().update({
         _id: id,
-        data: translations
+        data: newTranslations
       });
 
       return result;

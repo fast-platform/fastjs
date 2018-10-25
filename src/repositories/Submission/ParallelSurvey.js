@@ -48,7 +48,7 @@ let ParallelSurvey = (() => {
   }
 
   function getGroupId (submission) {
-    let groupId = Utilities.get(() => Submission.local().getParallelSurvey(submission).groupId);
+    let groupId = Utilities.get(() => Submission('*').local().getParallelSurvey(submission).groupId);
 
     return groupId;
   }
@@ -81,11 +81,11 @@ let ParallelSurvey = (() => {
     };
 
     // Store information of the parallelSurvey on the current submission
-    vm.currentSubmission.data.parallelSurvey = Submission.local().setParallelSurvey(parallelSurvey);
+    vm.currentSubmission.data.parallelSurvey = Submission('*').local().setParallelSurvey(parallelSurvey);
 
     // New survey Information
     let surveyData = {
-      parallelSurvey: Submission.local().setParallelSurvey({
+      parallelSurvey: Submission('*').local().setParallelSurvey({
         ...parallelSurvey,
         participantName: nextParticipant
       })
@@ -96,12 +96,12 @@ let ParallelSurvey = (() => {
 
   function prepareNewUserObject ({ submission, vm, info }) {
     let participantName = info[0];
-    let parallelsurveyInfo = Submission.local().getParallelSurvey(submission);
+    let parallelsurveyInfo = Submission('*').local().getParallelSurvey(submission);
 
     parallelsurveyInfo.participantName = participantName;
     // New survey Information
     let surveyData = {
-      parallelSurvey: Submission.local().setParallelSurvey(parallelsurveyInfo)
+      parallelSurvey: Submission('*').local().setParallelSurvey(parallelsurveyInfo)
     };
 
     return surveyData;

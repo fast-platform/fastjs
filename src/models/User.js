@@ -2,12 +2,11 @@ import axios from 'axios';
 import Configuration from './Configuration';
 import Utilities from 'utilities';
 import Model from '../Fluent/Model';
-import Fluent from '../Fluent/Fluent';
 import Connection from '../Wrappers/Connection';
 import to from 'await-to-js';
 import Form from '../models/Form';
 
-export default Fluent.extend(Model, {
+export default Model.compose({
   properties: {
     name: 'User',
     remoteConnection: {

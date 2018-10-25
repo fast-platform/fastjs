@@ -1,11 +1,10 @@
 import Model from '../Fluent/Model';
-import Fluent from '../Fluent/Fluent';
 import Utilities from 'utilities';
 import Connection from 'Wrappers/Connection';
 import to from 'await-to-js';
 import moment from 'moment';
 
-export default Fluent.extend(Model, {
+export default Model.compose({
   properties: {
     name: 'Role',
     remoteConnection: {

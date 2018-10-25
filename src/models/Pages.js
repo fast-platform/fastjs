@@ -1,11 +1,10 @@
 import Model from '../Fluent/Model';
-import Fluent from '../Fluent/Fluent';
 import Utilities from 'utilities';
 import Configuration from './Configuration';
 import to from 'await-to-js';
 import moment from 'moment';
 
-export default Fluent.extend(Model, {
+export default Model.compose({
   properties: {
     name: 'Pages',
     remoteConnection: {

@@ -1,11 +1,10 @@
 import moment from 'moment';
 import Utilities from 'utilities';
 import Model from '../Fluent/Model';
-import Fluent from '../Fluent/Fluent';
 import Labels from './repositories/Labels';
 import Configuration from './Configuration';
 
-export default Fluent.extend(Model, {
+export default Model.compose({
   properties: {
     name: 'Form',
     remoteConnection: {
@@ -15,13 +14,16 @@ export default Fluent.extend(Model, {
   },
   methods: {
     getModel ({ path }) {
-      return Fluent.extend(Model, {
+      return Model.compose({
         properties: {
           remoteConnection: {
-            path: path
+            path
           }
         }
-      }).compose(Fluent.privatize)();
+      })();
+    },
+    find ({ path }) {
+      return this.local().where('data.path', '=', path).first();
     },
     /**
      *
@@ -30,7 +32,7 @@ export default Fluent.extend(Model, {
     async cardFormattedForms (action) {
       let result = await this.local().get();
 
-      result = result.filter((o) => {
+      result = result.filter(o => {
         return o.data.tags.indexOf('visible') > -1;
       });
       result = result.sort((a, b) => {
@@ -39,12 +41,15 @@ export default Fluent.extend(Model, {
         return a > b ? 1 : a < b ? -1 : 0;
       });
 
-      result = result.map((f) => {
+      result = result.map(f => {
         return {
           title: f.data.title,
           tags: f.data.tags,
           customIcon: true,
-          icon: action === 'create' ? 'statics/customSVG/startSurvey.svg' : 'statics/customSVG/collectedData.svg',
+          icon:
+            action === 'create' ?
+              'statics/customSVG/startSurvey.svg' :
+              'statics/customSVG/collectedData.svg',
           subtitle: 'Last updated: ' + moment(f.data.modified).fromNow(),
           actions: [
             {
@@ -96,7 +101,7 @@ export default Fluent.extend(Model, {
         await this.local().clear({ sure: true });
       }
 
-      offlineForms.forEach(async (form) => {
+      offlineForms.forEach(async form => {
         await this.local().insert({ data: form, fastUpdated: moment().unix() });
       });
       return offlineForms;
@@ -110,7 +115,7 @@ export default Fluent.extend(Model, {
 
       if (remoteForms && !Utilities.isEmpty(remoteForms)) {
         await this.local().clear({ sure: true });
-        remoteForms.forEach(async (form) => {
+        remoteForms.forEach(async form => {
           await this.local().insert({
             data: form,
             fastUpdated: unixDate
@@ -135,9 +140,12 @@ export default Fluent.extend(Model, {
 
       let templates = [];
 
-      Utilities.eachComponent(fullForm.data.components, (c) => {
+      Utilities.eachComponent(fullForm.data.components, c => {
         if (c.properties && c.properties.FAST_TABLE_TEMPLATE) {
-          templates.push({ key: c.key, template: c.properties.FAST_TABLE_TEMPLATE });
+          templates.push({
+            key: c.key,
+            template: c.properties.FAST_TABLE_TEMPLATE
+          });
         }
       });
 

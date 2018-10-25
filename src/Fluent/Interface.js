@@ -1,6 +1,8 @@
 import stampit from '@stamp/it';
 import Utilities from 'utilities';
 import Collection from './Collection';
+// import Fluent from './Fluent';
+
 export default stampit({
   init ({ name, remoteConnection }) {
     if (!name && !remoteConnection) {
@@ -8,18 +10,32 @@ export default stampit({
     }
     this.name = name || this.name;
     this.remoteConnection = remoteConnection || this.remoteConnection;
+    this.chainReference = [];
+    this.whereArray = [];
+    this.orWhereArray = [];
+    this.selectArray = [];
+    this.orderByArray = [];
+    this.limitNumber = undefined;
+    this.offsetNumber = undefined;
+    this.populate = [];
+    this.chunk = null;
+    this.pullSize = null;
   },
   properties: {
-    whereArray: [],
-    orWhereArray: [],
-    selectArray: [],
-    orderByArray: [],
-    limitNumber: undefined,
-    offsetNumber: undefined,
-    populate: [],
-    chunk: null,
-    pullSize: null,
-    operators: ['=', '<', '>', '<=', '>=', '<>', '!=', 'like', 'regexp', 'startsWith', 'endsWith', 'contains']
+    operators: [
+      '=',
+      '<',
+      '>',
+      '<=',
+      '>=',
+      '<>',
+      '!=',
+      'like',
+      'regexp',
+      'startsWith',
+      'endsWith',
+      'contains'
+    ]
   },
   methods: {
     /**
@@ -88,6 +104,12 @@ export default stampit({
     findAndRemove () {
       throw new Error('findAndRemove() method not implemented');
     },
+    owner (user) {
+      throw new Error('owner() method not implemented');
+    },
+    own (user) {
+      throw new Error('own() method not implemented');
+    },
     /**
      * Executes the Get() method and
      * returns the its first result
@@ -123,10 +145,12 @@ export default stampit({
      */
     select (...columns) {
       columns = this.prepareInput(columns);
-
-      this.selectArray = this.selectArray.concat(columns).filter((elem, pos, arr) => {
-        return arr.indexOf(elem) === pos;
-      });
+      this.chainReference.push({ method: 'select', args: columns });
+      this.selectArray = this.selectArray
+        .concat(columns)
+        .filter((elem, pos, arr) => {
+          return arr.indexOf(elem) === pos;
+        });
 
       return this;
     },
@@ -141,10 +165,10 @@ export default stampit({
       let _data = Array.isArray(data) ? [...data] : [data];
 
       if (this.selectArray.length > 0) {
-        _data = _data.map((element) => {
+        _data = _data.map(element => {
           let newElement = {};
 
-          this.selectArray.forEach((attribute) => {
+          this.selectArray.forEach(attribute => {
             let extract = Utilities.getFromPath(element, attribute, undefined);
 
             let value = Utilities.get(() => extract.value, undefined);
@@ -167,6 +191,7 @@ export default stampit({
      * @returns {Model} Fluent Model
      */
     offset (offset) {
+      this.chainReference.push({ method: 'offset', args: offset });
       this.offsetNumber = offset;
       return this;
     },
@@ -185,9 +210,10 @@ export default stampit({
      * @returns {Model} Fluent Model
      */
     where (...args) {
+      this.chainReference.push({ method: 'where', args: args });
       this.whereArray = [];
       args = Array.isArray(args[0]) ? args : [args];
-      args.forEach((arg) => {
+      args.forEach(arg => {
         if (arg.length !== 3) {
           throw new Error(
             'There where clouse is not properly formatted, expecting: ["attribute", "operator","value"] but got "' +
@@ -207,8 +233,9 @@ export default stampit({
      * @returns {Model} Fluent Model
      */
     andWhere (...args) {
+      this.chainReference.push({ method: 'andWhere', args: args });
       args = Array.isArray(args[0]) ? args : [args];
-      args.forEach((arg) => {
+      args.forEach(arg => {
         if (arg.length !== 3) {
           throw new Error(
             'There where clouse is not properly formatted, expecting: ["attribute", "operator","value"] but got "' +
@@ -229,7 +256,7 @@ export default stampit({
      */
     orWhere (...args) {
       args = Array.isArray(args[0]) ? args : [args];
-      args.forEach((arg) => {
+      args.forEach(arg => {
         if (arg.length !== 3) {
           throw new Error(
             'There orWhere clouse is not properly formatted, expecting: ["attribute", "operator","value"] but got "' +
@@ -268,7 +295,7 @@ export default stampit({
     async pluck (keyPath) {
       let data = await this.get();
 
-      data = data.map((e) => {
+      data = data.map(e => {
         let extracted = Utilities.getFromPath(e, keyPath, undefined);
 
         if (typeof extracted.value !== 'undefined') {
@@ -297,9 +324,14 @@ export default stampit({
       }
       let field = this.orderByArray[0];
 
-      if (this.selectArray.length > 0 && (field.includes('.') || field.includes('['))) {
+      if (
+        this.selectArray.length > 0 &&
+        (field.includes('.') || field.includes('['))
+      ) {
         throw new Error(
-          'Cannot orderBy nested attribute "' + field + '" when using Select. You must rename the attribute'
+          'Cannot orderBy nested attribute "' +
+            field +
+            '" when using Select. You must rename the attribute'
         );
       }
 
@@ -315,7 +347,11 @@ export default stampit({
         let B = Utilities.getFromPath(b, field, undefined).value;
 
         if (typeof A === 'undefined' || typeof B === 'undefined') {
-          throw new Error('Cannot order by property "' + field + '" not all values have this property');
+          throw new Error(
+            'Cannot order by property "' +
+              field +
+              '" not all values have this property'
+          );
         }
         // For default order and numbers
         if (type.includes('string') || type.includes('number')) {
@@ -339,10 +375,10 @@ export default stampit({
     prepareInput (input) {
       let cols = [];
 
-      input.forEach((item) => {
+      input.forEach(item => {
         let value = Array.isArray(item) ? item : item.split(',');
 
-        value = value.map((e) => {
+        value = value.map(e => {
           return e.trim();
         });
         cols = cols.concat(value);

@@ -10,8 +10,10 @@ let OfflineData = (() => {
     let remoteEndPoint = Form.getModel({ path: offlineSubmission.path }).remote();
 
     offlineSubmission.queuedForSync = true;
+    let sub = Submission(offlineSubmission.path);
+
     // Set the submission as queuedForSync
-    await Submission.local().update(offlineSubmission);
+    await sub.local().update(offlineSubmission);
 
     let [error, insertedData] = await to(remoteEndPoint.insert(offlineSubmission));
 
@@ -19,14 +21,14 @@ let OfflineData = (() => {
       console.log(error);
       offlineSubmission.queuedForSync = false;
       offlineSubmission.syncError = error;
-      Submission.local().update(offlineSubmission);
+      sub.local().update(offlineSubmission);
       throw new Error('Error while Syncing data');
     }
     if (!insertedData._id) {
       throw Error('The remote endpoint did not save the submission properly (no _id back)');
     }
 
-    let [e] = await to(Submission.local().remove(offlineSubmission._id));
+    let [e] = await to(sub.local().remove(offlineSubmission._id));
 
     if (e) {
       throw new Error('Sync error:Could not remove local submission after sync');

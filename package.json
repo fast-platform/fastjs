@@ -1,6 +1,6 @@
 {
   "name": "fast-fastjs",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "description": "Formio interface for online and offline use",
   "main": "lib/fast-fastjs.min.js",
   "directories": {
@@ -30,6 +30,19 @@
     "url": "https://github.com/UN-FAO/fastjs.git/issues"
   },
   "homepage": "https://github.com/UN-FAO/fastjs.git#readme",
+  "dependencies": {
+    "@stamp/compose": "^1.0.2",
+    "@stamp/it": "^1.1.0",
+    "@stamp/privatize": "^1.0.3",
+    "await-to-js": "^2.0.1",
+    "axios": "^0.18.0",
+    "bluebird": "^3.5.2",
+    "lokijs": "^1.5.5",
+    "md5": "^2.2.1",
+    "moment": "^2.22.2",
+    "stampit": "^4.2.0",
+    "uuid": "^3.2.1"
+  },
   "devDependencies": {
     "axios-mock-adapter": "^1.15.0",
     "babel-cli": "^6.26.0",
@@ -60,18 +73,5 @@
     "webpack-node-externals": "^1.7.2",
     "xmlhttprequest": "^1.8.0",
     "yargs": "^11.0.0"
-  },
-  "dependencies": {
-    "@stamp/compose": "^1.0.2",
-    "@stamp/it": "^1.1.0",
-    "@stamp/privatize": "^1.0.3",
-    "await-to-js": "^2.0.1",
-    "axios": "^0.18.0",
-    "bluebird": "^3.5.2",
-    "lokijs": "^1.5.5",
-    "md5": "^2.2.1",
-    "moment": "^2.22.2",
-    "stampit": "^4.2.0",
-    "uuid": "^3.2.1"
   }
 }
