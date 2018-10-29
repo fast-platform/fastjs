@@ -47,11 +47,13 @@ const config = {
           presets: [['env', { modules: false, targets: { node: 4 } }]]
         }
       },
-      {
-        test: /(\.jsx|\.js)$/,
-        loader: 'eslint-loader',
-        exclude: /node_modules/
-      }
+      /*
+        {
+          test: /(\.jsx|\.js)$/,
+          loader: 'eslint-loader',
+          exclude: /node_modules/
+        }
+        */
     ]
   },
   plugins: plugins,

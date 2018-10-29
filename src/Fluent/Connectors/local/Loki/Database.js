@@ -1,8 +1,9 @@
 import Promise from 'bluebird';
 import Loki from 'lokijs';
 import LokiIndexedAdapter from 'lokijs/src/loki-indexed-adapter';
-var DB = null;
+
 let Database = (() => {
+  var DB = null;
   /*
   |--------------------------------------------------------------------------
   | LockiDB Config
@@ -43,7 +44,7 @@ let Database = (() => {
         db = new Loki('FAST', dbConfig);
       }
 
-      function databaseInitialize () {
+      function databaseInitialize() {
         const baseModels =
           window && window._FLUENT_ && window._FLUENT_.models ?
             window._FLUENT_.models :
@@ -78,10 +79,7 @@ let Database = (() => {
    * @returns
    */
   const get = async function ({ env = 'prod' } = {}) {
-    if (!DB) {
-      DB = await _create({ env });
-    }
-    return DB;
+    return _create({ env });
   };
 
   return Object.freeze({

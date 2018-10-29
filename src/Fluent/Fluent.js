@@ -7,7 +7,7 @@ import formioLoki from './Connectors/merged/Formio-Loki/FluentConnector';
 var _FLUENT_FORMIO_BASEURL, _FAST_CONFIG_ID, _FAST_CONFIG_URL, _OFFLINE_START;
 
 const Fluent = stampit({
-  init () {
+  init() {
     this.registerInternalModels();
   },
   properties: {
@@ -21,34 +21,34 @@ const Fluent = stampit({
     }
   },
   methods: {
-    model (...args) {
+    model(...args) {
       this.registerModel(args);
       return stampit(...args);
     },
-    extend (...args) {
+    extend(...args) {
       this.registerModel(args);
       return compose(...args);
     },
-    compose (...args) {
+    compose(...args) {
       this.registerModel(args);
       return compose(...args);
     },
-    getLocalConnector (modelName) {
+    getLocalConnector(modelName) {
       let con = this.getConfigLocalConnector();
 
       return this.connectors.local[con](modelName);
     },
-    getRemoteConnector (remoteConnection) {
+    getRemoteConnector(remoteConnection) {
       let con = this.getConfigRemoteConnector();
 
       return this.connectors.remote[con](remoteConnection);
     },
-    getMergedConnector () {
+    getMergedConnector() {
       let con = this.getConfigMergedConnector();
 
       return this.connectors.merged[con];
     },
-    getConfigRemoteConnector () {
+    getConfigRemoteConnector() {
       if (
         window &&
         window._FLUENT_ &&
@@ -67,7 +67,7 @@ const Fluent = stampit({
       }
       return this.defaultRemote;
     },
-    getConfigLocalConnector () {
+    getConfigLocalConnector() {
       if (
         window &&
         window._FLUENT_ &&
@@ -86,7 +86,7 @@ const Fluent = stampit({
       }
       return this.defaulLocal;
     },
-    getConfigMergedConnector () {
+    getConfigMergedConnector() {
       if (
         window &&
         window._FLUENT_ &&
@@ -105,7 +105,7 @@ const Fluent = stampit({
       }
       return this.defaultMerged;
     },
-    registerInternalModels () {
+    registerInternalModels() {
       let models = [
         'Submission',
         'Form',
@@ -130,7 +130,7 @@ const Fluent = stampit({
         global._FLUENT_.models[model] = true;
       });
     },
-    registerModel (args) {
+    registerModel(args) {
       let name =
         args && args[0] && args[0].properties && args[0].properties.name ?
           args[0].properties.name :
@@ -153,12 +153,12 @@ const Fluent = stampit({
         global._FLUENT_.models[name] = true;
       }
     },
-    getRemoteToken (provider) {
+    getRemoteToken(provider) {
       let con = process.env.FLUENT_REMOTE_CONNECTOR || this.defaultRemote;
 
       return this.connectors.remote[con]({ name: 'token' }).getToken();
     },
-    setConfig ({
+    setConfig({
       FLUENT_FORMIO_BASEURL = undefined,
       FAST_CONFIG_ID = undefined,
       FAST_CONFIG_URL = undefined,
@@ -169,7 +169,7 @@ const Fluent = stampit({
       _FAST_CONFIG_URL = FAST_CONFIG_URL;
       _OFFLINE_START = OFFLINE_START;
     },
-    getConfig () {
+    getConfig() {
       return {
         FLUENT_FORMIO_BASEURL: _FLUENT_FORMIO_BASEURL,
         FAST_CONFIG_ID: _FAST_CONFIG_ID,

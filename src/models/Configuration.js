@@ -1,18 +1,17 @@
-import Fluent from '../Fluent/Fluent';
-import Utilities from 'utilities';
-import moment from 'moment';
-import Model from '../Fluent/Model';
+import Fluent from "../Fluent/Fluent";
+import Utilities from "utilities";
+import moment from "moment";
+import Model from "../Fluent/Model";
 // TODO We still have to figure out how to solve the problem of
 // The CONFIG URL and FLUENT_URL changing on APP sync
 // Every page refresh will make the urls go back to their default
-
 export default Fluent.extend(Model, {
   properties: {
-    name: 'Configuration',
+    name: "Configuration",
     remoteConnection: {
-      path: 'configuration',
+      path: "configuration",
       token: null,
-      type: 'config'
+      type: "config"
     }
   },
   methods: {
@@ -22,8 +21,8 @@ export default Fluent.extend(Model, {
      * @param {Object} config.appConfig The application Config
      * @param {Boolean} config.forceOnline If we need online
      */
-    async set ({ appConf, forceOnline }) {
-      if (String(appConf.offlineStart) === 'true' && !forceOnline) {
+    async set({ appConf, forceOnline }) {
+      if (String(appConf.offlineStart) === "true" && !forceOnline) {
         return this.setOffline({ appConf });
       }
       return this.setOnline({ appConf });
@@ -32,7 +31,7 @@ export default Fluent.extend(Model, {
      *
      * @param {*} param0
      */
-    async setOffline ({ appConf }) {
+    async setOffline({ appConf }) {
       let localConfig = await this.local().first();
 
       let localConfigDate = this.getConfigDate(localConfig);
@@ -56,14 +55,14 @@ export default Fluent.extend(Model, {
      *
      * @param {*} param0
      */
-    async setOnline ({ appConf }) {
+    async setOnline({ appConf }) {
       let localConfig = await this.local().first();
 
       let remoteConfig = await this.remote({ token: false }).first();
 
       if (!localConfig && !remoteConfig) {
         throw new Error(
-          'Application is not connected to internet, or the configuration file cannot be pulled'
+          "Application is not connected to internet, or the configuration file cannot be pulled"
         );
       }
 
@@ -83,16 +82,16 @@ export default Fluent.extend(Model, {
      *
      * @param {*} config
      */
-    getConfigDate (config) {
+    getConfigDate(config) {
       return Utilities.get(() => config.fastUpdated, 0);
     }
   }
 })
   .compose(Fluent.privatize)
   .privatizeMethods(
-    'setOnlineConfig',
-    'setOfflineConfig',
-    'getConfigDate',
-    'assingGlobalVariable',
-    'getRemote'
+    "setOnlineConfig",
+    "setOfflineConfig",
+    "getConfigDate",
+    "assingGlobalVariable",
+    "getRemote"
   )();

@@ -9,7 +9,7 @@ export default stampit(Interface, {
     /**
      *
      */
-    async get () {
+    async get() {
       let filterObject = this.prepareFilter();
 
       let data = await (await this.getModel())
@@ -27,7 +27,7 @@ export default stampit(Interface, {
     /**
      *
      */
-    prepareFilter () {
+    prepareFilter() {
       let andObject = { $and: [] };
       let orObject = { $or: [] };
       let globalFilter = {};
@@ -40,8 +40,8 @@ export default stampit(Interface, {
           if (c[0].includes('[')) {
             throw new Error(
               'Error in: "' +
-                c[0] +
-                '" "Where" close does not work with Array elements'
+              c[0] +
+              '" "Where" close does not work with Array elements'
             );
           }
 
@@ -90,7 +90,7 @@ export default stampit(Interface, {
      *
      * @param {*} operator
      */
-    getLokiOperator (operator) {
+    getLokiOperator(operator) {
       if (!this.operators.includes(operator)) {
         throw new Error('The "' + operator + '" operator is not supported');
       }
@@ -124,7 +124,7 @@ export default stampit(Interface, {
      * @param {String} db.model The name of the model to fetch
      * @returns {Promise} The DB model
      */
-    async getModel () {
+    async getModel() {
       const DB = await Database.get();
 
       return DB.getCollection(this.name);
@@ -132,7 +132,7 @@ export default stampit(Interface, {
     /**
      *
      */
-    async all () {
+    async all() {
       const model = await this.getModel();
 
       return model.find();
@@ -142,7 +142,7 @@ export default stampit(Interface, {
      * @param  {[type]} document [description]
      * @return {[type]}          [description]
      */
-    async remove (_id) {
+    async remove(_id) {
       if (!_id) {
         throw new Error(
           'No id assign to remove().You must give and _id to delete'
@@ -161,7 +161,7 @@ export default stampit(Interface, {
      * @param  {[type]} element [description]
      * @return {[type]}         [description]
      */
-    async insert (element) {
+    async insert(element) {
       element = Utilities.cloneDeep(element);
 
       const model = await this.getModel();
@@ -175,7 +175,7 @@ export default stampit(Interface, {
      * @param  {[type]} document [description]
      * @return {[type]}          [description]
      */
-    async update (document) {
+    async update(document) {
       if (!document._id) {
         throw new Error(
           'Loki connector error. Cannot update a Model without _id key'
@@ -193,7 +193,7 @@ export default stampit(Interface, {
      *
      * @param {*} param0
      */
-    async updateOrCreate ({ document }) {
+    async updateOrCreate({ document }) {
       const model = await this.getModel();
       let role = await model.findOne(document);
 
@@ -205,7 +205,7 @@ export default stampit(Interface, {
      *
      * @param {*} param0
      */
-    async findAndRemove ({ filter }) {
+    async findAndRemove({ filter }) {
       const model = await this.getModel();
 
       return model.findAndRemove(filter);
@@ -214,7 +214,7 @@ export default stampit(Interface, {
      *
      * @param {*} param0
      */
-    async clear () {
+    async clear() {
       const model = await this.getModel();
 
       return model.clear({ removeIndices: true });
@@ -223,7 +223,7 @@ export default stampit(Interface, {
      *
      * @param {*} user
      */
-    own (user) {
+    own(user) {
       // TODO user should be auth user
       if (!user) {
         throw new Error(
@@ -236,7 +236,7 @@ export default stampit(Interface, {
      *
      * @param {*} user
      */
-    owner (user) {
+    owner(user) {
       if (!user) {
         throw new Error(
           'owner() method requires a specific user to filter the submissions'
