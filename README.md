@@ -7,9 +7,6 @@ FASTjs + Form.io will help you develop faster in any Framework
 ### Installing
 
 To install this package in your project, you can use the following command within your terminal.
-FASTjs is quite big (3MB not minified), because we use quite a few libraries, but we do most
-of the heavy lifting for you. On time we will work to make the package smaller (We promise!)
-
 ```
 npm install --save fast-fastjs
 ```
