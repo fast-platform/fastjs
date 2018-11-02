@@ -1,18 +1,19 @@
 import Utilities from 'utilities';
-import Model from '../Fluent/Model';
+import { Fluent } from "fast-fluent";
 import Configuration from './Configuration';
 import moment from 'moment';
 
-export default Model.compose({
+export default Fluent.model({
   properties: {
     name: 'Translation',
-    remoteConnection: {
-      path: 'translations',
-      token: undefined
+    config: {
+      remote: {
+        path: 'translations'
+      }
     }
   },
   methods: {
-    async getFormTranslations () {
+    async getFormTranslations() {
       let i18n = {};
 
       let localTranslations = await this.local().first();
@@ -29,7 +30,7 @@ export default Model.compose({
     /**
      *
      */
-    async supportedLanguages () {
+    async supportedLanguages() {
       let translations = await this.local().get();
 
       if (translations.length === 0) {
@@ -61,14 +62,14 @@ export default Model.compose({
     /**
      *
      */
-    getIsoLanguages () {
+    getIsoLanguages() {
       return require('resources/isoLanguages.json');
     },
     /**
      *
      * @param {*} localTranslations
      */
-    getLocalizationDate (localTranslations) {
+    getLocalizationDate(localTranslations) {
       return Utilities.get(() => localTranslations[0].fastUpdated, 0);
     },
     /**
@@ -77,8 +78,8 @@ export default Model.compose({
      * @param  {[type]} password [description]
      * @return {[type]}          [description]
      */
-    async set ({ appConf, forceOnline }) {
-      if (appConf.offlineStart === 'true' && !forceOnline) {
+    async set({ appConf, forceOnline }) {
+      if (!forceOnline) {
         return this.setOffline({ appConf });
       }
       return this.setOnline({ appConf });
@@ -87,7 +88,7 @@ export default Model.compose({
      *
      * @param {*} param0
      */
-    async setOffline ({ appConf }) {
+    async setOffline({ appConf }) {
       let localTranslations = await this.local().get();
       let localDate = this.getLocalizationDate(localTranslations);
       let config = await Configuration.local().first();
@@ -105,7 +106,7 @@ export default Model.compose({
      *
      * @param {*} param0
      */
-    async setOnline ({ appConf }) {
+    async setOnline({ appConf }) {
       let localTranslations = await this.local().get();
       let appTranslations = await this.remote()
         .limit(50000)
@@ -125,7 +126,7 @@ export default Model.compose({
      *
      * @param {*} translationsArray
      */
-    async storeTranslations (translationsArray) {
+    async storeTranslations(translationsArray) {
       // Remove all previous translations
       this.local().clear({ sure: true });
 
@@ -141,7 +142,7 @@ export default Model.compose({
      * [setTranslations description]
      * @param {[type]} appTranslations [description]
      */
-    async process (translations) {
+    async process(translations) {
       let lenguages = this.getIsoLanguages();
       let result = {};
 
@@ -166,7 +167,7 @@ export default Model.compose({
       return result;
     },
 
-    async updateLabel (label, translation) {
+    async updateLabel(label, translation) {
       let trans = await this.remote()
         .where('data.label', '=', label)
         .first();
@@ -183,7 +184,7 @@ export default Model.compose({
       return result;
     },
 
-    async createTranslation (label) {
+    async createTranslation(label) {
       return this.remote().insert({
         data: {
           en: label,

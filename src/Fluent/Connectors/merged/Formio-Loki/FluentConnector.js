@@ -1,28 +1,28 @@
-import Interface from '../../../Interface';
+import { Interface } from 'fast-fluent';
 
 export default Interface.compose({
   properties: {
     localFx: undefined,
     remoteFx: undefined
   },
-  init (connectors) {
+  init(connectors) {
     this.connectors = connectors;
   },
   methods: {
-    async get () {
+    async get() {
       this.prepareMergedFunctions();
       const localData = await this.localFx.get();
       const remoteData = await this.remoteFx.get();
 
       return localData.concat(remoteData);
     },
-    owner (user) {
+    owner(user) {
       this.chainReference.push({ method: 'owner', args: user });
     },
-    own (user) {
+    own(user) {
       this.chainReference.push({ method: 'own', args: user });
     },
-    prepareMergedFunctions () {
+    prepareMergedFunctions() {
       this.localFx = this.connectors.local;
       this.remoteFx = this.connectors.remote;
 

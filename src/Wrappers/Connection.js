@@ -1,10 +1,11 @@
 import Event from './Event';
 import Promise from 'bluebird';
+import axios from 'axios';
 /* eslint-disable no-unused-vars */
 let Connection = (() => {
-  let online = window.navigator.onLine;
+  let online = (typeof window !== 'undefined') && window && window.navigator ? window.navigator.onLine : true;
 
-  function setOnline () {
+  function setOnline() {
     if (!online) {
       online = true;
       Event.emit({
@@ -15,7 +16,7 @@ let Connection = (() => {
     }
   }
 
-  function setOffline () {
+  function setOffline() {
     if (online) {
       online = false;
       Event.emit({
@@ -30,7 +31,7 @@ let Connection = (() => {
    * [status description]
    * @return {Promise} [description]
    */
-  function initEventListeners () {
+  function initEventListeners() {
     Event.listen({
       name: 'online',
       callback: function () {
@@ -47,18 +48,15 @@ let Connection = (() => {
     });
   }
 
-  function isOnline () {
+  function isOnline() {
     return new Promise((resolve, reject) => {
-      var xhr = XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHttp');
-
-      xhr.onload = function () {
+      axios.get('https://yesno.wtf/api')
+      .then(function (res) {
         resolve(true);
-      };
-      xhr.onerror = function (e) {
+      })
+      .catch(function (err) {
         resolve(false);
-      };
-      xhr.open('GET', 'https://yesno.wtf/api', true);
-      xhr.send();
+      })
     });
   }
 

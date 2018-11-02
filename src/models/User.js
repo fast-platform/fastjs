@@ -1,21 +1,23 @@
 import axios from 'axios';
 import Configuration from './Configuration';
 import Utilities from 'utilities';
-import Model from '../Fluent/Model';
+import { Fluent } from "fast-fluent";
 import Connection from '../Wrappers/Connection';
 import to from 'await-to-js';
 import Form from '../models/Form';
 
-export default Model.compose({
+export default Fluent.model({
   properties: {
     name: 'User',
-    remoteConnection: {
-      path: 'user',
-      token: undefined
+    config: {
+      remote: {
+        path: 'user',
+        token: undefined
+      }
     }
   },
   methods: {
-    async storeLocally (user) {
+    async storeLocally(user) {
       let localUser = await this.local()
         .where('data.email', '=', user.data.email)
         .first();
@@ -43,7 +45,7 @@ export default Model.compose({
 
       return this.local().insert(user);
     },
-    async updateUser (user) {
+    async updateUser(user) {
       let localUser = await this.local()
         .where('data.email', '=', user.data.email)
         .pluck('_id');
@@ -56,7 +58,7 @@ export default Model.compose({
 
       return this.local().insert(user);
     },
-    async login ({ credentials, role }) {
+    async login({ credentials, role }) {
       let url = (await Configuration.local().first()).APP_URL;
 
       if (role === 'admin') {

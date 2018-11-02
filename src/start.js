@@ -4,7 +4,10 @@ import Translation from './models/Translation';
 import Pages from './models/Pages';
 import SyncInterval from './repositories/Database/SyncInterval';
 import Roles from './models/Role';
-import Fluent from './Fluent/Fluent';
+import { Fluent } from "fast-fluent";
+import loki from './Fluent/Connectors/local/Loki/FluentConnector'
+import formio from './Fluent/Connectors/remote/Formio/FluentConnector';
+import formioLoki from './Fluent/Connectors/merged/Formio-Loki/FluentConnector';
 /* eslint-disable no-unused-vars */
 let FAST = (() => {
   /**
@@ -15,14 +18,33 @@ let FAST = (() => {
    * @param {*} conf
    * @param {*} conf.appConf Configuration of the App
    */
-  async function start ({ appConf, forceOnline }) {
+  async function start({ appConf, forceOnline }) {
     if (!forceOnline) {
-      Fluent.setConfig({
-        FLUENT_FORMIO_BASEURL: appConf.fluentFormioBaseUrl,
-        FAST_CONFIG_ID: appConf.appConfigId,
-        FAST_CONFIG_URL: appConf.appConfigUrl,
-        OFFLINE_START: appConf.offlineStart
-      });
+      Fluent.config(
+        {
+          REMOTE_CONNECTORS: [{
+            default: true,
+            name: 'formio',
+            baseUrl: appConf.fluentFormioBaseUrl,
+            connector: formio
+          },
+          {
+            name: 'formioConfig',
+            baseUrl: appConf.appConfigUrl,
+            connector: formio
+          }],
+          LOCAL_CONNECTORS: [{
+            name: 'loki',
+            connector: loki,
+            default: true
+          }],
+          MERGE_CONNECTORS: [{
+            default: true,
+            name: 'formioLoki',
+            connector: formioLoki
+          }],
+        }
+      );
       SyncInterval.set(3000);
     }
 
@@ -80,7 +102,7 @@ let FAST = (() => {
    * @param {Object} conf.appConf Configuration of the App
    * @returns
    */
-  async function sync ({ appConf }) {
+  async function sync({ appConf }) {
     return start({ appConf, forceOnline: true });
   }
 

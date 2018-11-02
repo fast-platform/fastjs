@@ -1,9 +1,8 @@
 import Promise from 'bluebird';
 import Loki from 'lokijs';
 import LokiIndexedAdapter from 'lokijs/src/loki-indexed-adapter';
-
+var DB = null;
 let Database = (() => {
-  var DB = null;
   /*
   |--------------------------------------------------------------------------
   | LockiDB Config
@@ -11,7 +10,15 @@ let Database = (() => {
   | Configuration for the Local DB creation.
   |
   */
+  const getModels = () => {
+    const models = (typeof window !== 'undefined') && window && window._FLUENT_ && window._FLUENT_.models ?
+      window._FLUENT_.models :
+      global && global._FLUENT_ && global._FLUENT_.models ?
+        global._FLUENT_.models :
+        undefined;
 
+    return models
+  }
   /**
    *
    *
@@ -19,7 +26,7 @@ let Database = (() => {
    * @param {string} configuration.env - Environment i.e 'production'
    * @returns
    */
-  const _create = function ({ env }) {
+  const _create = ({ env }) => {
     return new Promise((resolve) => {
       let idbAdapter;
       let pa;
@@ -30,7 +37,8 @@ let Database = (() => {
         autosaveInterval: 1000,
         autoload: true,
         /* eslint-disable no-use-before-define */
-        autoloadCallback: databaseInitialize
+        autoloadCallback: databaseInitialize,
+        throttledSaves: false
       };
 
       try {
@@ -45,13 +53,7 @@ let Database = (() => {
       }
 
       function databaseInitialize() {
-        const baseModels =
-          window && window._FLUENT_ && window._FLUENT_.models ?
-            window._FLUENT_.models :
-            global && global._FLUENT_ && global._FLUENT_.models ?
-              global._FLUENT_.models :
-              undefined;
-
+        const baseModels = getModels()
         if (!baseModels) {
           throw new Error(
             'Cannot Start FLUENT, no models registered or you dont have access to the "window" or "global" variable'
@@ -69,7 +71,25 @@ let Database = (() => {
       }
     });
   };
-
+  /**
+   * Checks if the DB is created or if new
+   * Models need to be added to the DB
+   * @returns {Boolean}
+   */
+  const shouldRecreate = () => {
+    if (!DB) {
+      return true
+    }
+    const windowModels = getModels()
+    const dbModels = DB.collections.reduce((acc, collection) => {
+      acc.push(collection.name)
+      return acc
+    }, []);
+    const should = !Object.keys(windowModels).every((element) => {
+      return dbModels.includes(element)
+    })
+    return should
+  }
   /**
    *
    *
@@ -79,7 +99,10 @@ let Database = (() => {
    * @returns
    */
   const get = async function ({ env = 'prod' } = {}) {
-    return _create({ env });
+    if (shouldRecreate()) {
+      DB = await _create({ env });
+    }
+    return DB
   };
 
   return Object.freeze({

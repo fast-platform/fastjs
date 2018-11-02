@@ -1,15 +1,17 @@
-import Model from '../Fluent/Model';
+import { Fluent } from "fast-fluent";
 import Utilities from 'utilities';
 import Configuration from './Configuration';
 import to from 'await-to-js';
 import moment from 'moment';
 
-export default Model.compose({
+export default Fluent.model({
   properties: {
     name: 'Pages',
-    remoteConnection: {
-      path: 'fast-app-pages',
-      token: undefined
+    config: {
+      remote: {
+        path: 'fast-app-pages',
+        token: undefined
+      }
     }
   },
   methods: {
@@ -19,8 +21,8 @@ export default Model.compose({
      * @param {Object} config.appConfig The application Config
      * @param {Boolean} config.forceOnline If we need online
      */
-    async set ({ appConf, forceOnline }) {
-      if (String(appConf.offlineStart) === 'true' && !forceOnline) {
+    async set({ appConf, forceOnline }) {
+      if (!forceOnline) {
         return this.setOffline({ appConf });
       }
       return this.setOnline();
@@ -31,7 +33,7 @@ export default Model.compose({
      * @param {Object} appConfig Application config
      * @return {Object} App pages
      */
-    async setOffline ({ appConf }) {
+    async setOffline({ appConf }) {
       let localPages = await this.local().first();
       let localDate = this.getUpdatedDate(localPages);
       let config = await Configuration.local().first();
@@ -53,7 +55,7 @@ export default Model.compose({
      * JSON files
      * @return {Object} App pages
      */
-    async setOnline () {
+    async setOnline() {
       let localPages = await this.local().first();
       let [error, pages] = await to(this.remote().first());
 
@@ -82,7 +84,7 @@ export default Model.compose({
      * @param {Array} pages Array of local pages
      * @returns {number} date las updated
      */
-    getUpdatedDate (pages) {
+    getUpdatedDate(pages) {
       return Utilities.get(() => pages.fastUpdated, 0);
     }
   }

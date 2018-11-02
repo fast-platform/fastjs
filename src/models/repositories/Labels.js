@@ -301,10 +301,6 @@ class FormLabels {
    * @param {Array} appLabels
    */
   static async getPagesLabels (Pages) {
-    console.log('----------------------');
-    console.log('===>Pages', Pages);
-    console.log('----------------------');
-
     let pagesLabels = {};
 
     Pages.pages.forEach((page) => {

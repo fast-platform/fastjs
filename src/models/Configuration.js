@@ -1,17 +1,17 @@
-import Fluent from "../Fluent/Fluent";
+import { Fluent } from "fast-fluent";
 import Utilities from "utilities";
 import moment from "moment";
-import Model from "../Fluent/Model";
 // TODO We still have to figure out how to solve the problem of
 // The CONFIG URL and FLUENT_URL changing on APP sync
 // Every page refresh will make the urls go back to their default
-export default Fluent.extend(Model, {
+export default Fluent.model({
   properties: {
     name: "Configuration",
-    remoteConnection: {
-      path: "configuration",
-      token: null,
-      type: "config"
+    config: {
+      remote: {
+        connector: 'formioConfig',
+        token: ''
+      }
     }
   },
   methods: {
@@ -22,7 +22,7 @@ export default Fluent.extend(Model, {
      * @param {Boolean} config.forceOnline If we need online
      */
     async set({ appConf, forceOnline }) {
-      if (String(appConf.offlineStart) === "true" && !forceOnline) {
+      if (!forceOnline) {
         return this.setOffline({ appConf });
       }
       return this.setOnline({ appConf });
@@ -58,7 +58,7 @@ export default Fluent.extend(Model, {
     async setOnline({ appConf }) {
       let localConfig = await this.local().first();
 
-      let remoteConfig = await this.remote({ token: false }).first();
+      let remoteConfig = await this.remote().first();
 
       if (!localConfig && !remoteConfig) {
         throw new Error(

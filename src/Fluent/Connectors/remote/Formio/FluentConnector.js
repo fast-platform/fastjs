@@ -1,44 +1,23 @@
 import to from 'await-to-js';
-// import Utilities from 'utilities';
+import Utilities from 'utilities';
 import axios from 'axios';
-import Interface from '../../../Interface';
-import stampit from '@stamp/it';
+import { Interface } from 'fast-fluent';
 import Connection from 'Wrappers/Connection';
-import Fluent from '../../../Fluent';
 
-export default stampit(Interface, {
+export default Interface.compose({
   methods: {
-    getToken () {
+    getToken() {
       return localStorage.getItem('formioToken');
     },
-    baseUrl () {
-      if (
-        this.remoteConnection &&
-        this.remoteConnection.type &&
-        this.remoteConnection.type === 'config'
-      ) {
-        const { FAST_CONFIG_URL } = Fluent.getConfig();
+    baseUrl() {
+      const { baseUrl, name } = this.connector
 
-        return FAST_CONFIG_URL;
+      if (!baseUrl) {
+        throw new Error(`You did not provide a baseUrl for the "${name}" connector`)
       }
-
-      const { FLUENT_FORMIO_BASEURL } = Fluent.getConfig();
-
-      return FLUENT_FORMIO_BASEURL;
+      return baseUrl.replace(/\/+$/, "")
     },
-    id () {
-      if (
-        this.remoteConnection &&
-        this.remoteConnection.type &&
-        this.remoteConnection.type === 'config'
-      ) {
-        const { FAST_CONFIG_ID } = Fluent.getConfig();
-
-        return FAST_CONFIG_ID;
-      }
-      return this.remoteConnection.id;
-    },
-    async get () {
+    async get() {
       let error;
       let result;
 
@@ -54,10 +33,13 @@ export default stampit(Interface, {
 
       return result;
     },
-    async all () {
+    async all() {
       return this.get();
     },
-    async insert (data) {
+    async insert(data, options) {
+      if (Array.isArray(data)) {
+        return this.ArrayInsert(data, options)
+      }
       let [error, result] = await to(this.httpPOST(data));
 
       if (error) {
@@ -66,7 +48,7 @@ export default stampit(Interface, {
       }
       return result.data;
     },
-    async update (data) {
+    async update(data) {
       if (!data._id) {
         throw new Error(
           'Formio connector error. Cannot update a Model without _id key'
@@ -86,7 +68,7 @@ export default stampit(Interface, {
       }
       return result.data;
     },
-    async clear ({ sure } = {}) {
+    async clear({ sure } = {}) {
       if (!sure || sure !== true) {
         throw new Error(
           'Clear() method will delete everything!, you must set the "sure" parameter "clear({sure:true})" to continue'
@@ -107,7 +89,7 @@ export default stampit(Interface, {
 
       return axios.all(promises);
     },
-    async remove (_id) {
+    async remove(_id) {
       let [error, removed] = await to(this.httpDelete(_id));
 
       if (error) {
@@ -117,14 +99,14 @@ export default stampit(Interface, {
 
       return removed;
     },
-    async find (_id) {
+    async find(_id) {
       if (typeof _id !== 'string') {
         throw new Error(
           'Formio connector find() method only accepts strings "' +
-            typeof _id +
-            '" given "' +
-            _id +
-            '"'
+          typeof _id +
+          '" given "' +
+          _id +
+          '"'
         );
       }
       let [error, data] = await to(this.where('_id', '=', _id).first());
@@ -136,45 +118,49 @@ export default stampit(Interface, {
 
       return data;
     },
-    getUrl () {
-      let baseUrl = this && this.baseUrl() ? this.baseUrl() : undefined;
-      let path =
-        this.remoteConnection && this.remoteConnection.path ?
-          this.remoteConnection.path :
-          undefined;
+    getUrl() {
+      const baseUrl = this && this.baseUrl() ? this.baseUrl() : undefined;
+      let path = Utilities.get(() => this.remoteConnection.path, undefined);
+      const id = Utilities.get(() => this.remoteConnection.id, undefined);
+      const pullForm = Utilities.get(() => this.remoteConnection.pullForm, undefined);
 
-      if (!this.remoteConnection.pullForm) {
-        path = !this.id() ?
+      if (!pullForm && path) {
+        path = !id ?
           `${path}/submission` :
-          `${path}/submission/${this.id()}`;
+          `${path}/submission/${id}`;
       }
 
-      if (!baseUrl || !path) {
+      if (!baseUrl) {
         throw new Error(
-          'Cannot get remote model. BaseUrl or Path is not defined'
+          'Cannot get remote model. baseUrl not defined'
         );
       }
 
-      let url = baseUrl + path;
-
-      return url;
+      if (path) {
+        return `${baseUrl}/${path}`
+      }
+      return baseUrl
     },
-    getHeaders () {
+    getHeaders() {
       let headers = {};
+      let token = localStorage.getItem('formioToken')
 
-      // Include Auth headers
-      if (this.remoteConnection.token) {
-        let type = this.getTokenType(this.remoteConnection.token);
-
-        headers[type] = this.remoteConnection.token;
+      if (this.remoteConnection.token || this.remoteConnection.token === '') {
+        token = this.remoteConnection.token
       }
 
+      if (!token) {
+        return headers
+      }
+
+      let type = this.getTokenType(token);
+      headers[type] = token;
       return headers;
     },
-    getSpacer (url) {
+    getSpacer(url) {
       return url.substr(url.length - 1) === '&' ? '' : '&';
     },
-    httpGET () {
+    httpGET() {
       let url = this.getUrl();
       let headers = this.getHeaders();
       let filters = this.getFilters();
@@ -194,47 +180,47 @@ export default stampit(Interface, {
 
       if (!Connection.isOnline()) {
         throw new Error(
-          `Cannot make get request to ${url}. You are not online`
+          `Cannot make get request to ${url}.You are not online`
         );
       }
 
       return axios.get(url, { headers });
     },
-    httpPOST (data) {
+    httpPOST(data) {
       let url = this.getUrl();
       let headers = this.getHeaders();
 
       if (!Connection.isOnline()) {
         throw new Error(
-          `Cannot make request post to ${url}. You are not online`
+          `Cannot make request post to ${url}.You are not online`
         );
       }
       return axios.post(url, data, { headers });
     },
-    httpPUT (data) {
-      let url = `${this.getUrl()}/${data._id}`;
+    httpPUT(data) {
+      let url = `${this.getUrl()} / ${data._id}`;
       let headers = this.getHeaders();
 
       if (!Connection.isOnline()) {
         throw new Error(
-          `Cannot make request post to ${url}. You are not online`
+          `Cannot make request post to ${url}.You are not online`
         );
       }
       return axios.put(url, data, { headers });
     },
-    httpDelete (_id) {
+    httpDelete(_id) {
       let headers = this.getHeaders();
-      let url = `${this.getUrl()}/${_id}`;
+      let url = `${this.getUrl()} / ${_id}`;
 
       return axios.delete(url, { headers });
     },
-    getTokenType (token) {
+    getTokenType(token) {
       if (token.length > 32) {
         return 'x-jwt-token';
       }
       return 'x-token';
     },
-    getFilters () {
+    getFilters() {
       let filter = this.whereArray;
 
       if (!filter || filter.length === 0) {
@@ -301,7 +287,7 @@ export default stampit(Interface, {
       });
       return filterQuery.substring(0, filterQuery.length - 1);
     },
-    getLimit () {
+    getLimit() {
       let limit = '?limit=';
 
       if (!this.limitNumber || this.limitNumber === 0) {
@@ -310,7 +296,7 @@ export default stampit(Interface, {
 
       return limit + this.limitNumber;
     },
-    getSkip () {
+    getSkip() {
       let skip = 'skip=';
 
       if (!this.offsetNumber) {
@@ -319,7 +305,7 @@ export default stampit(Interface, {
 
       return skip + this.offsetNumber;
     },
-    getSelect () {
+    getSelect() {
       let select = this.selectArray;
 
       select = select.map(e => {
@@ -336,7 +322,7 @@ export default stampit(Interface, {
      *
      * @param {*} user
      */
-    own (user) {
+    own(user) {
       if (!user) {
         throw new Error(
           'own() method requires a specific user to filter the submissions'
@@ -348,7 +334,7 @@ export default stampit(Interface, {
      *
      * @param {*} user
      */
-    owner (user) {
+    owner(user) {
       if (!user) {
         throw new Error(
           'owner() method requires a specific user to filter the submissions'
@@ -358,130 +344,3 @@ export default stampit(Interface, {
     }
   }
 });
-
-/**
-  const remoteModel = ((path) => {
-    let all = async function () {
-      let remoteData, error;
-      let formio = await getFormioInstance({ path });
-
-      [error, remoteData] = await to(formio.loadForms());
-      if (error) {
-        console.log(error);
-        throw new Error('Cannot get data');
-      }
-
-      return remoteData;
-    };
-
-    async function find ({ filter = undefined, limit = 30, select = undefined, populate = undefined, pagination }) {
-      let remoteSubmissions, error;
-      let formio = await getFormioInstance({ path: path });
-
-      let queryParams = {
-        limit: limit
-      };
-
-      if (filter && Array.isArray(filter)) {
-        let filterQuery = filterToString(filter);
-
-        queryParams = { ...queryParams, ...filterQuery };
-      }
-
-      if (select) {
-        let selectQuery = selectToString(select);
-
-        queryParams = { ...queryParams, ...selectQuery };
-      }
-
-      if (populate && Array.isArray(populate)) {
-        queryParams.populate = populate.join(',');
-      }
-
-      [error, remoteSubmissions] = await to(
-        formio.loadSubmissions({
-          params: queryParams
-        })
-      );
-      if (error) {
-        let path;
-
-        switch (path) {
-          case 'custom':
-            path = await config.get().baseURL;
-            break;
-          case undefined:
-            path = await config.get().url;
-            break;
-          default:
-            path = await config.get().baseURL;
-            path = path + '/' + path;
-            break;
-        }
-        let e = 'The API call to "' + path + '" could not be completed, server responded with ' + JSON.stringify(error);
-
-        throw new Error(e);
-      }
-
-      return remoteSubmissions;
-    }
-
-    async function findOne ({ filter }) {}
-
-    async function remove ({ id }) {
-      let formio = await getFormioInstance({ path: path, submissionID: id });
-      let a = await formio.deleteSubmission();
-    }
-
-    async function softDelete ({ id }) {
-      let formio = await getFormioInstance({ path: path, submissionID: id });
-      let original = await formio.loadSubmission();
-
-      original.data.enabled = false;
-      let data = original.data;
-      let softDeleted = await formio.saveSubmission({
-        _id: id,
-        data
-      });
-
-      return softDeleted;
-    }
-
-    async function insert ({ element }) {
-      let formio = await getFormioInstance({ path: path });
-
-      Formio.deregisterPlugin('offline');
-      let sub = await formio.saveSubmission(element);
-
-      return sub;
-    }
-
-    async function update ({ document }) {
-      let formio = await getFormioInstance({ path: path });
-
-      Formio.deregisterPlugin('offline');
-      let sub = await formio.saveSubmission(document);
-
-      return sub;
-    }
-
-    async function updateOrCreate ({ document }) {}
-
-    async function findAndRemove ({ filter }) {}
-
-    return Object.freeze({
-      find,
-      findOne,
-      remove,
-      insert,
-      update,
-      updateOrCreate,
-      findAndRemove,
-      getFormioInstance,
-      softDelete,
-      all
-    });
-  })();
-
-export default remoteModel;
-*/

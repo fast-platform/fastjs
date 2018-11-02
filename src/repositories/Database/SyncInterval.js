@@ -5,7 +5,7 @@ let SyncInterval = (() => {
   async function set (milliseconds) {
     let rInterval = function (callback, delay) {
       let dateNow = Date.now,
-        requestAnimation = window.requestAnimationFrame,
+        requestAnimation = (typeof window !== 'undefined') && window.requestAnimationFrame,
         start = dateNow(),
         stop,
         intervalFunc = function () {

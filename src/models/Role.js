@@ -1,29 +1,31 @@
-import Model from '../Fluent/Model';
+import { Fluent } from "fast-fluent";
 import Utilities from 'utilities';
 import Connection from 'Wrappers/Connection';
 import to from 'await-to-js';
 import moment from 'moment';
 
-export default Model.compose({
+export default Fluent.model({
   properties: {
     name: 'Role',
-    remoteConnection: {
-      path: 'access',
-      token: undefined,
-      pullForm: true
+    config: {
+      remote: {
+        path: 'access',
+        token: undefined,
+        pullForm: true
+      }
     }
   },
   methods: {
-    async set ({ url, appConf, forceOnline }) {
-      if (appConf.offlineStart === 'true' && !forceOnline) {
+    async set({ url, appConf, forceOnline }) {
+      if (!forceOnline) {
         return this.setOffline({ appConf });
       }
       return this.setOnline({ url });
     },
-    getRolesDate (localRoles) {
+    getRolesDate(localRoles) {
       return Utilities.get(() => localRoles.fastUpdated, 0);
     },
-    async setOnline () {
+    async setOnline() {
       let error;
       let remoteRoles;
 
@@ -53,7 +55,7 @@ export default Model.compose({
       }
       return localRoles;
     },
-    async setOffline ({ appConf }) {
+    async setOffline({ appConf }) {
       let localRoles = await this.local().first();
 
       let rolesDate = this.getRolesDate(localRoles);

@@ -2,63 +2,27 @@ import Auth from 'repositories/Auth/Auth';
 import moment from 'moment';
 import Utilities from 'utilities';
 import Form from 'models/Form';
-import Model from '../Fluent/Model';
+import { Fluent } from "fast-fluent";
 import Columns from './repositories/Columns';
 
-export default Model.compose({
+export default Fluent.model({
   properties: {
     name: 'Submission',
-    remoteConnection: undefined
+    config: {
+      remote: undefined
+    }
   },
-  init ({ path }) {
+  init({ path }) {
     this.path = path;
-    this.remoteConnection = { path };
+    this.config = {
+      remote: { path }
+    }
   },
   methods: {
-    async form () {
+    async form() {
       // return this.belongTo('Form', 'path', 'path');
     },
-    async get (id) {
-      id = id.replace(/\s/g, '');
-      let offline = await this.local().find({
-        filter: {
-          _id: id
-        }
-      });
-
-      if (offline.length > 0) {
-        return offline[0];
-      }
-      return {
-        data: false
-      };
-    },
-
-    async offline (formId) {
-      let filter = await this.find({
-        'data.user_email': Auth.email(),
-        'data.formio.formId': formId
-      });
-      // updated incomplete submission
-
-      filter = filter.filter(o => {
-        return o.data.sync === false || o.data.draft === false;
-      });
-      filter = filter.sort((a, b) => {
-        a = new Date(a.data.created);
-        b = new Date(b.data.created);
-        return a > b ? -1 : a < b ? 1 : 0;
-      });
-      return filter;
-    },
-
-    async stored (formId) {
-      return this.find({
-        'data.formio.formId': formId,
-        'data.owner': Auth.user()._id
-      });
-    },
-    async getUnsync () {
+    async getUnsync() {
       let unsynced = (await this.local()
         .where('sync', '=', false)
         .andWhere('draft', '=', false)
@@ -66,12 +30,12 @@ export default Model.compose({
         .andWhere('user_email', '=', Auth.email())
         .orderBy('created', 'desc', 'date')
         .get()).filter(d => {
-        return !d.queuedForSync;
-      });
+          return !d.queuedForSync;
+        });
 
       return unsynced;
     },
-    async showView (from) {
+    async showView(from) {
       let cols = (await Columns.getTableView(this.path)).map(
         o => `data.${o.path} as ${o.path}`
       );
@@ -137,7 +101,7 @@ export default Model.compose({
 
       return submissions;
     },
-    async getParallelParticipants (_id) {
+    async getParallelParticipants(_id) {
       let currentSubmission = await this.local()
         .where('_id', '=', _id)
         .get();
@@ -176,7 +140,7 @@ export default Model.compose({
       });
       return a;
     },
-    getParallelSurvey (submission) {
+    getParallelSurvey(submission) {
       let parallelsurveyInfo =
         Utilities.get(() => submission.data.data.paraparallelSurvey) ||
         Utilities.get(() => submission.data.parallelSurvey);
@@ -188,10 +152,10 @@ export default Model.compose({
 
       return parallelsurveyInfo;
     },
-    setParallelSurvey (parallelsurveyInfo) {
+    setParallelSurvey(parallelsurveyInfo) {
       return JSON.stringify(parallelsurveyInfo);
     },
-    async getGroups (formId) {
+    async getGroups(formId) {
       let submissions = await this.local().find();
 
       submissions = formId ?
@@ -215,7 +179,7 @@ export default Model.compose({
 
       return Utilities.uniqBy(groups, 'groupId');
     },
-    async getGroup (id) {
+    async getGroup(id) {
       let groups = await this.local().getGroups();
 
       groups = groups.filter(group => {
@@ -224,9 +188,9 @@ export default Model.compose({
       return groups[0];
     },
 
-    async removeFromGroup (submission) {},
+    async removeFromGroup(submission) { },
 
-    async assingToGroup (submissionId, groupId) {
+    async assingToGroup(submissionId, groupId) {
       let group = await this.local().getGroup(groupId[0]);
       let submission = await this.local().get(submissionId);
 

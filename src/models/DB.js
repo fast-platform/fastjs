@@ -1,6 +1,6 @@
-import Model from '../Fluent/Model';
+import { Fluent } from "fast-fluent";
 
-export default Model.compose({
+export default Fluent.model({
   properties: {
     name: undefined,
     remoteConnection: undefined
@@ -8,7 +8,9 @@ export default Model.compose({
   methods: {
     table ({ name, remoteConnection }) {
       this.name = name;
-      this.remoteConnection = remoteConnection;
+      this.config = {
+        remote: remoteConnection
+      };
       return this;
     }
   }

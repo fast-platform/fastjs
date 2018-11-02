@@ -31,7 +31,8 @@ const config = {
     filename: outputFile,
     library: libraryName,
     libraryTarget: 'umd',
-    umdNamedDefine: true
+    umdNamedDefine: true,
+    globalObject: 'this'
   },
   optimization: {
     minimize: minimize
@@ -74,8 +75,6 @@ const config = {
     axios: 'axios',
     bluebird: 'bluebird',
     formiojs: 'formiojs',
-    lokijs: 'lokijs',
-    md5: 'md5',
     moment: 'moment',
     uuid: 'uuid'
   },

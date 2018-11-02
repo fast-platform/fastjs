@@ -1,10 +1,9 @@
 import Database from './Database';
 import Utilities from 'utilities';
 import uuidv4 from 'uuid/v4';
-import Interface from '../../../Interface';
-import stampit from '@stamp/it';
+import { Interface } from 'fast-fluent';
 
-export default stampit(Interface, {
+export default Interface.compose({
   methods: {
     /**
      *
@@ -158,17 +157,20 @@ export default stampit(Interface, {
     },
     /**
      * [insert description]
-     * @param  {[type]} element [description]
+     * @param  {Object, Array} element [description]
      * @return {[type]}         [description]
      */
-    async insert(element) {
-      element = Utilities.cloneDeep(element);
+    async insert(data, options) {
+      if (Array.isArray(data)) {
+        return this.ArrayInsert(data, options)
+      }
+      data = Utilities.cloneDeep(data);
 
       const model = await this.getModel();
 
-      element._id = uuidv4() + '_local';
+      data._id = uuidv4() + '_local';
 
-      return model.insert(element);
+      return model.insert(data)
     },
     /**
      * [update description]

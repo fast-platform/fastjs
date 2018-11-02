@@ -1,37 +1,39 @@
 import moment from 'moment';
 import Utilities from 'utilities';
-import Model from '../Fluent/Model';
+import { Fluent } from "fast-fluent";
 import Labels from './repositories/Labels';
 import Configuration from './Configuration';
 
-export default Model.compose({
+export default Fluent.model({
   properties: {
     name: 'Form',
-    remoteConnection: {
-      path: 'form',
-      pullForm: true
+    config: {
+      remote:
+      {
+        path: 'form',
+        pullForm: true
+      }
     }
   },
   methods: {
-    getModel ({ path }) {
-      return Model.compose({
+    getModel({ path }) {
+      return Fluent.model({
         properties: {
-          remoteConnection: {
-            path
+          config: {
+            remote: { path }
           }
         }
       })();
     },
-    find ({ path }) {
+    find({ path }) {
       return this.local().where('data.path', '=', path).first();
     },
     /**
      *
      * @param {*} action
      */
-    async cardFormattedForms (action) {
+    async cardFormattedForms(action) {
       let result = await this.local().get();
-
       result = result.filter(o => {
         return o.data.tags.indexOf('visible') > -1;
       });
@@ -68,7 +70,7 @@ export default Model.compose({
     /**
      *
      */
-    async FormLabels (selection, i18n) {
+    async FormLabels(selection, i18n) {
       let forms = await this.local().get();
 
       return Labels.get(forms, i18n);
@@ -77,14 +79,14 @@ export default Model.compose({
      *
      * @param {*} forms
      */
-    getUpdatedAt (forms) {
+    getUpdatedAt(forms) {
       return Utilities.get(() => forms[0].fastUpdated, 0);
     },
     /**
      *
      * @param {*} param0
      */
-    async setOffline ({ appConf }) {
+    async setOffline({ appConf }) {
       let localForms = await this.local().get();
 
       let localDate = this.getUpdatedAt(localForms);
@@ -109,7 +111,7 @@ export default Model.compose({
     /**
      *
      */
-    async setOnline () {
+    async setOnline() {
       let remoteForms = await this.remote().get();
       let unixDate = moment().unix();
 
@@ -127,13 +129,13 @@ export default Model.compose({
      *
      * @param {*} param0
      */
-    async set ({ appConf, forceOnline }) {
-      if (appConf.offlineStart === 'true' && !forceOnline) {
+    async set({ appConf, forceOnline }) {
+      if (!forceOnline) {
         return this.setOffline({ appConf });
       }
       return this.setOnline();
     },
-    async getFastTableTemplates ({ path }) {
+    async getFastTableTemplates({ path }) {
       let fullForm = await this.local()
         .where('data.path', '=', path)
         .first();
