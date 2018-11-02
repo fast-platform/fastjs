@@ -25,8 +25,6 @@ import {FAST} from 'fast-fastjs';
 
 let config = await FAST.start(
 		    {
-          	Vue,             // {Vue} Your Vue instance (will create Vue.prototype.$FAST_CONFIG)
-            interval,        // {Boolean} Whether to initiate the App with the Sync interval
             appConf          // {Object} Configuration for the FASTjs library
         }
     );
@@ -47,13 +45,20 @@ We give the flexibility to pull the configuration every time we start the projec
   };
 
 // If we are storing our project configuration in Form.io
-  let appConfigUrl = 'https://ydvyhgtgqlcasur.form.io/configuration/submission/'
-  let appConfigId = '5a956eav847b730402b25656'
+  let appConfigUrl = 'https://ydvyhgtgqlcasur.form.io/configuration/submission/5a956eav847b730402b25656'
   let appConf = {
     type: 'remote',                // {String} type of config "remote" or "local"
-    appConfigId                    // {String} ID of the submission that has the config
     appConfigUrl,                  // {String} Full URL tot he Form.io Form with the config
-    translations: TRANSLATIONS     // {Object} i18n translations for the App
+    translations: TRANSLATIONS,     // {Object} i18n translations for the App
+    fluentFormioBaseUrl: FLUENT_FORMIO_BASEURL,
+    offlineFiles: {
+      Configuration: require('Configuration.json'),
+      Roles: require('Roles.json'),
+      lastUpdated: require('lastUpdate.json'),
+      Translations: require('Translations.json'),
+      Pages: require('Pages.json'),
+      Forms: require('Forms.json')
+     }
   };
 ```
 
@@ -91,26 +96,6 @@ If you are using Form.io to manage the config, you can use the following form to
 
 Remember to import this in your own Form.io Project.[(View it here!)](https://fast-app-config.stackblitz.io/)
 
-### Loading other Forms.
-
-With FAST.start(), we only load the register form to avoid pulling a lot of data on page load.
-It is mandatory to pull the rest of the Forms whenever is convinient for you (Depending on your app)
-
-To do so, we need to call the FAST.loadRemainingConfig() method. You could even call them one after
-the other...just like this:
-
-```javascript
-import {FAST} from 'fast-fastjs';
-
-let config = await FAST.start(
-		    {
-          	Vue,             // {Vue} Your Vue instance (will create Vue.prototype.$FAST_CONFIG)
-            interval,        // {Boolean} Whether to initiate the App with the Sync interval
-            appConf          // {Object} Configuration for the FASTjs library
-        }
-    );
-await FAST.loadRemainingConfig({ interval: true });
-```
 
 # FAST Models
 
