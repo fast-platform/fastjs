@@ -1,4 +1,4 @@
-import { Interface } from 'fast-fluent';
+import { Interface } from "fast-fluent";
 
 export default Interface.compose({
   properties: {
@@ -15,12 +15,6 @@ export default Interface.compose({
       const remoteData = await this.remoteFx.get();
 
       return localData.concat(remoteData);
-    },
-    owner(user) {
-      this.chainReference.push({ method: 'owner', args: user });
-    },
-    own(user) {
-      this.chainReference.push({ method: 'own', args: user });
     },
     prepareMergedFunctions() {
       this.localFx = this.connectors.local;

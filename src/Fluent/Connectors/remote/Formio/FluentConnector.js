@@ -1,23 +1,28 @@
-import to from 'await-to-js';
-import Utilities from 'utilities';
-import axios from 'axios';
-import { Interface } from 'fast-fluent';
-import Connection from 'Wrappers/Connection';
+import to from "await-to-js";
+import Utilities from "utilities";
+import axios from "axios";
+import { Interface } from "fast-fluent";
+import Connection from "Wrappers/Connection";
 
 export default Interface.compose({
   methods: {
     getToken() {
-      return localStorage.getItem('formioToken');
+      return localStorage.getItem("formioToken");
     },
     baseUrl() {
-      const { baseUrl, name } = this.connector
+      const { baseUrl, name } = this.connector;
 
       if (!baseUrl) {
-        throw new Error(`You did not provide a baseUrl for the "${name}" connector`)
+        throw new Error(
+          `You did not provide a baseUrl for the "${name}" connector`
+        );
       }
-      return baseUrl.replace(/\/+$/, "")
+      return baseUrl.replace(/\/+$/, "");
     },
     async get() {
+      if (this.ownerEmail) {
+        this.andWhere("owner", "=", this.ownerEmail);
+      }
       let error;
       let result;
 
@@ -25,7 +30,7 @@ export default Interface.compose({
 
       if (error) {
         console.log(error);
-        throw new Error('Error while getting submissions');
+        throw new Error("Error while getting submissions");
       }
 
       result = this.jsApplySelect(result.data);
@@ -38,25 +43,25 @@ export default Interface.compose({
     },
     async insert(data, options) {
       if (Array.isArray(data)) {
-        return this.ArrayInsert(data, options)
+        return this.ArrayInsert(data, options);
       }
       let [error, result] = await to(this.httpPOST(data));
 
       if (error) {
         console.log(error);
-        throw new Error('Cannot insert data');
+        throw new Error("Cannot insert data");
       }
       return result.data;
     },
     async update(data) {
       if (!data._id) {
         throw new Error(
-          'Formio connector error. Cannot update a Model without _id key'
+          "Formio connector error. Cannot update a Model without _id key"
         );
       }
-      if (data._id.includes('_local')) {
+      if (data._id.includes("_local")) {
         throw new Error(
-          'Formio connector error. Cannot update a local document'
+          "Formio connector error. Cannot update a local document"
         );
       }
 
@@ -64,7 +69,7 @@ export default Interface.compose({
 
       if (error) {
         console.log(error);
-        throw new Error('Cannot insert data');
+        throw new Error("Cannot insert data");
       }
       return result.data;
     },
@@ -76,11 +81,11 @@ export default Interface.compose({
       }
       let promises = [];
 
-      let [error, data] = await to(this.select('_id').pluck('_id'));
+      let [error, data] = await to(this.select("_id").pluck("_id"));
 
       if (error) {
         console.log(error);
-        throw new Error('Cannot get remote Model');
+        throw new Error("Cannot get remote Model");
       }
 
       data.forEach(_id => {
@@ -100,20 +105,20 @@ export default Interface.compose({
       return removed;
     },
     async find(_id) {
-      if (typeof _id !== 'string') {
+      if (typeof _id !== "string") {
         throw new Error(
           'Formio connector find() method only accepts strings "' +
-          typeof _id +
-          '" given "' +
-          _id +
-          '"'
+            typeof _id +
+            '" given "' +
+            _id +
+            '"'
         );
       }
-      let [error, data] = await to(this.where('_id', '=', _id).first());
+      let [error, data] = await to(this.where("_id", "=", _id).first());
 
       if (error) {
         console.log(error);
-        throw new Error('Find() could not get remote data');
+        throw new Error("Find() could not get remote data");
       }
 
       return data;
@@ -122,35 +127,34 @@ export default Interface.compose({
       const baseUrl = this && this.baseUrl() ? this.baseUrl() : undefined;
       let path = Utilities.get(() => this.remoteConnection.path, undefined);
       const id = Utilities.get(() => this.remoteConnection.id, undefined);
-      const pullForm = Utilities.get(() => this.remoteConnection.pullForm, undefined);
+      const pullForm = Utilities.get(
+        () => this.remoteConnection.pullForm,
+        undefined
+      );
 
       if (!pullForm && path) {
-        path = !id ?
-          `${path}/submission` :
-          `${path}/submission/${id}`;
+        path = !id ? `${path}/submission` : `${path}/submission/${id}`;
       }
 
       if (!baseUrl) {
-        throw new Error(
-          'Cannot get remote model. baseUrl not defined'
-        );
+        throw new Error("Cannot get remote model. baseUrl not defined");
       }
 
       if (path) {
-        return `${baseUrl}/${path}`
+        return `${baseUrl}/${path}`;
       }
-      return baseUrl
+      return baseUrl;
     },
     getHeaders() {
       let headers = {};
-      let token = localStorage.getItem('formioToken')
+      let token = localStorage.getItem("formioToken");
 
-      if (this.remoteConnection.token || this.remoteConnection.token === '') {
-        token = this.remoteConnection.token
+      if (this.remoteConnection.token || this.remoteConnection.token === "") {
+        token = this.remoteConnection.token;
       }
 
       if (!token) {
-        return headers
+        return headers;
       }
 
       let type = this.getTokenType(token);
@@ -158,7 +162,7 @@ export default Interface.compose({
       return headers;
     },
     getSpacer(url) {
-      return url.substr(url.length - 1) === '&' ? '' : '&';
+      return url.substr(url.length - 1) === "&" ? "" : "&";
     },
     httpGET() {
       let url = this.getUrl();
@@ -167,7 +171,7 @@ export default Interface.compose({
       let limit = this.getLimit();
       let skip = this.getSkip();
       let select = this.getSelect();
-      let spacer = '';
+      let spacer = "";
 
       // Always limit the amount of requests
       url = url + spacer + limit;
@@ -179,9 +183,7 @@ export default Interface.compose({
       url = select ? url + this.getSpacer(url) + select : url;
 
       if (!Connection.isOnline()) {
-        throw new Error(
-          `Cannot make get request to ${url}.You are not online`
-        );
+        throw new Error(`Cannot make get request to ${url}.You are not online`);
       }
 
       return axios.get(url, { headers });
@@ -198,7 +200,7 @@ export default Interface.compose({
       return axios.post(url, data, { headers });
     },
     httpPUT(data) {
-      let url = `${this.getUrl()} / ${data._id}`;
+      let url = `${this.getUrl()}/${data._id}`;
       let headers = this.getHeaders();
 
       if (!Connection.isOnline()) {
@@ -210,15 +212,15 @@ export default Interface.compose({
     },
     httpDelete(_id) {
       let headers = this.getHeaders();
-      let url = `${this.getUrl()} / ${_id}`;
+      let url = `${this.getUrl()}/${_id}`;
 
       return axios.delete(url, { headers });
     },
     getTokenType(token) {
       if (token.length > 32) {
-        return 'x-jwt-token';
+        return "x-jwt-token";
       }
-      return 'x-token';
+      return "x-token";
     },
     getFilters() {
       let filter = this.whereArray;
@@ -227,77 +229,77 @@ export default Interface.compose({
         return undefined;
       }
 
-      let filterQuery = '';
+      let filterQuery = "";
 
       filter.forEach(condition => {
-        let valueString = '';
+        let valueString = "";
         let element = condition[0];
         let operator = condition[1];
         let value = condition[2];
 
         switch (operator) {
-          case '=':
-            filterQuery = filterQuery + element + '=' + value + '&';
+          case "=":
+            filterQuery = filterQuery + element + "=" + value + "&";
             break;
-          case '!=':
-            filterQuery = filterQuery + element + '__ne=' + value + '&';
+          case "!=":
+            filterQuery = filterQuery + element + "__ne=" + value + "&";
             break;
-          case '>':
-            filterQuery = filterQuery + element + '__gt=' + value + '&';
+          case ">":
+            filterQuery = filterQuery + element + "__gt=" + value + "&";
             break;
-          case '>=':
-            filterQuery = filterQuery + element + '__gte=' + value + '&';
+          case ">=":
+            filterQuery = filterQuery + element + "__gte=" + value + "&";
             break;
-          case '<':
-            filterQuery = filterQuery + element + '__lt=' + value + '&';
+          case "<":
+            filterQuery = filterQuery + element + "__lt=" + value + "&";
             break;
-          case '<=':
-            filterQuery = filterQuery + element + '__lte=' + value + '&';
+          case "<=":
+            filterQuery = filterQuery + element + "__lte=" + value + "&";
             break;
-          case 'in':
-            valueString = '';
+          case "in":
+            valueString = "";
             value.forEach((val, index, array) => {
               valueString =
-                index === array.length - 1 ?
-                  valueString + val :
-                  valueString + val + ',';
+                index === array.length - 1
+                  ? valueString + val
+                  : valueString + val + ",";
             });
-            filterQuery = filterQuery + element + '__in=' + valueString + '&';
+            filterQuery = filterQuery + element + "__in=" + valueString + "&";
             break;
-          case 'nin':
-            valueString = '';
+          case "nin":
+            valueString = "";
             value.forEach((val, index, array) => {
               valueString =
-                index === array.length - 1 ?
-                  valueString + val :
-                  valueString + val + ',';
+                index === array.length - 1
+                  ? valueString + val
+                  : valueString + val + ",";
             });
-            filterQuery = filterQuery + element + '__nin=' + valueString + '&';
+            filterQuery = filterQuery + element + "__nin=" + valueString + "&";
             break;
-          case 'exists':
-            filterQuery = filterQuery + element + '__exists=' + true + '&';
+          case "exists":
+            filterQuery = filterQuery + element + "__exists=" + true + "&";
             break;
-          case '!exists':
-            filterQuery = filterQuery + element + '__exists=' + false + '&';
+          case "!exists":
+            filterQuery = filterQuery + element + "__exists=" + false + "&";
             break;
-          case 'regex':
-            filterQuery = filterQuery + element + '__regex=' + value + '&';
+          case "regex":
+            filterQuery = filterQuery + element + "__regex=" + value + "&";
             break;
         }
       });
       return filterQuery.substring(0, filterQuery.length - 1);
     },
     getLimit() {
-      let limit = '?limit=';
+      let limit = "?limit=";
 
       if (!this.limitNumber || this.limitNumber === 0) {
         this.limitNumber = 50;
       }
 
-      return limit + this.limitNumber;
+      return `${limit}${this.limitNumber}`;
     },
     getSkip() {
-      let skip = 'skip=';
+      let skip = "skip=";
 
       if (!this.offsetNumber) {
         this.offsetNumber = 0;
@@ -309,38 +311,14 @@ export default Interface.compose({
       let select = this.selectArray;
 
       select = select.map(e => {
-        return e.split(' as ')[0];
+        return e.split(" as ")[0];
       });
 
       if (!select) {
         return;
       }
 
-      return 'select=' + select.join(',');
-    },
-    /**
-     *
-     * @param {*} user
-     */
-    own(user) {
-      if (!user) {
-        throw new Error(
-          'own() method requires a specific user to filter the submissions'
-        );
-      }
-      this.andWhere('owner', '=', user);
-    },
-    /**
-     *
-     * @param {*} user
-     */
-    owner(user) {
-      if (!user) {
-        throw new Error(
-          'owner() method requires a specific user to filter the submissions'
-        );
-      }
-      this.andWhere('owner', '=', user);
+      return "select=" + select.join(",");
     }
   }
 });

@@ -9,6 +9,9 @@ export default Interface.compose({
      *
      */
     async get() {
+      if (this.ownerEmail) { 
+        this.andWhere('user_email', '=', this.ownerEmail);
+      }
       let filterObject = this.prepareFilter();
 
       let data = await (await this.getModel())
@@ -222,31 +225,6 @@ export default Interface.compose({
       const model = await this.getModel();
 
       return model.clear({ removeIndices: true });
-    },
-    /**
-     *
-     * @param {*} user
-     */
-    own(user) {
-      // TODO user should be auth user
-      if (!user) {
-        throw new Error(
-          "own() method requires a specific user to filter the submissions"
-        );
-      }
-      this.andWhere("user_email", "=", user);
-    },
-    /**
-     *
-     * @param {*} user
-     */
-    owner(user) {
-      if (!user) {
-        throw new Error(
-          "owner() method requires a specific user to filter the submissions"
-        );
-      }
-      this.andWhere("user_email", "=", user);
     }
   }
 });

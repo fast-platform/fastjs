@@ -35,7 +35,7 @@ export default Fluent.model({
 
       return unsynced;
     },
-    async showView({ from, limit }) {
+    async showView({ from, limit, owner }) {
       let cols = (await Columns.getTableView(this.path)).map(
         o => `data.${o.path} as ${o.path}`
       );
@@ -61,6 +61,7 @@ export default Fluent.model({
         submissions = await this.merged()
           .select(cols)
           .limit(limit)
+          .owner(owner)
           .get();
       }
 
