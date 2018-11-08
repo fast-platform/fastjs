@@ -1,7 +1,7 @@
-import Database from './Database';
-import Utilities from 'utilities';
-import uuidv4 from 'uuid/v4';
-import { Interface } from 'fast-fluent';
+import Database from "./Database";
+import Utilities from "utilities";
+import uuidv4 from "uuid/v4";
+import { Interface } from "fast-fluent";
 
 export default Interface.compose({
   methods: {
@@ -36,11 +36,11 @@ export default Interface.compose({
         this.whereArray.forEach(c => {
           let conditionToObject = {};
 
-          if (c[0].includes('[')) {
+          if (c[0].includes("[")) {
             throw new Error(
               'Error in: "' +
-              c[0] +
-              '" "Where" close does not work with Array elements'
+                c[0] +
+                '" "Where" close does not work with Array elements'
             );
           }
 
@@ -48,14 +48,14 @@ export default Interface.compose({
           let lokiOperator = this.getLokiOperator(c[1]);
 
           conditionToObject[c[0]][lokiOperator] = c[2];
-          if (lokiOperator.includes('$regex|')) {
+          if (lokiOperator.includes("$regex|")) {
             delete conditionToObject[c[0]][lokiOperator];
-            conditionToObject[c[0]]['$regex'] = lokiOperator
-              .replace('$regex|', '')
-              .replace('{{$var}}', c[2]);
+            conditionToObject[c[0]]["$regex"] = lokiOperator
+              .replace("$regex|", "")
+              .replace("{{$var}}", c[2]);
           }
 
-          andObject['$and'].push(conditionToObject);
+          andObject["$and"].push(conditionToObject);
         });
         globalFilter = andObject;
       }
@@ -68,14 +68,14 @@ export default Interface.compose({
           let lokiOperator = this.getLokiOperator(c[1]);
 
           conditionToObject[c[0]][lokiOperator] = c[2];
-          if (lokiOperator.includes('$regex|')) {
+          if (lokiOperator.includes("$regex|")) {
             delete conditionToObject[c[0]][lokiOperator];
-            conditionToObject[c[0]]['$regex'] = lokiOperator
-              .replace('$regex|', '')
-              .replace('{{$var}}', c[2]);
+            conditionToObject[c[0]]["$regex"] = lokiOperator
+              .replace("$regex|", "")
+              .replace("{{$var}}", c[2]);
           }
 
-          orObject['$or'].push(conditionToObject);
+          orObject["$or"].push(conditionToObject);
         });
 
         globalFilter = { $or: [andObject, orObject] };
@@ -95,18 +95,20 @@ export default Interface.compose({
       }
 
       let lokiOperators = {
-        '=': '$eq',
-        '<': '$lt',
-        '>': '$gt',
-        '<=': '$lte',
-        '>=': '$gte',
-        '<>': '$ne',
-        '!=': '$ne',
-        like: '$aeq',
-        regexp: '$regex',
-        startsWith: '$regex|^{{$var}}',
-        endsWith: '$regex|{{$var}}$',
-        contains: '$regex|{{$var}}'
+        "=": "$eq",
+        "<": "$lt",
+        ">": "$gt",
+        "<=": "$lte",
+        ">=": "$gte",
+        "<>": "$ne",
+        "!=": "$ne",
+        in: "$in",
+        nin: "$nin",
+        like: "$aeq",
+        regexp: "$regex",
+        startsWith: "$regex|^{{$var}}",
+        endsWith: "$regex|{{$var}}$",
+        contains: "$regex|{{$var}}"
       };
       let converted = Utilities.get(() => lokiOperators[operator], undefined);
 
@@ -144,12 +146,12 @@ export default Interface.compose({
     async remove(_id) {
       if (!_id) {
         throw new Error(
-          'No id assign to remove().You must give and _id to delete'
+          "No id assign to remove().You must give and _id to delete"
         );
       }
 
-      if (!_id.includes('_local')) {
-        throw new Error('You can`t delete non local submissions');
+      if (!_id.includes("_local")) {
+        throw new Error("You can`t delete non local submissions");
       }
       const model = await this.getModel();
 
@@ -162,15 +164,15 @@ export default Interface.compose({
      */
     async insert(data, options) {
       if (Array.isArray(data)) {
-        return this.ArrayInsert(data, options)
+        return this.ArrayInsert(data, options);
       }
       data = Utilities.cloneDeep(data);
 
       const model = await this.getModel();
 
-      data._id = uuidv4() + '_local';
+      data._id = uuidv4() + "_local";
 
-      return model.insert(data)
+      return model.insert(data);
     },
     /**
      * [update description]
@@ -180,7 +182,7 @@ export default Interface.compose({
     async update(document) {
       if (!document._id) {
         throw new Error(
-          'Loki connector error. Cannot update a Model without _id key'
+          "Loki connector error. Cannot update a Model without _id key"
         );
       }
       const model = await this.getModel();
@@ -229,10 +231,10 @@ export default Interface.compose({
       // TODO user should be auth user
       if (!user) {
         throw new Error(
-          'own() method requires a specific user to filter the submissions'
+          "own() method requires a specific user to filter the submissions"
         );
       }
-      this.andWhere('user_email', '=', user);
+      this.andWhere("user_email", "=", user);
     },
     /**
      *
@@ -241,10 +243,10 @@ export default Interface.compose({
     owner(user) {
       if (!user) {
         throw new Error(
-          'owner() method requires a specific user to filter the submissions'
+          "owner() method requires a specific user to filter the submissions"
         );
       }
-      this.andWhere('user_email', '=', user);
+      this.andWhere("user_email", "=", user);
     }
   }
 });
