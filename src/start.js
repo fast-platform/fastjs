@@ -20,7 +20,7 @@ let FAST = (() => {
    */
   async function start({ appConf, forceOnline }) {
     if (!forceOnline) {
-      Fluent.config(
+      await Fluent.config(
         {
           REMOTE_CONNECTORS: [{
             default: true,
@@ -45,7 +45,7 @@ let FAST = (() => {
           }],
         }
       );
-      SyncInterval.set(3000);
+      // SyncInterval.set(3000);
     }
 
     let config = await Configuration.set({ appConf, forceOnline });

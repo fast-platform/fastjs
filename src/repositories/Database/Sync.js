@@ -28,7 +28,7 @@ let Sync = class {
       return;
     }
 
-    let unsyncSubmissions = await Submission('*').getUnsync();
+    let unsyncSubmissions = await Submission().getUnsync();
 
     let isSyncing = await Scheduler.isSyncing();
 

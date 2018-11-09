@@ -1,6 +1,6 @@
-import Promise from 'bluebird';
-import Loki from 'lokijs';
-import LokiIndexedAdapter from 'lokijs/src/loki-indexed-adapter';
+import Promise from "bluebird";
+import Loki from "lokijs";
+import LokiIndexedAdapter from "lokijs/src/loki-indexed-adapter";
 var DB = null;
 let Database = (() => {
   /*
@@ -11,14 +11,17 @@ let Database = (() => {
   |
   */
   const getModels = () => {
-    const models = (typeof window !== 'undefined') && window && window._FLUENT_ && window._FLUENT_.models ?
-      window._FLUENT_.models :
-      global && global._FLUENT_ && global._FLUENT_.models ?
-        global._FLUENT_.models :
-        undefined;
-
-    return models
-  }
+    const models =
+      typeof window !== "undefined" &&
+      window &&
+      window._FLUENT_ &&
+      window._FLUENT_.models
+        ? window._FLUENT_.models
+        : global && global._FLUENT_ && global._FLUENT_.models
+        ? global._FLUENT_.models
+        : undefined;
+    return models;
+  };
   /**
    *
    *
@@ -27,7 +30,7 @@ let Database = (() => {
    * @returns
    */
   const _create = ({ env }) => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       let idbAdapter;
       let pa;
       let db;
@@ -42,25 +45,25 @@ let Database = (() => {
       };
 
       try {
-        idbAdapter = new LokiIndexedAdapter('FAST');
+        idbAdapter = new LokiIndexedAdapter("FAST");
         pa = new Loki.LokiPartitioningAdapter(idbAdapter, {
           paging: true
         });
 
-        db = new Loki('FAST', { ...dbConfig, adapter: pa });
+        db = new Loki("FAST", { ...dbConfig, adapter: pa });
       } catch (error) {
-        db = new Loki('FAST', dbConfig);
+        db = new Loki("FAST", dbConfig);
       }
 
       function databaseInitialize() {
-        const baseModels = getModels()
+        const baseModels = getModels();
         if (!baseModels) {
           throw new Error(
             'Cannot Start FLUENT, no models registered or you dont have access to the "window" or "global" variable'
           );
         }
 
-        Object.keys(baseModels).forEach((model) => {
+        Object.keys(baseModels).forEach(model => {
           const dbModel = db.getCollection(model);
 
           if (!dbModel) {
@@ -78,18 +81,18 @@ let Database = (() => {
    */
   const shouldRecreate = () => {
     if (!DB) {
-      return true
+      return true;
     }
-    const windowModels = getModels()
+    const windowModels = getModels();
     const dbModels = DB.collections.reduce((acc, collection) => {
-      acc.push(collection.name)
-      return acc
+      acc.push(collection.name);
+      return acc;
     }, []);
-    const should = !Object.keys(windowModels).every((element) => {
-      return dbModels.includes(element)
-    })
-    return should
-  }
+    const should = !Object.keys(windowModels).every(element => {
+      return dbModels.includes(element);
+    });
+    return should;
+  };
   /**
    *
    *
@@ -98,11 +101,11 @@ let Database = (() => {
    * @param {string} configuration.env - Environment i.e 'production'
    * @returns
    */
-  const get = async function ({ env = 'prod' } = {}) {
+  const get = async function ({ env = "prod" } = {}) {   
     if (shouldRecreate()) {
       DB = await _create({ env });
     }
-    return DB
+    return DB;
   };
 
   return Object.freeze({

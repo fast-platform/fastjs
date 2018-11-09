@@ -27,7 +27,7 @@ export default Fluent.model({
         .where("sync", "=", false)
         .andWhere("draft", "=", false)
         .andWhere("syncError", "=", false)
-        .andWhere("user_email", "=", Auth.email())
+        .owner(Auth.email())
         .orderBy("created", "desc", "date")
         .get()).filter(d => {
         return !d.queuedForSync;

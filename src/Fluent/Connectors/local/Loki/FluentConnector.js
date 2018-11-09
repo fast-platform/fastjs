@@ -9,8 +9,8 @@ export default Interface.compose({
      *
      */
     async get() {
-      if (this.ownerEmail) { 
-        this.andWhere('user_email', '=', this.ownerEmail);
+      if (this.ownerEmail) {
+        this.andWhere("user_email", "=", this.ownerEmail);
       }
       let filterObject = this.prepareFilter();
 
@@ -130,7 +130,6 @@ export default Interface.compose({
      */
     async getModel() {
       const DB = await Database.get();
-
       return DB.getCollection(this.name);
     },
     /**
