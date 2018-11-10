@@ -29,7 +29,7 @@ let Database = (() => {
    * @param {string} configuration.env - Environment i.e 'production'
    * @returns
    */
-  const _create = ({ env }) => {
+  const _create = () => {
     return new Promise(resolve => {
       let idbAdapter;
       let pa;
@@ -79,19 +79,21 @@ let Database = (() => {
    * Models need to be added to the DB
    * @returns {Boolean}
    */
-  const shouldRecreate = () => {
-    if (!DB) {
-      return true;
-    }
+  const shouldCreate = () => {
     const windowModels = getModels();
     const dbModels = DB.collections.reduce((acc, collection) => {
       acc.push(collection.name);
       return acc;
     }, []);
-    const should = !Object.keys(windowModels).every(element => {
-      return dbModels.includes(element);
+
+    let models = [];
+    Object.keys(windowModels).forEach(m => {
+      if (!dbModels.includes(m)) {
+        models.push(m);
+      }
     });
-    return should;
+
+    return models;
   };
   /**
    *
@@ -101,9 +103,15 @@ let Database = (() => {
    * @param {string} configuration.env - Environment i.e 'production'
    * @returns
    */
-  const get = async function ({ env = "prod" } = {}) {   
-    if (shouldRecreate()) {
-      DB = await _create({ env });
+  const get = async function() {
+    if (!DB) {
+      DB = await _create();
+    }
+    const recreateModels = shouldCreate();
+    if (recreateModels.length > 0) {
+      recreateModels.forEach(model => {
+        DB.addCollection(model);
+      });
     }
     return DB;
   };
