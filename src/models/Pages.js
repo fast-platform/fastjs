@@ -1,15 +1,15 @@
 import { Fluent } from "fast-fluent";
-import Utilities from 'utilities';
-import Configuration from './Configuration';
-import to from 'await-to-js';
-import moment from 'moment';
+import Utilities from "utilities";
+import Configuration from "./Configuration";
+import to from "await-to-js";
+import moment from "moment";
 
 export default Fluent.model({
   properties: {
-    name: 'Pages',
+    name: "Pages",
     config: {
       remote: {
-        path: 'fast-app-pages',
+        path: "fast-app-pages",
         token: undefined
       }
     }
@@ -37,7 +37,23 @@ export default Fluent.model({
       let localPages = await this.local().first();
       let localDate = this.getUpdatedDate(localPages);
       let config = await Configuration.local().first();
-      let offlinePages = Utilities.get(() => appConf.offlineFiles.Pages[0].data);
+      let offlinePages = Utilities.get(
+        () => appConf.offlineFiles.Pages[0].data
+      );
+
+      // Check if pages follows new or legacy format
+      if (!offlinePages.hasOwnProperty("pages")) {
+        const p = [];
+
+        for (let i = 0; i < appConf.offlineFiles.Pages.length; i += 1) {
+          p.push(appConf.offlineFiles.Pages[i].data);
+        }
+
+        offlinePages = {
+          pages: p,
+          submit: true
+        };
+      }
 
       // If the configuration in the JSON file is
       // older than the one in the local DB
@@ -48,7 +64,10 @@ export default Fluent.model({
       if (localPages) {
         await this.local().clear({ sure: true });
       }
-      return this.local().insert({ ...offlinePages, fastUpdated: moment().unix() });
+      return this.local().insert({
+        ...offlinePages,
+        fastUpdated: moment().unix()
+      });
     },
     /**
      * Sets all pages from the online
@@ -57,14 +76,30 @@ export default Fluent.model({
      */
     async setOnline() {
       let localPages = await this.local().first();
-      let [error, pages] = await to(this.remote().first());
+      let [error, pages] = await to(this.remote().get());
 
       if (error) {
         console.log(error);
-        throw new Error('Could not get remote Pages.');
+        throw new Error("Could not get remote Pages.");
       }
 
-      pages = Utilities.get(() => pages.data);
+      // Check if pages follows new or legacy format
+      if (!pages[0].data.hasOwnProperty("pages")) {
+        const p = [];
+
+        for (let i = 0; i < pages.length; i += 1) {
+          p.push(pages[i].data);
+        }
+
+        pages = {
+          pages: p,
+          submit: true
+        };
+      } else {
+        pages = Utilities.get(() => pages[0].data);
+      }
+
+      pages = console.log("pages", pages);
 
       // If we pulled the remote pages and
       // The submission is not empty
