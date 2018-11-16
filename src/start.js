@@ -58,35 +58,6 @@ let FAST = (() => {
 
     let appTranslations = await Translation.set({ appConf, forceOnline });
 
-    /*
-    let currentConf = await Configuration.getLocal();
-
-    let date = _get(currentConf, 'meta.formsLastUpdated', 1);
-    let isOnline = await Connection.isOnline();
-
-    if (isOnline) {
-      try {
-        let data = await Formio.request(
-          config.APP_URL + '/form?modified__gt=' + new Date(date * 1000).toISOString() + '&select=path',
-          'GET'
-        );
-
-        Configuration.setLastUpdated({ element: 'Forms', data });
-        let shouldUpdate = data.some((form) => {
-          return form.path === 'userregister';
-        });
-
-        if (shouldUpdate) {
-          Form.update({
-            filter: [{ element: 'path', query: '=', value: 'userregister' }]
-          });
-        }
-      } catch (error) {
-        console.log('error', error);
-      }
-    }
-    */
-
     return {
       config: config,
       translations: appTranslations,
