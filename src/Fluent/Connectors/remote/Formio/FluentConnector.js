@@ -19,6 +19,25 @@ export default Interface.compose({
       }
       return baseUrl.replace(/\/+$/, "");
     },
+    async paginate(perPage, currentPage) {
+      currentPage = currentPage ? currentPage : 1;
+      perPage = perPage ? perPage : 15;
+      const limit = this.limitNumber < perPage ? this.limitNumber : perPage;
+      this.skip((currentPage - 1) * limit);
+      this.limit(limit);
+
+      let error;
+      let result;
+
+      [error, result] = await to(this.get());
+
+      if (error) {
+        console.log(error);
+        throw new Error("Error while getting paginated data");
+      }
+
+      return result;
+    },
     async get() {
       if (this.ownerEmail) {
         this.andWhere("owner", "=", this.ownerEmail);
