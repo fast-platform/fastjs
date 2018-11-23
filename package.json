@@ -2,7 +2,7 @@
   "name": "fast-fastjs",
   "version": "0.6.0",
   "description": "Formio interface for online and offline use",
-  "main": "lib/fast-fastjs.min.js",
+  "main": "lib/fast-fastjs.js",
   "directories": {
     "lib": "lib",
     "test": "test"
@@ -35,6 +35,7 @@
     "axios": "^0.18.0",
     "bluebird": "^3.5.2",
     "fast-fluent": "^0.1.15",
+    "fluent-formio": "^0.1.0",
     "lokijs": "^1.5.5",
     "md5": "^2.2.1",
     "moment": "^2.22.2",

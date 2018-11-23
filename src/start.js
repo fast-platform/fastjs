@@ -6,7 +6,7 @@ import SyncInterval from './repositories/Database/SyncInterval';
 import Roles from './models/Role';
 import { Fluent } from "fast-fluent";
 import loki from './Fluent/Connectors/local/Loki/FluentConnector'
-import formio from './Fluent/Connectors/remote/Formio/FluentConnector';
+import formio from 'fluent-formio';
 import formioLoki from './Fluent/Connectors/merged/Formio-Loki/FluentConnector';
 /* eslint-disable no-unused-vars */
 let FAST = (() => {
