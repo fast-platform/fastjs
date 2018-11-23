@@ -1,6 +1,6 @@
-import Utilities from 'utilities';
-import Translation from 'models/Translation';
-import Pages from 'models/Pages';
+import Utilities from "utilities";
+import Translation from "models/Translation";
+import Pages from "models/Pages";
 
 class FormLabels {
   /**
@@ -8,7 +8,7 @@ class FormLabels {
    * @param {*} formNameFilter
    * @param {*} languageFilter
    */
-  static async get (forms, i18n) {
+  static async get(forms, i18n) {
     return this.handle(forms, i18n);
   }
   /**
@@ -16,22 +16,23 @@ class FormLabels {
    * @param {*} formNameFilter
    * @param {*} languageFilter
    */
-  static async handle (forms, i18n) {
+  static async handle(forms, i18n) {
     let labels = await this.fetchAllLabels(forms, i18n);
 
     let translations = (await Translation.local().first()).data;
 
     // Merge labels and translations
-    Object.keys(translations).forEach(function (languageCode) {
+    Object.keys(translations).forEach(function(languageCode) {
       let translationsLabels = translations[languageCode];
 
-      Object.keys(translationsLabels).forEach(function (translationLabel) {
+      Object.keys(translationsLabels).forEach(function(translationLabel) {
         if (
           labels[translationLabel] &&
           translationsLabels[translationLabel] &&
-          translationsLabels[translationLabel] !== ''
+          translationsLabels[translationLabel] !== ""
         ) {
-          labels[translationLabel].translations[languageCode] = translationsLabels[translationLabel];
+          labels[translationLabel].translations[languageCode] =
+            translationsLabels[translationLabel];
         }
       });
     });
@@ -43,10 +44,10 @@ class FormLabels {
    *  types of labels inputs that the
    *  application has
    */
-  static async fetchAllLabels (forms, i18n) {
+  static async fetchAllLabels(forms, i18n) {
     let allLabels = {};
 
-    forms = forms.map((form) => {
+    forms = forms.map(form => {
       return form.data;
     });
 
@@ -69,14 +70,18 @@ class FormLabels {
    * @param {Object} labels
    * @param {Object} label
    */
-  static createOrAdd ({ labels, label }) {
+  static createOrAdd({ labels, label }) {
     let newObject = { ...labels };
+
+    if (!label) {
+      return newObject;
+    }
 
     // If the label already exists
     if (newObject[label.text]) {
       // If the location is an Array of Locations
       if (label.location && Array.isArray(label.location)) {
-        label.location.forEach((l) => {
+        label.location.forEach(l => {
           newObject[label.text].location.push({
             text: label.text,
             template: label.template,
@@ -95,7 +100,7 @@ class FormLabels {
           template: label.template,
           translations: {}
         };
-        label.location.forEach((l) => {
+        label.location.forEach(l => {
           newObject[label.text].location.push({
             text: label.text,
             template: label.template,
@@ -119,10 +124,10 @@ class FormLabels {
    * @param {Object} labelsObject1
    * @param {Object} labelsObject2
    */
-  static mergeLabels (labelsObject1, labelsObject2) {
+  static mergeLabels(labelsObject1, labelsObject2) {
     let merged = { ...labelsObject1 };
 
-    Object.keys(labelsObject2).forEach((key) => {
+    Object.keys(labelsObject2).forEach(key => {
       merged = this.createOrAdd({
         labels: merged,
         label: {
@@ -138,30 +143,30 @@ class FormLabels {
    * be translated from the Form.io forms
    * @param {Array} Forms
    */
-  static getFormLabels (Forms) {
+  static getFormLabels(Forms) {
     let componentLabels = {};
     // Extranct all labels for all available forms
 
     let formioLabelsPositions = [
-      'suffix',
-      'prefix',
-      'addAnother',
-      'removeRow',
-      'saveRow',
-      'legend',
-      'title',
-      'label',
-      'placeholder',
-      'tooltip'
+      "suffix",
+      "prefix",
+      "addAnother",
+      "removeRow",
+      "saveRow",
+      "legend",
+      "title",
+      "label",
+      "placeholder",
+      "tooltip"
     ];
 
-    Forms.forEach((form) => {
+    Forms.forEach(form => {
       // Add title of the Forms to the translations
       componentLabels = this.createOrAdd({
         labels: componentLabels,
         label: {
           text: form.title,
-          type: 'formTitle',
+          type: "formTitle",
           component: form.path,
           form: form.path,
           picture: null
@@ -170,10 +175,10 @@ class FormLabels {
       // Go across every component
       Utilities.eachComponent(
         form.components,
-        (component) => {
+        component => {
           // Check for the common translated Items listed above
-          formioLabelsPositions.forEach((position) => {
-            if (component[position] && component[position] !== '') {
+          formioLabelsPositions.forEach(position => {
+            if (component[position] && component[position] !== "") {
               // Add the Label if is not empty
               componentLabels = this.createOrAdd({
                 labels: componentLabels,
@@ -190,13 +195,13 @@ class FormLabels {
 
           // Check for components that have values with labels (i.e: radio)
           if (component.values) {
-            component.values.forEach((value) => {
-              if (value.label && value.label !== '') {
+            component.values.forEach(value => {
+              if (value.label && value.label !== "") {
                 componentLabels = this.createOrAdd({
                   labels: componentLabels,
                   label: {
                     text: value.label,
-                    type: 'value',
+                    type: "value",
                     component: component.key,
                     form: form.path,
                     picture: null
@@ -207,12 +212,12 @@ class FormLabels {
           }
 
           // Check for HTML tag elements in the forms
-          if (component.type === 'htmlelement' && component.content !== '') {
+          if (component.type === "htmlelement" && component.content !== "") {
             componentLabels = this.createOrAdd({
               labels: componentLabels,
               label: {
                 text: component.content,
-                type: 'htmlElement',
+                type: "htmlElement",
                 component: component.key,
                 form: form.path,
                 picture: null
@@ -221,15 +226,15 @@ class FormLabels {
           }
 
           // Check specificaly for select elements
-          if (component.type === 'select') {
+          if (component.type === "select") {
             if (component.data && component.data.values) {
-              component.data.values.forEach((value) => {
-                if (value.label && value.label !== '') {
+              component.data.values.forEach(value => {
+                if (value.label && value.label !== "") {
                   componentLabels = this.createOrAdd({
                     labels: componentLabels,
                     label: {
                       text: value.label,
-                      type: 'selectValue',
+                      type: "selectValue",
                       component: component.key,
                       form: form.path,
                       picture: null
@@ -241,15 +246,15 @@ class FormLabels {
           }
 
           // Check for survey elements
-          if (component.type && component.type === 'survey') {
+          if (component.type && component.type === "survey") {
             if (component.questions) {
               // Check for every question on the survey
-              component.questions.forEach((q) => {
+              component.questions.forEach(q => {
                 componentLabels = this.createOrAdd({
                   labels: componentLabels,
                   label: {
                     text: q.label,
-                    type: 'surveyLabel',
+                    type: "surveyLabel",
                     component: component.key,
                     form: form.path,
                     picture: null
@@ -257,12 +262,12 @@ class FormLabels {
                 });
               });
               // Check every text of the answers
-              component.values.forEach((v) => {
+              component.values.forEach(v => {
                 componentLabels = this.createOrAdd({
                   labels: componentLabels,
                   label: {
                     text: v.label,
-                    type: 'surveyValues',
+                    type: "surveyValues",
                     component: component.key,
                     form: form.path,
                     picture: null
@@ -283,10 +288,10 @@ class FormLabels {
    *  App translations
    * @param {Array} appLabels
    */
-  static async getAppLabels (appLabels) {
+  static async getAppLabels(appLabels) {
     let translations = {};
 
-    appLabels.forEach((l) => {
+    appLabels.forEach(l => {
       translations = this.createOrAdd({
         labels: translations,
         label: l
@@ -300,28 +305,28 @@ class FormLabels {
    *  App Pages
    * @param {Array} appLabels
    */
-  static async getPagesLabels (Pages) {
+  static async getPagesLabels(Pages) {
     let pagesLabels = {};
 
-    Pages.pages.forEach((page) => {
-      if (page.title && page.title !== '') {
+    Pages.pages.forEach(page => {
+      if (page.title && page.title !== "") {
         pagesLabels = this.createOrAdd({
           labels: pagesLabels,
           label: {
             text: page.title,
-            type: 'pageTitle',
+            type: "pageTitle",
             picture: null,
             page: page
           }
         });
       }
-      page.cards.forEach((card) => {
-        if (card.title && card.title !== '') {
+      page.cards.forEach(card => {
+        if (card.title && card.title !== "") {
           pagesLabels = this.createOrAdd({
             labels: pagesLabels,
             label: {
               text: card.title,
-              type: 'pageCardTitle',
+              type: "pageCardTitle",
               picture: null,
               card: card,
               page: page
@@ -329,12 +334,12 @@ class FormLabels {
           });
         }
 
-        if (card.subtitle && card.subtitle !== '') {
+        if (card.subtitle && card.subtitle !== "") {
           this.createOrAdd({
             labels: pagesLabels,
             label: {
               text: card.subtitle,
-              type: 'pageCardSubtitle',
+              type: "pageCardSubtitle",
               picture: null,
               card: card,
               page: page
@@ -342,13 +347,13 @@ class FormLabels {
           });
         }
 
-        card.actions.forEach((action) => {
-          if (action.text && action.text !== '') {
+        card.actions.forEach(action => {
+          if (action.text && action.text !== "") {
             pagesLabels = this.createOrAdd({
               labels: pagesLabels,
               label: {
                 text: action.text,
-                type: 'pageActionButtonText',
+                type: "pageActionButtonText",
                 picture: null,
                 card: card,
                 page: page
