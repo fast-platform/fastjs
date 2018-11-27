@@ -157,7 +157,8 @@ class FormLabels {
       "title",
       "label",
       "placeholder",
-      "tooltip"
+      "tooltip",
+      "errorLabel"
     ];
 
     Forms.forEach(form => {
@@ -211,18 +212,42 @@ class FormLabels {
             });
           }
 
-          // Check for HTML tag elements in the forms
-          if (component.type === "htmlelement" && component.content !== "") {
-            componentLabels = this.createOrAdd({
-              labels: componentLabels,
-              label: {
-                text: component.content,
-                type: "htmlElement",
-                component: component.key,
-                form: form.path,
-                picture: null
+          // Check for html text in HTML or Content components
+          if (component.type === "htmlelement" || component.type === "content") {
+            const html = (component.content || component.html || "").trim();
+
+            if (html !== "") {
+              // The following regex captures all Form.io templates elements using the 
+              // formio component's instance i18n translation function (https://regexr.com/43sfm).
+              // Warning: the "positive lookbehind" (?<=) feature may not be available for all browsers.
+              const regex = /(?<=\{\{\s*?instance.t\(\s*?[\'|\"])(.*?)(?=([\'|\"]\s*?\))(\s*?)\}\})/g;
+              const matched = [];
+              let match = regex.exec(html);
+
+              // Loop through all matches
+              while (match !== null) {
+                matched.push(match[0].trim());
+                match = regex.exec(html);
               }
-            });
+              // Create a label for each match (if none, don't anything)
+              if (matched.length > 0) {
+                matched.forEach(text => {
+                  // Omit empty text strings
+                  if (text !== "") {
+                    componentLabels = this.createOrAdd({
+                      labels: componentLabels,
+                      label: {
+                        text,
+                        type: "html",
+                        component: component.key,
+                        form: form.path,
+                        picture: null
+                      }
+                    });
+                  }
+                });
+              }
+            }
           }
 
           // Check specificaly for select elements
