@@ -76,7 +76,11 @@ export default Fluent.model({
      */
     async setOnline() {
       let localPages = await this.local().first();
-      let [error, pages] = await to(this.remote().get());
+      let [error, pages] = await to(
+        this.remote()
+          .limit(9999999)
+          .get()
+      );
 
       if (error) {
         console.log(error);
