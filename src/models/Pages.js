@@ -99,8 +99,6 @@ export default Fluent.model({
         pages = Utilities.get(() => pages[0].data);
       }
 
-      pages = console.log("pages", pages);
-
       // If we pulled the remote pages and
       // The submission is not empty
       if (pages && !Utilities.isEmpty(pages)) {

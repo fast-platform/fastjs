@@ -1,16 +1,15 @@
-import moment from 'moment';
-import Utilities from 'utilities';
+import moment from "moment";
+import Utilities from "utilities";
 import { Fluent } from "fast-fluent";
-import Labels from './repositories/Labels';
-import Configuration from './Configuration';
+import Labels from "./repositories/Labels";
+import Configuration from "./Configuration";
 
 export default Fluent.model({
   properties: {
-    name: 'Form',
+    name: "Form",
     config: {
-      remote:
-      {
-        path: 'form',
+      remote: {
+        path: "form",
         pullForm: true
       }
     }
@@ -26,7 +25,9 @@ export default Fluent.model({
       })();
     },
     find({ path }) {
-      return this.local().where('data.path', '=', path).first();
+      return this.local()
+        .where("data.path", "=", path)
+        .first();
     },
     /**
      *
@@ -35,7 +36,7 @@ export default Fluent.model({
     async cardFormattedForms(action) {
       let result = await this.local().get();
       result = result.filter(o => {
-        return o.data.tags.indexOf('visible') > -1;
+        return o.data.tags.indexOf("visible") > -1;
       });
       result = result.sort((a, b) => {
         a = a.data.title;
@@ -49,14 +50,14 @@ export default Fluent.model({
           tags: f.data.tags,
           customIcon: true,
           icon:
-            action === 'create' ?
-              'statics/customSVG/startSurvey.svg' :
-              'statics/customSVG/collectedData.svg',
-          subtitle: 'Last updated: ' + moment(f.data.modified).fromNow(),
+            action === "create"
+              ? "statics/customSVG/startSurvey.svg"
+              : "statics/customSVG/collectedData.svg",
+          subtitle: "Last updated: " + moment(f.data.modified).fromNow(),
           actions: [
             {
-              text: action === 'create' ? 'Start' : 'View data',
-              target: 'form',
+              text: action === "create" ? "Start" : "View data",
+              target: "form",
               view: action,
               path: f.data.path
             }
@@ -102,9 +103,9 @@ export default Fluent.model({
       if (localForms) {
         await this.local().clear({ sure: true });
       }
-
+      const unixDate = moment().unix();
       offlineForms.forEach(async form => {
-        await this.local().insert({ data: form, fastUpdated: moment().unix() });
+        await this.local().insert({ data: form, fastUpdated: unixDate });
       });
       return offlineForms;
     },
@@ -112,17 +113,20 @@ export default Fluent.model({
      *
      */
     async setOnline() {
-      let remoteForms = await this.remote().get();
+      let remoteForms = await this.remote().limit(9999999).get();
       let unixDate = moment().unix();
 
       if (remoteForms && !Utilities.isEmpty(remoteForms)) {
         await this.local().clear({ sure: true });
-        remoteForms.forEach(async form => {
-          await this.local().insert({
+        const forms = remoteForms.reduce((forms, form) => {
+          const element = {
             data: form,
             fastUpdated: unixDate
-          });
-        });
+          };
+          forms.push(element);
+          return forms;
+        }, []);
+        return await this.local().insert(forms, { showProgress: true });
       }
     },
     /**
@@ -137,7 +141,7 @@ export default Fluent.model({
     },
     async getFastTableTemplates({ path }) {
       let fullForm = await this.local()
-        .where('data.path', '=', path)
+        .where("data.path", "=", path)
         .first();
 
       let templates = [];

@@ -1,13 +1,13 @@
-import Configuration from './models/Configuration';
-import Form from './models/Form';
-import Translation from './models/Translation';
-import Pages from './models/Pages';
-import SyncInterval from './repositories/Database/SyncInterval';
-import Roles from './models/Role';
+import Configuration from "./models/Configuration";
+import Form from "./models/Form";
+import Translation from "./models/Translation";
+import Pages from "./models/Pages";
+import SyncInterval from "./repositories/Database/SyncInterval";
+import Roles from "./models/Role";
 import { Fluent } from "fast-fluent";
-import loki from './Fluent/Connectors/local/Loki/FluentConnector'
-import formio from 'fluent-formio';
-import formioLoki from './Fluent/Connectors/merged/Formio-Loki/FluentConnector';
+import loki from "./Fluent/Connectors/local/Loki/FluentConnector";
+import formio from "fluent-formio";
+import formioLoki from "./Fluent/Connectors/merged/Formio-Loki/FluentConnector";
 /* eslint-disable no-unused-vars */
 let FAST = (() => {
   /**
@@ -20,48 +20,53 @@ let FAST = (() => {
    */
   async function start({ appConf, forceOnline }) {
     if (!forceOnline) {
-      await Fluent.config(
-        {
-          REMOTE_CONNECTORS: [{
+      await Fluent.config({
+        REMOTE_CONNECTORS: [
+          {
             default: true,
-            name: 'formio',
+            name: "formio",
             baseUrl: appConf.fluentFormioBaseUrl,
             connector: formio
           },
           {
-            name: 'formioConfig',
+            name: "formioConfig",
             baseUrl: appConf.appConfigUrl,
             connector: formio
-          }],
-          LOCAL_CONNECTORS: [{
-            name: 'loki',
+          }
+        ],
+        LOCAL_CONNECTORS: [
+          {
+            name: "loki",
             connector: loki,
             default: true
-          }],
-          MERGE_CONNECTORS: [{
+          }
+        ],
+        MERGE_CONNECTORS: [
+          {
             default: true,
-            name: 'formioLoki',
+            name: "formioLoki",
             connector: formioLoki
-          }],
-        }
-      );
+          }
+        ]
+      });
       // SyncInterval.set(3000);
     }
+    const config = await Configuration.set({ appConf, forceOnline })
+    let promises = [
+      Roles.set({ appConf, forceOnline }),
+      Pages.set({ appConf, forceOnline }),
+      Form.set({ appConf, forceOnline }),
+      Translation.set({ appConf, forceOnline })
+    ];
 
-    let config = await Configuration.set({ appConf, forceOnline });
+    let results = await Promise.all(promises);
 
-    await Roles.set({ appConf, forceOnline });
-
-    await Pages.set({ appConf, forceOnline });
-
-    await Form.set({ appConf, forceOnline });
-
-    let appTranslations = await Translation.set({ appConf, forceOnline });
+    const appTranslations = results[3];
 
     return {
       config: config,
       translations: appTranslations,
-      defaultLanguage: localStorage.getItem('defaultLenguage') || 'en'
+      defaultLanguage: localStorage.getItem("defaultLenguage") || "en"
     };
   }
   /**
