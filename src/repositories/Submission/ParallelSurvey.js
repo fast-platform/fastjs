@@ -48,6 +48,7 @@ let ParallelSurvey = (() => {
   }
 
   function getGroupId (submission) {
+    console.log('getGroupId', Submission('*').local());
     let groupId = Utilities.get(() => Submission('*').local().getParallelSurvey(submission).groupId);
 
     return groupId;
@@ -81,11 +82,11 @@ let ParallelSurvey = (() => {
     };
 
     // Store information of the parallelSurvey on the current submission
-    vm.currentSubmission.data.parallelSurvey = Submission('*').local().setParallelSurvey(parallelSurvey);
+    vm.currentSubmission.parallelSurvey = Submission('*').setParallelSurvey(parallelSurvey);
 
     // New survey Information
     let surveyData = {
-      parallelSurvey: Submission('*').local().setParallelSurvey({
+      parallelSurvey: Submission('*').setParallelSurvey({
         ...parallelSurvey,
         participantName: nextParticipant
       })
@@ -115,14 +116,15 @@ let ParallelSurvey = (() => {
     }
     return prepareNewGroupObject({ submission, vm, info });
   }
-  /*
+
   async function storeNewSurvey ({ survey, vm }) {
     let formio = new Formio(vm.$FAST_CONFIG.APP_URL + '/' + vm.$route.params.idForm);
+    console.log('formio', formio);
     // De register if there was a previous registration
 
     Formio.deregisterPlugin('offline');
     // Register the plugin for offline mode
-    Formio.registerPlugin(OFFLINE_PLUGIN.getPlugin({ formio: formio, hashField: vm.hashField }), 'offline');
+    Formio.registerPlugin(OFFLINE_PLUGIN.getPlugin({ formio, hashField: vm.hashField }), 'offline');
 
     let formSubmission = {
       data: survey,
@@ -135,11 +137,11 @@ let ParallelSurvey = (() => {
 
     return created;
   }
-*/
+
   return Object.freeze({
     createWizard,
-    createNewSurvey
-    // storeNewSurvey
+    createNewSurvey,
+    storeNewSurvey
   });
 })();
 
