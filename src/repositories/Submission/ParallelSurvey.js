@@ -81,16 +81,20 @@ let ParallelSurvey = (() => {
       submissionId: submission._id
     };
 
+    console.log('submission', submission);
+
     // Store information of the parallelSurvey on the current submission
-    vm.currentSubmission.parallelSurvey = Submission('*').setParallelSurvey(parallelSurvey);
+    vm.currentSubmission.parallelSurvey = Submission().setParallelSurvey(parallelSurvey);
 
     // New survey Information
     let surveyData = {
-      parallelSurvey: Submission('*').setParallelSurvey({
+      parallelSurvey: Submission().setParallelSurvey({
         ...parallelSurvey,
         participantName: nextParticipant
       })
     };
+
+    console.log('surveyData FastJS', surveyData);
 
     return surveyData;
   }
