@@ -107,9 +107,8 @@ export default Fluent.model({
     async getParallelParticipants(_id) {
       let currentSubmission = await this.local()
         .where("_id", "=", _id)
-        .get();
+        .first();
 
-      currentSubmission = currentSubmission[0];
       let groupId = Utilities.get(
         () => currentSubmission.data.data.parallelSurvey
       );
@@ -159,7 +158,7 @@ export default Fluent.model({
       return JSON.stringify(parallelsurveyInfo);
     },
     async getGroups(formId) {
-      let submissions = await this.local().find();
+      let submissions = await this.local().limit(999999).get();
 
       submissions = formId
         ? submissions.filter(submission => {
