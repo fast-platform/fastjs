@@ -49,9 +49,9 @@ let FAST = (() => {
           }
         ]
       });
-      // SyncInterval.set(3000);
+      SyncInterval.set(3000);
     }
-    const config = await Configuration.set({ appConf, forceOnline })
+    const config = await Configuration.set({ appConf, forceOnline });
     let promises = [
       Roles.set({ appConf, forceOnline }),
       Pages.set({ appConf, forceOnline }),
