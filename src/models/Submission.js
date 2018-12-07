@@ -104,15 +104,12 @@ export default Fluent.model({
 
       return submissions;
     },
-    async getParallelParticipants(_id) {
+    async getParallelParticipants(_id, path) {
       let currentSubmission = await this.local()
         .where("_id", "=", _id)
-        .get();
+        .first();
 
-      currentSubmission = currentSubmission[0];
-      let groupId = Utilities.get(
-        () => currentSubmission.data.data.parallelSurvey
-      );
+      let groupId = Utilities.get(() => currentSubmission.data.parallelSurvey);
 
       groupId =
         groupId && groupId !== "[object Object]"
@@ -120,33 +117,28 @@ export default Fluent.model({
           : undefined;
 
       let submissions = await this.local()
-        .where("path", "=", this.path)
+        .where("path", "=", path)
         .get();
 
       let a = submissions.filter(submission => {
         let parallelSurveyID = Utilities.get(
-          () => submission.data.data.parallelSurvey
+          () => submission.data.parallelSurvey
         );
-
-        parallelSurveyID =
-          parallelSurveyID && parallelSurveyID !== "[object Object]"
-            ? JSON.parse(parallelSurveyID).groupId
-            : undefined;
-        return parallelSurveyID && parallelSurveyID === groupId;
+        try {
+          parallelSurveyID =
+            parallelSurveyID && parallelSurveyID !== "[object Object]"
+              ? JSON.parse(parallelSurveyID).groupId
+              : undefined;
+          return parallelSurveyID && parallelSurveyID === groupId;
+        } catch (e) {
+          return false;
+        }
       });
 
-      a = a.map(e => {
-        e.data.data.parallelSurvey;
-      });
-      a = a.map(survey => {
-        return JSON.parse(survey);
-      });
-      return a;
+      return a.map(e => JSON.parse(e.data.parallelSurvey));
     },
     getParallelSurvey(submission) {
-      let parallelsurveyInfo =
-        Utilities.get(() => submission.data.data.paraparallelSurvey) ||
-        Utilities.get(() => submission.data.parallelSurvey);
+      let parallelsurveyInfo = Utilities.get(() => submission.parallelSurvey);
 
       parallelsurveyInfo =
         parallelsurveyInfo && parallelsurveyInfo !== "[object Object]"
@@ -159,7 +151,7 @@ export default Fluent.model({
       return JSON.stringify(parallelsurveyInfo);
     },
     async getGroups(formId) {
-      let submissions = await this.local().find();
+      let submissions = await this.local().where("path", "=", formId).get();
 
       submissions = formId
         ? submissions.filter(submission => {

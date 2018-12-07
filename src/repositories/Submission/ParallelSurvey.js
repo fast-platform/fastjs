@@ -1,21 +1,21 @@
-import uuidv4 from 'uuid/v4';
-import Utilities from 'utilities';
-import Submission from 'models/Submission';
-import Promise from 'bluebird';
+import uuidv4 from "uuid/v4";
+import Utilities from "utilities";
+import Submission from "models/Submission";
+import Promise from "bluebird";
 
 let ParallelSurvey = (() => {
-  function getNewGroupWizard (vm) {
-    let progressSteps = ['1', '2', '3'];
+  function getNewGroupWizard(vm) {
+    let progressSteps = ["1", "2", "3"];
     let steps = [
       {
-        title: vm.$t('Group Name'),
-        text: vm.$t('Give the group a name'),
-        inputValidator: (value) => {
+        title: vm.$t("Group Name"),
+        text: vm.$t("Give the group a name"),
+        inputValidator: value => {
           return new Promise((resolve, reject) => {
-            if (value !== '') {
+            if (value !== "") {
               resolve();
             } else {
-              let error = new Error(vm.$t('The group name is already taken'));
+              let error = new Error(vm.$t("The group name is already taken"));
 
               reject(error);
             }
@@ -23,45 +23,46 @@ let ParallelSurvey = (() => {
         }
       },
       {
-        title: vm.$t('Current Participant Name'),
-        text: vm.$t('Give the current participant a name')
+        title: vm.$t("Current Participant Name"),
+        text: vm.$t("Give the current participant a name")
       },
       {
-        title: vm.$t('Next participant Name'),
-        text: vm.$t('Give the next participant a name')
+        title: vm.$t("Next participant Name"),
+        text: vm.$t("Give the next participant a name")
       }
     ];
 
     return { progressSteps: progressSteps, steps: steps };
   }
 
-  function getNewUserWizard (vm) {
-    let progressSteps = ['1'];
+  function getNewUserWizard(vm) {
+    let progressSteps = ["1"];
     let steps = [
       {
-        title: vm.$t('Participant Name'),
-        text: vm.$t('Give the next participant a name')
+        title: vm.$t("Participant Name"),
+        text: vm.$t("Give the next participant a name")
       }
     ];
 
     return { progressSteps: progressSteps, steps: steps };
   }
 
-  function getGroupId (submission) {
-    console.log('getGroupId', Submission('*').local());
-    let groupId = Utilities.get(() => Submission('*').local().getParallelSurvey(submission).groupId);
+  function getGroupId(submission) {
+    let groupId = Utilities.get(
+      () => Submission().getParallelSurvey(submission).groupId
+    );
 
     return groupId;
   }
 
-  function submissionHasGroup (groupId) {
-    return groupId;
+  function submissionHasGroup(groupId) {
+    return !!groupId;
   }
   /**
    * Creates the Wizard object to have new user or new group
    * @param {*} param0
    */
-  async function createWizard ({ submission, vm }) {
+  async function createWizard({ submission, vm }) {
     let groupId = getGroupId(submission);
 
     if (submissionHasGroup(groupId)) {
@@ -69,7 +70,7 @@ let ParallelSurvey = (() => {
     }
     return Object.assign({}, getNewGroupWizard(vm), { groupId: groupId });
   }
-  function prepareNewGroupObject ({ submission, vm, info }) {
+  function prepareNewGroupObject({ submission, vm, info }) {
     let groupName = info[0];
     let participantName = info[1];
     let nextParticipant = info[2];
@@ -81,10 +82,10 @@ let ParallelSurvey = (() => {
       submissionId: submission._id
     };
 
-    console.log('submission', submission);
-
     // Store information of the parallelSurvey on the current submission
-    vm.currentSubmission.parallelSurvey = Submission().setParallelSurvey(parallelSurvey);
+    vm.currentSubmission.parallelSurvey = Submission().setParallelSurvey(
+      parallelSurvey
+    );
 
     // New survey Information
     let surveyData = {
@@ -94,25 +95,23 @@ let ParallelSurvey = (() => {
       })
     };
 
-    console.log('surveyData FastJS', surveyData);
-
     return surveyData;
   }
 
-  function prepareNewUserObject ({ submission, vm, info }) {
+  function prepareNewUserObject({ submission, info }) {
     let participantName = info[0];
-    let parallelsurveyInfo = Submission('*').local().getParallelSurvey(submission);
+    let parallelsurveyInfo = Submission().getParallelSurvey(submission);
 
     parallelsurveyInfo.participantName = participantName;
     // New survey Information
     let surveyData = {
-      parallelSurvey: Submission('*').local().setParallelSurvey(parallelsurveyInfo)
+      parallelSurvey: Submission().setParallelSurvey(parallelsurveyInfo)
     };
 
     return surveyData;
   }
 
-  async function createNewSurvey ({ submission, vm, info }) {
+  async function createNewSurvey({ submission, vm, info }) {
     let groupId = getGroupId(submission);
 
     if (submissionHasGroup(groupId)) {
@@ -121,31 +120,14 @@ let ParallelSurvey = (() => {
     return prepareNewGroupObject({ submission, vm, info });
   }
 
-  async function storeNewSurvey ({ survey, vm }) {
-    let formio = new Formio(vm.$FAST_CONFIG.APP_URL + '/' + vm.$route.params.idForm);
-    console.log('formio', formio);
-    // De register if there was a previous registration
-
-    Formio.deregisterPlugin('offline');
-    // Register the plugin for offline mode
-    Formio.registerPlugin(OFFLINE_PLUGIN.getPlugin({ formio, hashField: vm.hashField }), 'offline');
-
-    let formSubmission = {
-      data: survey,
-      redirect: 'Update',
-      draft: true,
-      trigger: 'createParalelSurvey'
-    };
-
-    let created = await formio.saveSubmission(formSubmission);
-
-    return created;
+  async function assignSelfId(created) {
+    console.log(created);
   }
 
   return Object.freeze({
     createWizard,
     createNewSurvey,
-    storeNewSurvey
+    assignSelfId
   });
 })();
 
