@@ -148,12 +148,13 @@ class FormLabels {
       // The following regex captures all Form.io template interpolations using the 
       // formio component's instance i18n translation function (https://regexr.com/43sfm).
       // Warning: the "positive lookbehind" (?<=) feature may not be available for all browsers.
-      const regex = /(?<=\{\{\s*?instance.t\(\s*?[\'|\"])(.*?)(?=([\'|\"]\s*?\))(\s*?)\}\})/g;
+      // const regex = /(?<=\{\{\s*?instance.t\(\s*?[\'|\"])(.*?)(?=([\'|\"]\s*?\))(\s*?)\}\})/g;
+      const regex = /\{\{\s*?instance.t\(\s*?[\'|\"](.*?)(?=([\'|\"]\s*?\))\s*?\}\})/g;
       const matched = [];
       let match = regex.exec(text);
       // Loop through all matches
       while (match !== null) {
-        matched.push(match[0].trim());
+        matched.push(match[0].replace(/.*?instance\.t\(\s*[\'|\"']/, '').trim());
         match = regex.exec(text);
       }
       return matched;
