@@ -329,6 +329,29 @@ class FormLabels {
               });
             }
           }
+
+          // Check for Edit Grid component header and footer templates
+          if (component.type === 'editgrid' && component.templates) {
+            const header = extrapolateTranslations(component.templates.header);
+            const footer = extrapolateTranslations(component.templates.footer);
+
+            // Create a label for each match (if none, don't anything)
+            Array().concat(header, footer).forEach(text => {
+              // Omit empty text strings
+              if (text !== "") {
+                componentLabels = this.createOrAdd({
+                  labels: componentLabels,
+                  label: {
+                    text,
+                    type: "editgrid",
+                    component: component.key,
+                    form: form.path,
+                    picture: null
+                  }
+                });
+              }
+            });
+          }
         },
         true
       );
