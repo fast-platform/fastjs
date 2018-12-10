@@ -2,6 +2,7 @@ import Database from "./Database";
 import Utilities from "utilities";
 import uuidv4 from "uuid/v4";
 import { Interface } from "fast-fluent";
+import Auth from "../../../../repositories/Auth/Auth";
 
 export default Interface.compose({
   methods: {
@@ -10,7 +11,8 @@ export default Interface.compose({
      */
     async get() {
       if (this.ownerEmail) {
-        this.andWhere("user_email", "=", this.ownerEmail);
+        // this.andWhere("user_email", "=", this.ownerEmail);
+        this.andWhere("user_email", "=", Auth.email());
       }
       let filterObject = this.prepareFilter();
 
