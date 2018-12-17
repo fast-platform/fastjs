@@ -65,7 +65,7 @@ class FormLabels {
   }
   /**
    * Given an Object with text labels and a label Object
-   * to add it checks if it already exists or
+   * to add. It checks if the label already exists or
    * creates it if needed
    * @param {Object} labels
    * @param {Object} label
@@ -118,9 +118,9 @@ class FormLabels {
     return newObject;
   }
   /**
-   * Merges 2 different sets of translations
-   * into a single one with no repeted
-   * elements
+   * Merges 2 different sets of translations into
+   * a single one with no repeted elements
+   *
    * @param {Object} labelsObject1
    * @param {Object} labelsObject2
    */
@@ -145,7 +145,7 @@ class FormLabels {
    */
   static getFormLabels(Forms) {
     const extrapolateTranslations = text => {
-      // The following regex captures all Form.io template interpolations using the 
+      // The following regex captures all Form.io template interpolations using the
       // formio component's instance i18n translation function (https://regexr.com/43sfm).
       // Warning: the "positive lookbehind" (?<=) feature may not be available for all browsers.
       // const regex = /(?<=\{\{\s*?instance.t\(\s*?[\'|\"])(.*?)(?=([\'|\"]\s*?\))(\s*?)\}\})/g;
@@ -154,7 +154,9 @@ class FormLabels {
       let match = regex.exec(text);
       // Loop through all matches
       while (match !== null) {
-        matched.push(match[0].replace(/.*?instance\.t\(\s*[\'|\"']/, '').trim());
+        matched.push(
+          match[0].replace(/.*?instance\.t\(\s*[\'|\"']/, "").trim()
+        );
         match = regex.exec(text);
       }
       return matched;
@@ -210,7 +212,7 @@ class FormLabels {
           });
 
           // Check for components that have tooltips
-          if(component.tooltip) {
+          if (component.tooltip) {
             const texts = extrapolateTranslations(component.tooltip);
 
             if (texts.length === 0) {
@@ -222,12 +224,12 @@ class FormLabels {
                 labels: componentLabels,
                 label: {
                   text,
-                  type: 'tooltip',
+                  type: "tooltip",
                   component: component.key,
                   form: form.path,
                   picture: null
                 }
-              })
+              });
             });
           }
 
@@ -250,13 +252,16 @@ class FormLabels {
           }
 
           // Check for html text in HTML or Content components
-          if (component.type === "htmlelement" || component.type === "content") {
+          if (
+            component.type === "htmlelement" ||
+            component.type === "content"
+          ) {
             const html = (component.content || component.html || "").trim();
 
             if (html !== "") {
               const texts = extrapolateTranslations(html);
               // If no interpolation found check if content is simple text (no html string)
-              if (texts.length === 0 && !(/<[a-z][\s\S]*>/i.test(html))) {
+              if (texts.length === 0 && !/<[a-z][\s\S]*>/i.test(html)) {
                 texts.push(html);
               }
               // Create a label for each match (if none, don't anything)
@@ -331,26 +336,28 @@ class FormLabels {
           }
 
           // Check for Edit Grid component header and footer templates
-          if (component.type === 'editgrid' && component.templates) {
+          if (component.type === "editgrid" && component.templates) {
             const header = extrapolateTranslations(component.templates.header);
             const footer = extrapolateTranslations(component.templates.footer);
 
             // Create a label for each match (if none, don't anything)
-            Array().concat(header, footer).forEach(text => {
-              // Omit empty text strings
-              if (text !== "") {
-                componentLabels = this.createOrAdd({
-                  labels: componentLabels,
-                  label: {
-                    text,
-                    type: "editgrid",
-                    component: component.key,
-                    form: form.path,
-                    picture: null
-                  }
-                });
-              }
-            });
+            Array()
+              .concat(header, footer)
+              .forEach(text => {
+                // Omit empty text strings
+                if (text !== "") {
+                  componentLabels = this.createOrAdd({
+                    labels: componentLabels,
+                    label: {
+                      text,
+                      type: "editgrid",
+                      component: component.key,
+                      form: form.path,
+                      picture: null
+                    }
+                  });
+                }
+              });
           }
         },
         true
