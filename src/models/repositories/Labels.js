@@ -144,8 +144,24 @@ class FormLabels {
    * @param {Array} Forms
    */
   static getFormLabels(Forms) {
+    const extrapolateTranslations = text => {
+      // The following regex captures all Form.io template interpolations using the 
+      // formio component's instance i18n translation function (https://regexr.com/43sfm).
+      // Warning: the "positive lookbehind" (?<=) feature may not be available for all browsers.
+      // const regex = /(?<=\{\{\s*?instance.t\(\s*?[\'|\"])(.*?)(?=([\'|\"]\s*?\))(\s*?)\}\})/g;
+      const regex = /\{\{\s*?instance.t\(\s*?[\'|\"](.*?)(?=([\'|\"]\s*?\))\s*?\}\})/g;
+      const matched = [];
+      let match = regex.exec(text);
+      // Loop through all matches
+      while (match !== null) {
+        matched.push(match[0].replace(/.*?instance\.t\(\s*[\'|\"']/, '').trim());
+        match = regex.exec(text);
+      }
+      return matched;
+    };
+
     let componentLabels = {};
-    // Extranct all labels for all available forms
+    // Extract all labels for all available forms
 
     let formioLabelsPositions = [
       "suffix",
@@ -157,7 +173,6 @@ class FormLabels {
       "title",
       "label",
       "placeholder",
-      "tooltip",
       "errorLabel"
     ];
 
@@ -194,6 +209,28 @@ class FormLabels {
             }
           });
 
+          // Check for components that have tooltips
+          if(component.tooltip) {
+            const texts = extrapolateTranslations(component.tooltip);
+
+            if (texts.length === 0) {
+              texts.push(component.tooltip);
+            }
+
+            texts.forEach(text => {
+              componentLabels = this.createOrAdd({
+                labels: componentLabels,
+                label: {
+                  text,
+                  type: 'tooltip',
+                  component: component.key,
+                  form: form.path,
+                  picture: null
+                }
+              })
+            });
+          }
+
           // Check for components that have values with labels (i.e: radio)
           if (component.values) {
             component.values.forEach(value => {
@@ -217,36 +254,27 @@ class FormLabels {
             const html = (component.content || component.html || "").trim();
 
             if (html !== "") {
-              // The following regex captures all Form.io templates elements using the 
-              // formio component's instance i18n translation function (https://regexr.com/43sfm).
-              // Warning: the "positive lookbehind" (?<=) feature may not be available for all browsers.
-              const regex = /(?<=\{\{\s*?instance.t\(\s*?[\'|\"])(.*?)(?=([\'|\"]\s*?\))(\s*?)\}\})/g;
-              const matched = [];
-              let match = regex.exec(html);
-
-              // Loop through all matches
-              while (match !== null) {
-                matched.push(match[0].trim());
-                match = regex.exec(html);
+              const texts = extrapolateTranslations(html);
+              // If no interpolation found check if content is simple text (no html string)
+              if (texts.length === 0 && !(/<[a-z][\s\S]*>/i.test(html))) {
+                texts.push(html);
               }
               // Create a label for each match (if none, don't anything)
-              if (matched.length > 0) {
-                matched.forEach(text => {
-                  // Omit empty text strings
-                  if (text !== "") {
-                    componentLabels = this.createOrAdd({
-                      labels: componentLabels,
-                      label: {
-                        text,
-                        type: "html",
-                        component: component.key,
-                        form: form.path,
-                        picture: null
-                      }
-                    });
-                  }
-                });
-              }
+              texts.forEach(text => {
+                // Omit empty text strings
+                if (text !== "") {
+                  componentLabels = this.createOrAdd({
+                    labels: componentLabels,
+                    label: {
+                      text,
+                      type: "html",
+                      component: component.key,
+                      form: form.path,
+                      picture: null
+                    }
+                  });
+                }
+              });
             }
           }
 
@@ -271,7 +299,7 @@ class FormLabels {
           }
 
           // Check for survey elements
-          if (component.type && component.type === "survey") {
+          if (component.type === "survey") {
             if (component.questions) {
               // Check for every question on the survey
               component.questions.forEach(q => {
@@ -300,6 +328,29 @@ class FormLabels {
                 });
               });
             }
+          }
+
+          // Check for Edit Grid component header and footer templates
+          if (component.type === 'editgrid' && component.templates) {
+            const header = extrapolateTranslations(component.templates.header);
+            const footer = extrapolateTranslations(component.templates.footer);
+
+            // Create a label for each match (if none, don't anything)
+            Array().concat(header, footer).forEach(text => {
+              // Omit empty text strings
+              if (text !== "") {
+                componentLabels = this.createOrAdd({
+                  labels: componentLabels,
+                  label: {
+                    text,
+                    type: "editgrid",
+                    component: component.key,
+                    form: form.path,
+                    picture: null
+                  }
+                });
+              }
+            });
           }
         },
         true
