@@ -4,6 +4,7 @@ import Utilities from "utilities";
 import Form from "models/Form";
 import { Fluent } from "fast-fluent";
 import Columns from "./repositories/Columns";
+import to from "await-to-js";
 
 export default Fluent.model({
   properties: {
@@ -53,16 +54,41 @@ export default Fluent.model({
       let submissions = [];
 
       if (from === "remote") {
-        submissions = await this.remote()
-          .select(cols)
-          .limit(limit)
-          .get();
+        const [error, result] = await to(
+          this.remote()
+            .select(cols)
+            .limit(limit)
+            .get()
+        );
+
+        if (error) {
+          console.log("error", error);
+          submissions = [];
+        }
+        submissions = !error && result;
       } else {
-        submissions = await this.merged()
+        submissions = await this.local()
           .select(cols)
           .limit(limit)
           .owner(owner)
           .get();
+
+        const [error, result] = await to(
+          this.remote()
+            .select(cols)
+            .limit(limit)
+            .owner(Auth.user()._id)
+            .get()
+        );
+
+        let remote = [];
+        if (error) {
+          console.log("error", error);
+        }
+
+        remote = error ? [] : result;
+
+        submissions = [...submissions, ...remote];
       }
 
       let templates = await Form.getFastTableTemplates({ path: this.path });
@@ -151,7 +177,9 @@ export default Fluent.model({
       return JSON.stringify(parallelsurveyInfo);
     },
     async getGroups(formId) {
-      let submissions = await this.local().where("path", "=", formId).get();
+      let submissions = await this.local()
+        .where("path", "=", formId)
+        .get();
 
       submissions = formId
         ? submissions.filter(submission => {
