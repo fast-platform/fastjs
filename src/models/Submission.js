@@ -41,6 +41,8 @@ export default Fluent.model({
         o => `data.${o.path} as ${o.path}`
       );
 
+      console.log('cols', cols);
+
       cols = [
         ...cols,
         "_id",
